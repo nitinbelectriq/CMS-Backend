@@ -1,0 +1,54 @@
+select mmc.id,mmc.nav_id,mmc.title ,
+mmp.id as parent_id,mmp.nav_id as parent_nav_id,mmp.title as parent_title 
+from menu_mst mmc left join menu_mst mmp on mmc.parent_id = mmp.id 
+ ;
+==============================================================================
+==============================================================================
+
+
+ INSERT INTO `exicharger`.`menu_mst` (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`,  `status`) 
+ VALUES ('1', '1', 'registration', 'Vehicle Registration', 'collapsable', 'app_registration', 'Y');
+
+ INSERT INTO `exicharger`.`menu_mst` 
+ (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`, `url`,  `status`) VALUES 
+ ('2', '1', 'vehicle', 'End User - Vehicle Registration', 'item', 'model_training', '/registration/vehicle', 'Y');
+
+
+
+
+ INSERT INTO `exicharger`.`menu_mst` (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`,  `status`) 
+ VALUES ('1', '1', 'bookings', 'Bookings', 'collapsable', 'book', 'Y');
+
+ INSERT INTO `exicharger`.`menu_mst` (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`,  `status`) 
+ VALUES ('1', '1', 'payments', 'Payments', 'collapsable', 'credit_score', 'Y');
+
+ INSERT INTO `exicharger`.`menu_mst` (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`,  `status`) 
+ VALUES ('1', '1', 'party', '3rd Party Integration', 'collapsable', 'integration_instructions', 'Y');
+
+
+ INSERT INTO `exicharger`.`menu_mst` 
+ (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`, `url`,  `status`) VALUES 
+ ('2', '1', 'alexa', 'Alexa Integration', 'item', 'model_training', 'test5', 'Y');
+
+
+ INSERT INTO `exicharger`.`menu_mst` 
+ (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`, `url`,  `status`) VALUES 
+ ('2', '1', 'googleAPI', 'Google Home Integration', 'item', 'model_training', 'test6', 'Y');
+
+
+ INSERT INTO `exicharger`.`menu_mst` 
+ (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`, `url`,  `status`) VALUES 
+ ('2', '1', 'apiIntegration', 'Api Integration', 'item', 'model_training', 'test7', 'Y');
+
+
+========================================
+
+
+
+ 
+==============================================================================
+==============================================================================
+
+
+  INSERT INTO `exicharger`.`menu_mst` (`nav_level`, `project_id`, `nav_id`, `title`, `type`, `icon`, `display_order`, `status`) 
+ VALUES ('1', '1', 'chargerManagement', 'Dispatch Management', 'collapsable', 'movie_filter', '17', 'Y');

@@ -1,0 +1,2867 @@
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`BatchidBy_GetbatchList`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `BatchidBy_GetbatchList`(IP_BATCH_ID varchar(20),out OP_ErrorCode int , out  OP_ErrorDetail varchar(200))
+BEGIN
+select id,batch_no from exicharger.charger_batch_mst where id=IP_BATCH_ID;
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`DeleteCardSerial_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `DeleteCardSerial_Mstdata`(
+IP_ID int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select csm.id from exicharger.card_serial_mst csm     
+              where csm.id=IP_ID and csm.Status='Y') 
+    then
+              set OP_ErrorCode =  2; 
+     else
+    DELETE FROM exicharger.card_serial_mst WHERE id=IP_ID;
+     set OP_ErrorCode = 0; 
+   
+   end if; 
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`DeleteChargerBatch_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `DeleteChargerBatch_Mstdata`(
+IP_ID int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select cbm.id from exicharger.charger_batch_mst cbm     
+              where cbm.id=IP_ID and cbm.Status='Y') 
+    then
+              set OP_ErrorCode =  2; 
+     else
+    DELETE FROM exicharger.charger_batch_mst WHERE id=IP_ID;
+     set OP_ErrorCode = 0; 
+   
+   end if; 
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`DeleteChargerSerial_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `DeleteChargerSerial_Mstdata`(
+IP_ID int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select csm.id from exicharger.charger_serial_mst csm     
+              where csm.id=IP_ID and csm.Status='Y') 
+    then
+              set OP_ErrorCode =  2; 
+     else
+    DELETE FROM exicharger.charger_serial_mst WHERE id=IP_ID;
+     set OP_ErrorCode = 0; 
+   
+   end if; 
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`DeleteClient_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `DeleteClient_Mstdata`(
+  IP_ID int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select cm.id from exicharger.client_mst cm     
+              where cm.id=IP_ID and cm.Status='Y') 
+    then
+              set OP_ErrorCode =  2; 
+     else
+      DELETE FROM exicharger.client_mst WHERE id=IP_ID;
+     set OP_ErrorCode = 0; 
+end if; 
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`DeleteVersion_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `DeleteVersion_Mstdata`(
+IP_ID int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select vm.id from exicharger.version_mst vm     
+              where vm.id=IP_ID and vm.Status='Y') 
+    then
+              set OP_ErrorCode =  2; 
+     else
+    DELETE FROM exicharger.version_mst WHERE id=IP_ID;
+     set OP_ErrorCode = 0; 
+   
+   end if; 
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetAllBtachNo_bybatchid`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetAllBtachNo_bybatchid`(
+IP_BATCH_ID varchar(20),
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_BATCH_ID is null or IP_BATCH_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+select  CSM.id,CBM.batch_no,CSM.serial_no,CSM.batch_id,CSM.current_version,CSM.Address,CSM.Lat,CSM.Lng,CSM.status,
+CSM.current_dt,CSm.created_date,CSM.createdby,CSM.modify_date,CSM.modifyby
+from exicharger.charger_serial_mst  CSM,exicharger.charger_batch_mst CBM
+where CBM.id=CSM.batch_id AND csm.batch_id=IP_BATCH_ID;
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetAllCardSerial_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetAllCardSerial_Mstdata`(
+IP_ID varchar(20),
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+select id, serial_no, batch_id, charger_serial_id, current_firmware_version_id, 
+current_firmware_date, isupdate_available, 
+status, created_date, createdby, modify_date, modifyby
+from exicharger.card_serial_mst where id=IP_ID;
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetAllChargerBatch_mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetAllChargerBatch_mstdata`(
+IP_ID varchar(20),
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+select  name, description,batch_no,client_id, status, created_date, createdby, modify_date, modifyby
+from exicharger.charger_batch_mst where id=IP_ID;
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetAllChargerSerial_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetAllChargerSerial_Mstdata`(
+IP_ID varchar(20),
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+select  serial_no, batch_id,current_version,Address,Lat,Lng,status,current_dt, created_date, createdby, modify_date, modifyby
+from exicharger.charger_serial_mst where id=IP_ID;
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetAllClient_Mstdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetAllClient_Mstdata`(IP_ID varchar(20),out OP_ErrorCode int)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+select  name, description, status, created_date, createdby, modify_date, modifyby
+from exicharger.client_mst where id=IP_ID;
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetAllVersion_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetAllVersion_MstData`(IP_ID varchar(20),out OP_ErrorCode int)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select vm.Id from exicharger.version_mst vm      
+              where vm.id=IP_ID and vm.Status='Y') 
+    then
+              set OP_ErrorCode =  2;  
+    else
+    
+select name,description,filename,filepath,IsUpdate_Available,status,release_date,created_date,createdby,modify_date,modifyby
+from exicharger.version_mst  WHERE id=IP_ID;
+ set OP_ErrorCode = 0;  
+End if;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetChargerSerial_LatLong`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetChargerSerial_LatLong`(
+IP_BATCHID varchar(20),
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_BATCHID is null or IP_BATCHID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+select  id, serial_no,
+batch_id, current_version, 
+ Address, Lat, Lng,
+OTA_Config, Periodic_Check_Ref_Time,
+Periodicity_in_hours, When_to_Upgrade, 
+ Upgrade_Specific_Time, status,
+current_dt, created_date, 
+ createdby 
+ from exicharger.charger_serial_mst where batch_id=IP_BATCHID;
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`GetmappingDatabybatch_No`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `GetmappingDatabybatch_No`(IP_BATCHNO varchar(20),out OP_ErrorCode int)
+BEGIN
+IF (IP_BATCHNO is null or IP_BATCHNO ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+select batch_id,version_id,batch_no,status,created_date,createdby,modify_date,modifyby 
+from exicharger.batch_version_mapping WHERE batch_no=IP_BATCHNO;
+  set OP_ErrorCode = 0;   
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`InsertBatch_version_mapping`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `InsertBatch_version_mapping`( 
+IP_BATCHNO varchar(20),
+IP_VERSION_ID int,
+IP_BATCH_ID int,
+IP_STATUS VARCHAR(10),
+IP_CREATED_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_BATCHNO is null or IP_BATCHNO ='')
+then
+set OP_ErrorCode = 1;       
+ /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_VERSION_ID is null or IP_VERSION_ID='')
+then
+set OP_ErrorCode = 2;
+  /*set OP_ErrorDetail = 'File name  is having null value';*/
+End If;
+
+ IF (IP_BATCH_ID is null or IP_BATCH_ID ='')
+then
+set OP_ErrorCode = 3;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+  
+IF (IP_CREATED_BY is null or IP_CREATED_BY ='')
+then
+set OP_ErrorCode = 5;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+
+
+    INSERT INTO exicharger.batch_version_mapping
+(
+batch_id, 
+version_id, 
+batch_no, 
+status, 
+created_date, 
+createdby
+)
+VALUES (IP_BATCH_ID,IP_VERSION_ID,IP_BATCH_ID,IP_STATUS,now(),IP_CREATED_BY);
+set OP_ErrorCode = 0;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`InsertCardSerial_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `InsertCardSerial_MstData`(
+IP_SERIAL_NO VARCHAR(20),
+IP_BATCH_ID int,
+IP_CHARGER_SERIAL_ID int,
+IP_CURRENT_FIRMWAREVERSION_ID int,
+IP_STATUS VARCHAR(10),
+IP_CREATED_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_SERIAL_NO is null or IP_SERIAL_NO ='')
+then
+set OP_ErrorCode = 1;       
+ /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_BATCH_ID is null or IP_BATCH_ID='')
+then
+set OP_ErrorCode = 2;
+  /*set OP_ErrorDetail = 'File name  is having null value';*/
+End If;
+
+ IF (IP_STATUS is null or IP_STATUS ='')
+then
+set OP_ErrorCode = 3;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+IF (IP_CHARGER_SERIAL_ID is null or IP_CHARGER_SERIAL_ID ='')
+then
+set OP_ErrorCode = 4;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+IF (IP_CURRENT_FIRMWAREVERSION_ID is null or IP_CURRENT_FIRMWAREVERSION_ID ='')
+then
+set OP_ErrorCode = 5;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+IF (IP_CREATED_BY is null or IP_CREATED_BY ='')
+then
+set OP_ErrorCode = 6;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+
+
+   INSERT INTO exicharger.card_serial_mst
+(
+serial_no,
+batch_id,
+charger_serial_id,
+current_firmware_version_id,
+current_firmware_date,
+isupdate_available,
+status,
+created_date,
+createdby,
+modify_date,
+modifyby)
+VALUES
+(
+IP_SERIAL_NO,
+IP_BATCH_ID,
+IP_CHARGER_SERIAL_ID,
+IP_CURRENT_FIRMWAREVERSION_ID,
+now(),null,'Y',now(),IP_CREATED_BY,null,null);
+set OP_ErrorCode = 0;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`InsertChargerBatch_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `InsertChargerBatch_MstData`(
+IP_NAME VARCHAR(50),
+IP_DES VARCHAR(100),
+IP_BATCHNO varchar(20),
+IP_CLIENT_NO int,
+IP_STATUS VARCHAR(10),
+IP_CREATED_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_NAME is null or IP_NAME ='')
+then
+set OP_ErrorCode = 1;       
+ /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_DES is null or IP_DES='')
+then
+set OP_ErrorCode = 2;
+  /*set OP_ErrorDetail = 'File name  is having null value';*/
+End If;
+
+ IF (IP_STATUS is null or IP_STATUS ='')
+then
+set OP_ErrorCode = 3;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+IF (IP_BATCHNO is null or IP_BATCHNO ='')
+then
+set OP_ErrorCode = 4;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+IF (IP_CREATED_BY is null or IP_CREATED_BY ='')
+then
+set OP_ErrorCode = 5;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+IF (IP_CLIENT_NO is null or IP_CLIENT_NO ='')
+then
+set OP_ErrorCode = 6;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+
+if(select count(name) from exicharger.charger_batch_mst where name=IP_NAME)
+then
+              set OP_ErrorCode =  7;     
+              /*set OP_ErrorDetail = 'Your submission are already in records!'; */
+    else
+    INSERT INTO exicharger.charger_batch_mst
+(
+name,
+description,
+batch_no,
+client_id,
+status,
+created_date,
+createdby
+)
+VALUES (IP_NAME,IP_DES,IP_BATCHNO,IP_CLIENT_NO,IP_STATUS,now(),IP_CREATED_BY);
+set OP_ErrorCode = 0;
+end if;
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`InsertClient_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `InsertClient_MstData`(
+IP_NAME VARCHAR(50),
+IP_DES VARCHAR(100),
+IP_STATUS VARCHAR(10),
+IP_CREATED_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_NAME is null or IP_NAME ='')
+then
+set OP_ErrorCode = 1;       
+ /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_DES is null or IP_DES='')
+then
+set OP_ErrorCode = 2;
+  /*set OP_ErrorDetail = 'File name  is having null value';*/
+End If;
+
+ IF (IP_STATUS is null or IP_STATUS ='')
+then
+set OP_ErrorCode = 3;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+IF (IP_CREATED_BY is null or IP_CREATED_BY ='')
+then
+set OP_ErrorCode = 5;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+
+if(select count(name) from exicharger.client_mst where name=IP_NAME)
+then
+              set OP_ErrorCode =  6;     
+              /*set OP_ErrorDetail = 'Your submission are already in records!'; */
+    else
+    INSERT INTO exicharger.client_mst
+(
+name,
+description,
+status,
+created_date,
+createdby,
+modify_date,
+modifyby)
+VALUES (IP_NAME,IP_DES,IP_STATUS,now(),IP_CREATED_BY,NULL,null);
+set OP_ErrorCode = 0;
+end if;
+END$$
+
+DELIMITER ;
+
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`InsertVersion_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `InsertVersion_MstData`(
+IP_NAME VARCHAR(50),
+IP_DES VARCHAR(100),
+IP_FILENAME VARCHAR(100),
+IP_FILEPATH VARCHAR(200),
+IP_ISUPDATE_AVAILABLE int,
+IP_STATUS VARCHAR(10),
+IP_RELEASE_DATE DATE,
+IP_CREATED_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_NAME is null or IP_NAME ='')
+then
+set OP_ErrorCode = 1;       
+ /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_FILENAME is null or IP_FILENAME='')
+then
+set OP_ErrorCode = 2;
+  /*set OP_ErrorDetail = 'File name  is having null value';*/
+End If;
+IF (IP_FILEPATH is null or IP_FILEPATH ='')
+then
+set OP_ErrorCode = 3;   
+ /*set OP_ErrorDetail = 'File path  is having null value';*/
+End If;
+
+IF (IP_RELEASE_DATE is null or IP_RELEASE_DATE ='') 
+ then
+set OP_ErrorCode = 4;       
+ /*set OP_ErrorDetail = 'Release date  is having null value';*/
+End If;
+
+
+IF (IP_CREATED_BY is null or IP_CREATED_BY ='')
+then
+set OP_ErrorCode = 6;       
+ /*set OP_ErrorDetail = 'Created by  is having null value';*/
+End If;
+IF (IP_DES is null or IP_DES ='')
+then
+set OP_ErrorCode = 7;       
+ /*set OP_ErrorDetail = 'Description  is having null value';*/
+End If;
+IF (IP_STATUS is null or IP_STATUS ='')
+then
+set OP_ErrorCode = 8;       
+ /*set OP_ErrorDetail = 'Description  is having null value';*/
+End If;
+
+if(select count(filename) from exicharger.version_mst where filename=IP_FILENAME)
+then
+              set OP_ErrorCode =  9;     
+              /*set OP_ErrorDetail = 'Your submission are already in records!'; */
+else
+
+INSERT INTO exicharger.version_mst
+(name,description,filename,filepath,IsUpdate_Available,status,release_date,created_date,createdby)
+VALUES (IP_NAME,IP_DES,IP_FILENAME,IP_FILEPATH,IP_ISUPDATE_AVAILABLE,IP_STATUS,IP_RELEASE_DATE,now(),IP_CREATED_BY);
+set OP_ErrorCode = 0;
+/*set OP_ErrorDetail = 'Success';*/
+
+end if;
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_BatchNo`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_BatchNo`(out OP_ErrorCode int , out  OP_ErrorDetail varchar(200))
+BEGIN
+select id,batch_no from exicharger.charger_batch_mst;
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Check_UserLogin`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Check_UserLogin`(
+IP_USERNAME VARCHAR(100),IP_PASSWORD VARCHAR(100),
+OUT OP_ErrorCode INT 
+)
+BEGIN
+  DECLARE IP_USER_ID INT;  
+  DECLARE v_user_uid INT;
+  DECLARE v_error_code INT;
+  DECLARE v_user_status VARCHAR(10);
+  DECLARE v_count INT;
+  DECLARE V_ATTEMPTCOUNT INT;
+IF (IP_USERNAME IS NULL OR IP_USERNAME ='')
+THEN
+SET OP_ErrorCode = 1;       
+ /*SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_PASSWORD IS NULL OR IP_PASSWORD ='')
+THEN
+SET OP_ErrorCode = 2;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF NOT EXISTS(SELECT um.USER_ID FROM USER_MST um      
+              WHERE um.USER_NAME=IP_USERNAME AND UM.IS_ACTIVE='Y') 
+              THEN
+              SET OP_ErrorCode =  4;     
+              /*SET OP_ErrorDetail = 'User name does not exist'; */
+ELSE IF NOT EXISTS(SELECT USER_ID FROM USER_MST WHERE USER_NAME=IP_USERNAME AND USER_PASSWORD=IP_PASSWORD)  
+                             THEN 
+                             
+                             SET OP_ErrorCode =  14   ;
+                             /*SET OP_ErrorDetail = 'Password is incorrect..';*/
+                             
+                             SELECT um.USER_ID 
+                               INTO v_user_uid
+                               FROM USER_MST um      
+                       WHERE um.USER_NAME=IP_USERNAME 
+                         AND UM.IS_ACTIVE='Y';
+              
+                                SELECT COUNT(1)  
+                                  INTO V_count 
+                                  FROM USER_ATTEMPT_HISTORY 
+                                 WHERE USER_ID=v_user_uid 
+                                   AND DATE(attempt_date)=DATE(NOW());
+                                   
+                                 IF v_count = 0                                 
+                                 THEN 
+                                           INSERT INTO user_attempt_history
+                                           (
+                                           user_id
+                                           ,attempt_date
+                                           ,attempt_count
+                                           ,last_attempt_date
+                                           )
+                                           VALUES
+                                           (v_user_uid
+                                           ,NOW()
+                                           ,1
+                                           ,NOW()
+                                           );
+                                   ELSE
+                                   
+                                     
+                                   SELECT attempt_count 
+                                     INTO V_ATTEMPTCOUNT 
+                                     FROM USER_ATTEMPT_HISTORY 
+                                    WHERE USER_ID=v_user_uid 
+                                      AND DATE(attempt_date)=DATE(NOW());
+                                      
+                                      IF V_ATTEMPTCOUNT >= 5
+                                      THEN
+                                                          CALL proc_block_user(v_user_uid,v_user_uid,'Invalid credentials while login',v_error_code);
+                                                          SET OP_ErrorCode =  10   ;
+                                                          /*SET OP_ErrorDetail = 'User is Blocked..';*/
+                                      END IF;
+                                       UPDATE user_attempt_history
+                                         SET attempt_count  = attempt_count +1
+                                             ,last_attempt_date = NOW()
+                                       WHERE user_id = v_user_uid
+                                         AND DATE(attempt_date) = DATE(NOW());
+                                 END IF;                              
+                             
+ELSE  
+   
+    SELECT USER_ID INTO IP_USER_ID FROM  USER_MST WHERE (USER_NAME=IP_USERNAME AND USER_PASSWORD=IP_PASSWORD);
+   IF(IP_USER_ID>0)  
+        THEN 
+                             /*SELECT USER_ID,USER_STATUS,IS_ACTIVE,First_Name,User_Name  
+                             FROM USER_MST
+                             WHERE USER_ID=IP_USER_ID; */
+              SELECT um.USER_ID,um.USER_STATUS,um.IS_ACTIVE,um.First_Name,um.User_Name,cm.name,um.client_id 
+                             FROM exicharger.USER_MST um,exicharger.client_mst cm
+                             WHERE um.USER_ID=IP_USER_ID and um.client_id=cm.id; 
+                             
+                             SELECT USER_STATUS
+                               INTO v_user_status
+                             FROM USER_MST
+                             WHERE USER_ID=IP_USER_ID; 
+                
+        
+        IF v_user_status = 'B'
+        THEN
+                                           SET OP_ErrorCode =  10   ;
+                                                          /*SET OP_ErrorDetail = 'User is Blocked..';*/
+        ELSE
+        UPDATE user_attempt_history SET ATTEMPT_COUNT='0' WHERE USER_ID=IP_USER_ID;
+                             SET OP_ErrorCode = 0;
+                             /*SET OP_ErrorDetail = 'Success';*/
+       /* CALL Proc_GetActivityByUserRole(IP_USER_ID,@OP_ErrorCode , @OP_ErrorDetail);
+        CALL Proc_Get_Role_ByUserId(IP_USER_ID,@OP_ErrorCode , @OP_ErrorDetail);*/
+        
+                   INSERT INTO user_login_log (UserId,Logintime,STATUS) SELECT IP_USER_ID ,NOW(),'Y'; 
+                   
+                               UPDATE user_attempt_history
+                                         SET attempt_count  = 0
+                                             ,last_attempt_date = NOW()
+                                       WHERE user_id = v_user_uid
+                                         AND DATE(attempt_date) = DATE(NOW());
+                                 END IF;
+        
+    ELSE
+        SET OP_ErrorCode = 99;
+                             /*SET OP_ErrorDetail = 'Failed';*/
+   END IF;
+END IF;
+END IF;
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Delete_Firmware`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Delete_Firmware`(
+  IP_ID int ,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;   
+set OP_ErrorDetail="Id having null value";    
+End If;
+
+     UPDATE exicharger.version_mst 
+    set status='D',
+              release_date=now()
+    where id=IP_ID ;
+       
+         UPDATE exicharger.batch_version_mapping set status='D' where version_id=IP_ID ;
+     set OP_ErrorCode = 0; 
+     set OP_ErrorDetail="Sucess";
+     
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Delete_NewFirmware`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Delete_NewFirmware`(
+IP_ID int ,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;   
+set OP_ErrorDetail="Id having null value";    
+End If;
+
+   UPDATE exicharger.client_batch_version_mapping set status='D' where version_id=IP_ID ;
+     set OP_ErrorCode = 0; 
+     set OP_ErrorDetail="Sucess";
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetBatchNo`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetBatchNo`()
+BEGIN
+select id,batch_no from exicharger.charger_batch_mst;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetCardDetails_ChargerSetting`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetCardDetails_ChargerSetting`(IP_CHARGERSERIAL_ID varchar(20),out OP_ErrorCode int)
+BEGIN
+IF (IP_CHARGERSERIAL_ID is null or IP_CHARGERSERIAL_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+select CSM1.serial_no,
+CSM1.current_firmware_version_id, 
+ CSM1.LatestSW_version_id, CSM1.Last_Update_Attempt_Time,
+CSM1.Last_Update_Attempt_Status, CSM1.LastSuccessful_Update_Time,
+CSM1.current_firmware_date, CSM1.isupdate_available, 
+ CSM1.status,CSM2.OTA_Config,CSM2.Periodic_Check_Ref_Time,CSM2.Periodicity_in_hours,
+CSM2.When_to_Upgrade,CSM2.Upgrade_Specific_Time
+from exicharger.card_serial_mst  CSM1,exicharger.charger_serial_mst CSM2
+  WHERE CSM1.charger_serial_id=CSM2.ID AND CSM1.charger_serial_id=IP_CHARGERSERIAL_ID;
+  set OP_ErrorCode = 0;   
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetChargerDetails`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetChargerDetails`()
+BEGIN
+select  CSM.id, CSM.serial_no,
+CSM.batch_id,CBM.batch_no, CSM.current_version, 
+ CSM.Address, CSM.Lat, CSM.Lng,
+CSM.OTA_Config, CSM.Periodic_Check_Ref_Time,
+CSM.Periodicity_in_hours, CSM.When_to_Upgrade, 
+ CSM.Upgrade_Specific_Time, CSM.status,
+CSM.current_dt, CSM.created_date, 
+ CSM.createdby 
+ from exicharger.charger_serial_mst CSM,exicharger.charger_batch_mst CBM
+WHERE CSm.batch_id=CBM.id ;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetClientList`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetClientList`(ip_client_id int, out OP_ErrorCode int , out  OP_ErrorDetail varchar(200))
+BEGIN
+select id,name from exicharger.client_mst where
+id = ip_client_id
+and status='Y';
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetEdit_FirmwareData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetEdit_FirmwareData`(
+IP_ID int ,
+out OP_ErrorCode int ,
+out  OP_ErrorDetail varchar(200))
+BEGIN
+  select  bvm.batch_id,vm.description,vm.client_id,cm.name,vm.id,vm.name,vm.filename,vm.filepath,vm.release_date,vm.created_date,vm.status 
+ from exicharger.version_mst vm, exicharger.client_mst cm,exicharger.batch_version_mapping bvm where vm.client_id=cm.id and vm.id=bvm.version_id and vm.id=IP_ID;
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetEdit_NewFirmwareData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetEdit_NewFirmwareData`(
+  IP_ID int ,
+out OP_ErrorCode int ,
+out  OP_ErrorDetail varchar(200)
+)
+BEGIN
+   select  bvm.batch_id,
+  vm.description,
+  bvm.client_id,
+  cm.name,
+  vm.id,
+  vm.name,
+  vm.filename,
+  bvm.filepath,
+  bvm.released_date,
+  bvm.created_date,
+  bvm.status 
+ from exicharger.version_mst vm,
+exicharger.client_mst cm,
+exicharger.client_batch_version_mapping bvm 
+ where bvm.client_id=cm.id and vm.id=bvm.version_id and vm.id=IP_ID;
+
+ 
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetModel_ByChargerId`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetModel_ByChargerId`(IP_CHARGER_ID VARCHAR(20),out OP_ErrorCode int , out  OP_ErrorDetail varchar(200))
+BEGIN
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Charger Having null value';
+End If;
+  
+  /*select csm.id,cmm.code,csm.name,csm.serial_no,csm.model_id,cmm.status,ctm.name as charger_type
+  from exicharger.charger_serial_mst csm,exicharger.charging_model_mst cmm ,exicharger.charger_type_mst ctm
+  where csm.name=IP_CHARGER_ID and csm.status='Y' and cmm.status='Y' and ctm.status='Y' and csm.model_id=cmm.id and cmm.charger_type_id=ctm.id;*/
+  select csm.id,cmm.code,csm.name,csm.serial_no,csm.model_id,cmm.status
+   ,ctm.name as charger_type
+  from exicharger.charger_serial_mst csm 
+  inner join  exicharger.charging_model_mst cmm  on csm.model_id = cmm.id  and cmm.status ='Y' 
+  inner join exicharger.charger_type_mst ctm on cmm.charger_type_id = ctm.id and ctm.status = 'Y'
+  where csm.name=IP_CHARGER_ID 
+  and csm.status='Y'; 
+  set OP_ErrorCode = 0; 
+  set OP_ErrorDetail = 'Success';
+  
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetVersionAllColumn`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetVersionAllColumn`(out OP_ErrorCode int , out  OP_ErrorDetail varchar(200))
+BEGIN
+select cm.name as client_name,vm.id,vm.name,vm.filename,vm.filepath,DATE_FORMAT(vm.release_date, '%m-%d-%Y') as release_date,DATE_FORMAT(vm.created_date, '%m-%d-%Y') as created_date,vm.status 
+ from exicharger.version_mst vm, exicharger.client_mst cm where vm.client_id=cm.id and vm.status in ('M','P') order by vm.created_date desc;
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetVersionDetails`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetVersionDetails`(out OP_ErrorCode int , out  OP_ErrorDetail varchar(200))
+BEGIN
+select cbvm.id,cbvm.version_id,cm.name as client_name,
+   vm.id,vm.name,
+   vm.filename,
+   cbvm.filepath,
+   DATE_FORMAT(cbvm.released_date, '%m-%d-%Y') as release_date,
+   DATE_FORMAT(cbvm.created_date, '%m-%d-%Y') as created_date,
+   cbvm.status 
+ from 
+ exicharger.version_mst vm,
+exicharger.client_mst cm,
+exicharger.client_batch_version_mapping cbvm
+where
+cbvm.client_id=cm.id and
+cbvm.version_id=vm.id
+and cbvm.status in ('M','P') 
+ order by cbvm.created_date desc; 
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_GetVersion_bybatchid`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_GetVersion_bybatchid`(
+IP_BATCH_ID varchar(20),
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_BATCH_ID is null or IP_BATCH_ID ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+ select VM.NAME as version,VM.filename,VM.filepath,VM.IsUpdate_Available,BVM.batch_no from exicharger.batch_version_mapping BVM,exicharger.version_mst VM where BVM.version_id=VM.id and
+  BVM.batch_id=IP_BATCH_ID and BVM.status='Y';
+  set OP_ErrorCode = 0; 
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Get_HeartBeat_Interval_ByChargerid`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Get_HeartBeat_Interval_ByChargerid`(
+IP_Charger_Id varchar(20),
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_Charger_Id is null or IP_Charger_Id ='')
+then
+set OP_ErrorCode = 1;       
+End If;
+
+select heartbeat_interval from charger_connector_mapping
+     where charger_display_id=IP_Charger_Id and status='Y' and heartbeat_interval IS NOT NULL order by heartbeat_interval desc limit 1;
+set OP_ErrorCode = 0; 
+ set OP_ErrorDetail="Success";
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_InsertStartTrans_meter_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_InsertStartTrans_meter_log`(
+IP_ACTION varchar(20),
+IP_MESSAGE_ID int,
+IP_MESSAGE_CODE varchar(200),
+IP_CHARGER_ID VARCHAR(200),
+IP_IDTAG VARCHAR(200),
+IP_CONNECTOR_ID VARCHAR(500),
+IP_METER_START int,
+IP_STARTTRANS_TIMESTAMP varchar(200),
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+
+)
+BEGIN
+Declare IP_ID_TAG int;
+declare IP_MESS_CODE int;
+IF (IP_ACTION is null or IP_ACTION ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;
+IF (IP_MESSAGE_ID is null or IP_MESSAGE_ID ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Message id  is having null value';
+End If;
+IF (IP_MESSAGE_CODE is null or IP_MESSAGE_CODE ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Message code  is having null value';
+End If;
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_IDTAG is null or IP_IDTAG ='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail = 'idTag  is having null value';
+End If;
+IF (IP_CONNECTOR_ID is null or IP_CONNECTOR_ID ='')
+then
+set OP_ErrorCode = 6;       
+ set OP_ErrorDetail = 'Connector id  is having null value';
+End If;
+/*---Update User Charger Log---*/
+/* UPDATE user_charging_log  set meter_start_value=IP_METER_START,meter_start_time=now(),message_code=IP_MESSAGE_CODE
+where  connector_no=IP_CONNECTOR_ID and charger_display_id=IP_CHARGER_ID and charging_status='A';*/
+
+/*-----End Update User Charging Log---*/
+
+
+ 
+SELECT COUNT(1) INTO IP_MESS_CODE FROM  meter_log 
+              WHERE message_code=IP_MESSAGE_CODE and charger_id = IP_CHARGER_ID and connector_id = IP_CONNECTOR_ID
+    and start_time = IP_STARTTRANS_TIMESTAMP ;
+  IF(IP_MESS_CODE = 0) 
+ then
+
+
+update meter_log set active_transaction_status = 'N',modify_date=now(),remarks='HARD DEACTIVE'
+where charger_id=IP_CHARGER_ID and connector_id=IP_CONNECTOR_ID and active_transaction_status = 'Y';
+
+INSERT INTO meter_log  (
+action,
+message_id,
+message_code,
+charger_id,
+idtag,
+connector_id,
+meter_start,
+start_value,
+start_time,
+created_on,
+active_transaction_status
+) 
+values (IP_ACTION,IP_MESSAGE_ID,IP_MESSAGE_CODE,IP_CHARGER_ID,IP_IDTAG,IP_CONNECTOR_ID,
+IP_METER_START,IP_METER_START,IP_STARTTRANS_TIMESTAMP,now(),'Y'
+);
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+end if;
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_InsertStopTrans_meter_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_InsertStopTrans_meter_log`(
+IP_STOP_TIMESTAMP datetime,
+IP_CHARGER_ID VARCHAR(200),
+IP_TRANSACTION_ID int,
+IP_METER_STOP int,
+IP_REASON_ID varchar(200),
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+declare IP_START_VAL int;
+declare IP_STARTTIME datetime;
+Declare IP_READING varchar(400);
+  Declare IP_DURATION decimal(10,3);
+IF (IP_STOP_TIMESTAMP is null or IP_STOP_TIMESTAMP ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Stop timestamp  is having null value';
+End If;
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_TRANSACTION_ID is null or IP_TRANSACTION_ID ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Transaction id  is having null value';
+End If;
+IF (IP_METER_STOP is null or IP_METER_STOP ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Meter Stop Value  is having null value';
+End If;
+
+select start_value,start_time into IP_START_VAL,IP_STARTTIME from meter_log 
+where transaction_id=IP_TRANSACTION_ID and action='StartTransaction';
+
+select sum(IP_METER_STOP-IP_START_VAL) as meter_reading into IP_READING from meter_log 
+where transaction_id=IP_TRANSACTION_ID and action='StartTransaction';
+
+select (TIMESTAMPDIFF(SECOND,IP_STARTTIME,IP_STOP_TIMESTAMP)) as duration into IP_DURATION  from meter_log 
+where transaction_id=IP_TRANSACTION_ID and action='StartTransaction';
+
+                    
+  UPDATE meter_log set stop_time=IP_STOP_TIMESTAMP, 
+  stop_value=IP_METER_STOP, 
+  meter_stop=IP_METER_STOP,
+  meter_reading=IP_READING,
+  duration=IP_DURATION, 
+  energy_consumed = IP_READING,
+  modify_date=now(),
+  active_transaction_status='N',
+  reason=IP_REASON_ID
+  where  transaction_id=IP_TRANSACTION_ID;
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_InsertVersion_Data`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_InsertVersion_Data`(
+IP_BATCH_ID int(11),
+IP_FILEVERSION VARCHAR(100),
+IP_DESCRIPTION VARCHAR(100),
+IP_FILENAME VARCHAR(100),
+IP_FILEPATH VARCHAR(100),
+IP_USER_ID int,
+IP_CLIENT_ID int,
+/*IP_UPDATE_AVAILABLE VARCHAR(100),*/
+/*IP_PASSWORD VARCHAR(100),*/
+OUT OP_ErrorCode INT,
+OUT OP_ErrorDetail varchar(100) 
+)
+BEGIN
+  DECLARE V_BATCHNO varchar(50);  
+  declare V_COUNT int;
+  declare v_version_id int;
+  
+IF (IP_FILEVERSION IS NULL OR IP_FILEVERSION ='')
+THEN
+SET OP_ErrorCode = 1;       
+ /*SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_DESCRIPTION IS NULL OR IP_DESCRIPTION ='')
+THEN
+SET OP_ErrorCode = 2;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_BATCH_ID IS NULL OR IP_BATCH_ID ='')
+THEN
+SET OP_ErrorCode = 3;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_CLIENT_ID IS NULL OR IP_CLIENT_ID ='')
+THEN
+SET OP_ErrorCode = 3;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+              
+INSERT INTO exicharger.version_mst
+(
+name,
+description,
+filename,
+filepath,
+client_id,
+IsUpdate_Available,
+status,
+release_date,
+created_date,
+createdby,
+modify_date,
+modifyby)
+VALUES
+(IP_FILEVERSION,IP_DESCRIPTION,IP_FILENAME,IP_FILEPATH,IP_CLIENT_ID,1,'M',NULL,now(),IP_USER_ID,NULL,NULL);
+
+
+  SELECT row_count() INTO V_COUNT ;
+  
+  IF(V_COUNT>0)
+  THEN
+/* SELECT batch_no INTO  V_BATCHNO  FROM charger_ota.CHARGER_BATCH_MST WHERE ID=IP_BATCH_ID;*/
+
+select max(id) into v_version_id FROM exicharger.version_mst;
+/*SELECT id INTO v_version_id FROM charger_ota.version_mst ORDER BY id DESC LIMIT 1;*/
+
+INSERT INTO exicharger.batch_version_mapping
+(batch_id,
+version_id,
+batch_no,
+status,
+created_date,
+createdby
+)
+VALUES
+(IP_BATCH_ID,v_version_id,'','M',now(),IP_USER_ID);
+SET OP_ErrorCode = 0;   
+ SET OP_ErrorDetail = 'Success';
+
+end if;
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_InsertVersion_NewDetails`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_InsertVersion_NewDetails`(
+IP_BATCH_ID int(11),
+IP_FILEVERSION VARCHAR(100),
+IP_DESCRIPTION VARCHAR(100),
+IP_FILENAME VARCHAR(100),
+IP_FILEPATH VARCHAR(100),
+IP_USER_ID int,
+IP_CLIENT_ID int, 
+OUT OP_ErrorCode INT,
+OUT OP_ErrorDetail varchar(100) 
+)
+BEGIN
+  declare V_BATCHNO varchar(50);  
+  declare V_COUNT int;
+  declare v_version_id int;
+  IF (IP_FILEVERSION IS NULL OR IP_FILEVERSION ='')
+THEN
+SET OP_ErrorCode = 1;       
+ /*SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_DESCRIPTION IS NULL OR IP_DESCRIPTION ='')
+THEN
+SET OP_ErrorCode = 2;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_BATCH_ID IS NULL OR IP_BATCH_ID ='')
+THEN
+SET OP_ErrorCode = 3;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_CLIENT_ID IS NULL OR IP_CLIENT_ID ='')
+THEN
+SET OP_ErrorCode = 4;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+IF (IP_FILEPATH IS NULL OR IP_FILEPATH ='')
+THEN
+SET OP_ErrorCode = 5;       
+/* SET OP_ErrorDetail = 'UserName is having null value';*/
+END IF;
+INSERT INTO exicharger.version_mst
+(
+name,
+description,
+filename,
+filepath,
+client_id,
+IsUpdate_Available,
+status,
+release_date,
+created_date,
+createdby,
+modify_date,
+modifyby)
+VALUES
+(IP_FILEVERSION,IP_DESCRIPTION,IP_FILENAME,IP_FILEPATH,IP_CLIENT_ID,0,'Y',NULL,now(),IP_USER_ID,NULL,NULL);
+
+SELECT row_count() INTO V_COUNT ;
+IF(V_COUNT>0)
+  THEN
+select max(id) into v_version_id FROM exicharger.version_mst;
+
+INSERT INTO exicharger.client_batch_version_mapping
+(client_id,
+batch_id,
+filepath,
+version_id,
+status,
+IsUpdate_Available,
+released_date,
+released_by,
+created_date,
+created_by,
+modify_date,
+modify_by
+)
+VALUES
+(IP_CLIENT_ID,IP_BATCH_ID,IP_FILEPATH,v_version_id,'M',0,null,null,now(),IP_USER_ID,null,null);
+SET OP_ErrorCode = 0;   
+ SET OP_ErrorDetail = 'Success';
+
+end if;
+
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Insert_Interval`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Insert_Interval`(
+ip_chargerid  varchar(20) ,
+ip_Key VARCHAR(50),
+ip_Value int,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (ip_chargerid is null or ip_chargerid='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="ChargerId having null value";
+End If;
+IF (ip_Key is null or ip_Key='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Key having null value";
+End If;
+if(ip_Key='heartbeat_interval')
+  then
+  IF NOT EXISTS(SELECT ccm.charger_display_id FROM charger_connector_mapping ccm      
+              WHERE ccm.charger_display_id=ip_chargerid AND ccm.status='Y') 
+              THEN
+     insert into charger_connector_mapping (status,charger_display_id,heartbeat_interval) values('Y',ip_chargerid,ip_Value);
+     
+    
+    SET OP_ErrorCode =  0; 
+    SET OP_ErrorDetail = 'InterVal inserted sucecessfully.';
+    
+   else
+   UPDATE charger_connector_mapping set heartbeat_interval=ip_Value
+              where  charger_display_id=ip_chargerid and status='Y';        
+        set OP_ErrorCode = 0;       
+        set OP_ErrorDetail="InterVal updated sucecessfully";
+
+  end if; 
+  
+   #added 11 02 2021 chunky
+     update charger_serial_mst set heartbeat_interval=ip_Value where name = ip_chargerid ;
+              
+  end if;
+
+  
+  /*if(ip_Key='heartbeat_interval')
+  then
+   insert into charger_connector_mapping (charger_display_id,heartbeat_interval) values(ip_chargerid,ip_Value);
+      set OP_ErrorCode = 0;       
+      set OP_ErrorDetail="Sucess";
+  End If;  */
+
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_NewUpdate_FirmwareUpdatedData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_NewUpdate_FirmwareUpdatedData`(
+  IP_ID int ,
+  IP_BATCH_ID int ,
+  IP_VERSION varchar(50),
+  IP_DESCRIPTION varchar(100) ,
+  IP_FILENAME VARCHAR(100),
+  IP_FILEPATH VARCHAR(200),
+  IP_USER_ID int ,
+  IP_CLIENT_ID int ,  
+ out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="Id having null value";
+End If;
+IF (IP_BATCH_ID is null or IP_BATCH_ID='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Batch having null value";
+End If;
+IF (IP_VERSION is null or IP_VERSION='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail="Version having null value";
+End If;
+IF (IP_DESCRIPTION is null or IP_DESCRIPTION='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail="Description having null value";
+End If;
+IF (IP_FILENAME is null or IP_FILENAME='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail="File name having null value";
+End If;
+IF (IP_FILEPATH is null or IP_FILEPATH='')
+then
+set OP_ErrorCode = 6;       
+ set OP_ErrorDetail="File path having null value";
+End If;
+IF (IP_CLIENT_ID is null or IP_CLIENT_ID='')
+then
+set OP_ErrorCode = 7;       
+ set OP_ErrorDetail=" Client  having null value";
+End If;
+UPDATE exicharger.version_mst 
+    set NAME=IP_VERSION, description=IP_DESCRIPTION,
+    filename=IP_FILENAME,     
+    modify_date=now(),
+    modifyby=IP_USER_ID             
+    where id=IP_ID ;
+    
+     UPDATE exicharger.client_batch_version_mapping
+     set batch_id=IP_BATCH_ID,
+     client_id=IP_CLIENT_ID,      
+               filepath=IP_FILEPATH,
+     modify_date=now(),
+     modify_by=IP_USER_ID
+     where version_id=IP_ID; 
+     
+     set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_UpdateStartTrans_Res_Meter_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_UpdateStartTrans_Res_Meter_log`(
+  IP_MESSAGECODE varchar(200),
+  IP_CHARGER_ID varchar(20), 
+  IP_TRANSACTION_ID bigint,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+  
+ )
+BEGIN
+DECLARE v_count INT;
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="ChargerId having null value";
+End If;
+  IF (IP_MESSAGECODE is null or IP_MESSAGECODE='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Message code having null value";
+End If;
+  IF (IP_TRANSACTION_ID is null or IP_TRANSACTION_ID='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Transaction id having null value";
+End If;
+            SELECT COUNT(1)  
+                                  INTO V_count 
+                                  FROM meter_log 
+                                 WHERE transaction_id=IP_TRANSACTION_ID 
+                                   AND active_transaction_status='Y';
+       IF v_count = 0                              
+                              THEN 
+ 
+   UPDATE meter_log  set transaction_id=IP_TRANSACTION_ID  where  message_code=IP_MESSAGECODE and active_transaction_status='Y';
+   else
+     set OP_ErrorCode = 10; 
+      set OP_ErrorDetail="Transation id already exist.";
+      end if;
+
+/* UPDATE user_charging_log  set transaction_id=IP_TRANSACTION_ID 
+where  message_code=IP_MESSAGECODE and charging_status='A';*/
+     set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+END$$
+
+DELIMITER ;
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_UpdateStartTrans_Res_UserCharging_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_UpdateStartTrans_Res_UserCharging_log`(
+  IP_MESSAGECODE varchar(200),
+  IP_CHARGER_ID varchar(20), 
+  IP_TRANSACTION_ID bigint,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="ChargerId having null value";
+End If;
+  IF (IP_MESSAGECODE is null or IP_MESSAGECODE='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Message code having null value";
+End If;
+  IF (IP_TRANSACTION_ID is null or IP_TRANSACTION_ID='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Transaction id having null value";
+End If;
+UPDATE user_charging_log  set charger_transaction_id=IP_TRANSACTION_ID 
+where  message_code=IP_MESSAGECODE and charging_status='A';
+set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_UpdateStartTrans_UserCharging_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_UpdateStartTrans_UserCharging_log`(
+IP_ACTION varchar(20),
+IP_MESSAGE_ID int,
+IP_MESSAGE_CODE varchar(200),
+IP_CHARGER_ID VARCHAR(200),
+IP_IDTAG VARCHAR(200),
+IP_CONNECTOR_ID VARCHAR(500),
+IP_METER_START int,
+IP_STARTTRANS_TIMESTAMP varchar(200),
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+DECLARE v_count INT;
+IF (IP_ACTION is null or IP_ACTION ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;
+IF (IP_MESSAGE_ID is null or IP_MESSAGE_ID ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Message id  is having null value';
+End If;
+IF (IP_MESSAGE_CODE is null or IP_MESSAGE_CODE ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Message code  is having null value';
+End If;
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_IDTAG is null or IP_IDTAG ='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail = 'idTag  is having null value';
+End If;
+IF (IP_CONNECTOR_ID is null or IP_CONNECTOR_ID ='')
+then
+set OP_ErrorCode = 6;       
+ set OP_ErrorDetail = 'Connector id  is having null value';
+End If;
+
+SELECT COUNT(1)  
+                                  INTO V_count 
+                                  FROM user_charging_log 
+                                 WHERE connector_no=IP_CONNECTOR_ID 
+            and charger_display_id=IP_CHARGER_ID 
+                                   AND charging_status='A';
+       IF v_count = 0                              
+                              THEN 
+
+insert into user_charging_log (action,message_id,message_code,charger_display_id,id_tag,connector_no,meter_start_value,meter_start_time,created_date,charging_status) 
+ values(IP_ACTION,IP_MESSAGE_ID,IP_MESSAGE_CODE,IP_CHARGER_ID,IP_IDTAG,IP_CONNECTOR_ID,IP_METER_START,now(),IP_STARTTRANS_TIMESTAMP,'A');
+      set OP_ErrorCode = 10; 
+      set OP_ErrorDetail="StartTransaction record inserted successfully.";
+
+else
+
+ UPDATE user_charging_log  set meter_start_value=IP_METER_START,meter_start_time=now(),message_code=IP_MESSAGE_CODE
+where  connector_no=IP_CONNECTOR_ID and charger_display_id=IP_CHARGER_ID and charging_status='A';
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+      end if;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_UpdateStopTrans_UserCharging_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_UpdateStopTrans_UserCharging_log`(
+IP_CHARGER_ID VARCHAR(200),
+IP_TRANSACTION_ID int,
+IP_METER_STOP decimal,
+IP_STOP_TIMESTAMP datetime,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+declare IP_START_VAL int;
+declare IP_STARTTIME datetime;
+Declare IP_READING varchar(400);
+  Declare IP_DURATION decimal(10,3);
+  Declare IP_TRANSACTION int;
+   Declare IP_STATUS varchar(100);
+  IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_TRANSACTION_ID is null or IP_TRANSACTION_ID ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Transaction id  is having null value';
+End If;
+IF (IP_METER_STOP is null or IP_METER_STOP ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Meter Stop Value  is having null value';
+End If;
+
+select meter_start_value,meter_start_time into IP_START_VAL,IP_STARTTIME from user_charging_log 
+where charger_transaction_id=IP_TRANSACTION_ID and action='RemoteStart' and charging_status='A' ;
+
+select sum(IP_METER_STOP-IP_START_VAL) as meter_reading into IP_READING from user_charging_log 
+where charger_transaction_id=IP_TRANSACTION_ID and action='RemoteStart' and charging_status='A';
+
+select (TIMESTAMPDIFF(SECOND,IP_STARTTIME,IP_STOP_TIMESTAMP)) as duration into IP_DURATION  
+from user_charging_log 
+where charger_transaction_id=IP_TRANSACTION_ID and action='RemoteStart' and charging_status='A';
+
+SELECT COUNT(*) INTO IP_STATUS FROM  user_charging_log WHERE charging_status='A';
+IF(IP_STATUS >0) 
+ then
+
+update user_charging_log set charging_status='C' where action='RemoteStart';
+  
+  set OP_ErrorCode = 5;       
+ set OP_ErrorDetail = 'Status updated successfully';
+
+ else
+UPDATE user_charging_log set meter_stop_time=IP_STOP_TIMESTAMP, 
+meter_stop_value=IP_METER_STOP,
+modify_date=now(),charging_status='C',
+  meter_reading=IP_READING,
+  duration=IP_DURATION, 
+  energy_consumed =IP_READING
+  where charger_display_id=IP_CHARGER_ID and
+  charger_transaction_id=IP_TRANSACTION_ID
+  and action='RemoteStart' and charging_status='A';  
+  set OP_ErrorCode = 0;       
+ set OP_ErrorDetail = 'Success';
+end if;
+
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_UpdateUserCharging_log_Stop_Trans`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_UpdateUserCharging_log_Stop_Trans`(
+IP_CHARGER_ID VARCHAR(200),
+IP_TRANSACTION_ID int,
+IP_METER_STOP decimal,
+IP_STOP_TIMESTAMP datetime,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+declare IP_START_VAL int;
+declare IP_STARTTIME datetime;
+Declare IP_READING varchar(400);
+  Declare IP_DURATION decimal(10,3);
+  IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_TRANSACTION_ID is null or IP_TRANSACTION_ID ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Transaction id  is having null value';
+End If;
+IF (IP_METER_STOP is null or IP_METER_STOP ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Meter Stop Value  is having null value';
+End If;
+
+select meter_start_value,meter_start_time into IP_START_VAL,IP_STARTTIME from user_charging_log 
+where charger_transaction_id=IP_TRANSACTION_ID and action='RemoteStart' and charging_status='A' limit 1 ;
+
+select sum(IP_METER_STOP-IP_START_VAL) as meter_reading into IP_READING from user_charging_log 
+where charger_transaction_id=IP_TRANSACTION_ID and action='RemoteStart' and charging_status='A';
+
+select (TIMESTAMPDIFF(SECOND,IP_STARTTIME,IP_STOP_TIMESTAMP)) as duration into IP_DURATION  
+from user_charging_log 
+where charger_transaction_id=IP_TRANSACTION_ID and action='RemoteStart' and charging_status='A';
+
+
+UPDATE user_charging_log set meter_stop_time=IP_STOP_TIMESTAMP, 
+meter_stop_value=IP_METER_STOP,
+modify_date=now(),charging_status='C',
+  meter_reading=IP_READING,
+  duration=IP_DURATION, 
+  energy_consumed =IP_READING
+  where charger_display_id=IP_CHARGER_ID and
+  charger_transaction_id=IP_TRANSACTION_ID
+  and action='RemoteStart' and charging_status='A';
+
+  
+  set OP_ErrorCode = 0;       
+ set OP_ErrorDetail = 'Success';
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Update_Charger_Status`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Update_Charger_Status`(
+  IP_CHARGER_ID varchar(20) ,
+IP_CONNECTOR int,
+IP_STATUS varchar (10),
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="ChargerId having null value";
+End If;
+IF (IP_CONNECTOR is null or IP_CONNECTOR='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Connector having null value";
+End If;
+IF (IP_STATUS is null or IP_STATUS='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail="Status having null value";
+End If;
+
+   UPDATE exicharger.charger_connector_mapping set current_status_date=now(),
+        current_status=IP_STATUS  where  charger_display_id=IP_CHARGER_ID and connector_no=IP_CONNECTOR ;
+     set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Update_FirmwareUpdatedData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Update_FirmwareUpdatedData`(
+  IP_ID int ,
+  IP_BATCH_ID int ,
+  IP_VERSION varchar(50),
+  IP_DESCRIPTION varchar(100) ,
+  IP_FILENAME VARCHAR(100),
+  IP_FILEPATH VARCHAR(200),
+  IP_USER_ID int ,
+  IP_CLIENT_ID int ,  
+ out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="Id having null value";
+End If;
+IF (IP_BATCH_ID is null or IP_BATCH_ID='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Batch having null value";
+End If;
+IF (IP_VERSION is null or IP_VERSION='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail="Version having null value";
+End If;
+IF (IP_DESCRIPTION is null or IP_DESCRIPTION='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail="Description having null value";
+End If;
+IF (IP_FILENAME is null or IP_FILENAME='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail="File name having null value";
+End If;
+IF (IP_FILEPATH is null or IP_FILEPATH='')
+then
+set OP_ErrorCode = 6;       
+ set OP_ErrorDetail="File path having null value";
+End If;
+IF (IP_CLIENT_ID is null or IP_CLIENT_ID='')
+then
+set OP_ErrorCode = 7;       
+ set OP_ErrorDetail=" Client  having null value";
+End If;
+
+     UPDATE exicharger.version_mst 
+    set NAME=IP_VERSION, description=IP_DESCRIPTION,
+    filename=IP_FILENAME,
+    filepath=IP_FILEPATH,
+    client_id=IP_CLIENT_ID,
+    modify_date=now(),
+    modifyby=IP_USER_ID             
+    where id=IP_ID ;
+       
+      UPDATE exicharger.batch_version_mapping
+     set batch_id=IP_BATCH_ID,
+     modify_date=now(),
+     modifyby=IP_USER_ID
+     where version_id=IP_ID; 
+     
+     set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+     
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Update_FirmwareUpdatedData2`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Update_FirmwareUpdatedData2`(
+  IP_ID int ,
+  IP_BATCH_ID int ,
+  IP_VERSION varchar(50),
+  IP_DESCRIPTION varchar(100) ,   
+  IP_USER_ID int ,
+  IP_CLIENT_ID int ,  
+ out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="Id having null value";
+End If;
+IF (IP_BATCH_ID is null or IP_BATCH_ID='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Batch having null value";
+End If;
+IF (IP_VERSION is null or IP_VERSION='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail="Version having null value";
+End If;
+IF (IP_DESCRIPTION is null or IP_DESCRIPTION='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail="Description having null value";
+End If;
+
+IF (IP_CLIENT_ID is null or IP_CLIENT_ID='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail=" Client  having null value";
+End If;
+
+     UPDATE exicharger.version_mst 
+    set NAME=IP_VERSION, description=IP_DESCRIPTION,    
+    client_id=IP_CLIENT_ID,
+    modify_date=now(),
+    modifyby=IP_USER_ID             
+    where id=IP_ID ;
+       
+      UPDATE exicharger.batch_version_mapping
+     set batch_id=IP_BATCH_ID,
+     modify_date=now(),
+     modifyby=IP_USER_ID
+     where version_id=IP_ID; 
+     
+     set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+     
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_Update_Publish_Status`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_Update_Publish_Status`(
+IP_ID int ,
+IP_USERID int,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="Id having null value";
+End If;
+IF (IP_USERID is null or IP_USERID='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Id having null value";
+End If;
+
+     /*UPDATE exicharger.version_mst 
+    set status='P',
+              release_date=now()
+    where id=IP_ID ;*/
+       
+         UPDATE exicharger.client_batch_version_mapping set status='P',released_date=now(),
+        released_by=IP_USERID,IsUpdate_Available=1  where  version_id=IP_ID ;
+     set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Success";
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_insert_User_Charging_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_insert_User_Charging_log`(
+IP_MESSAGE_ID int,
+IP_MESSAGE_CODE varchar(200),
+IP_CHARGER_ID VARCHAR(200),
+IP_ACTION varchar(20),
+IP_CONNECTOR_ID int,
+IP_IDTAG varchar(200),
+IP_USER_ID int,
+IP_STATION_ID int,
+IP_COMMAND_SOURCE varchar(100),
+IP_DEVICE_ID varchar(30),
+IP_APP_VERSION varchar(30),
+IP_OS_VERSION varchar(30),
+IP_MOBILE_NO varchar(20),
+IP_VEHICLE_NO varchar(20),
+IP_VEHICLE_ID int,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+Declare IP_USERID int;
+Declare IP_MESS_CODE int;
+IF (IP_MESSAGE_ID is null or IP_MESSAGE_ID ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;
+IF (IP_MESSAGE_CODE is null or IP_MESSAGE_CODE ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Message code  is having null value';
+End If;
+IF (IP_ACTION is null or IP_ACTION ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_CONNECTOR_ID is null or IP_CONNECTOR_ID ='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail = 'Connector  is having null value';
+End If;
+IF (IP_IDTAG is null or IP_IDTAG ='')
+then
+set OP_ErrorCode = 6;       
+ set OP_ErrorDetail = 'Connector  is having null value';
+End If;
+IF (IP_USER_ID is null or IP_USER_ID ='')
+then
+set OP_ErrorCode = 7;       
+ set OP_ErrorDetail = 'User id  is having null value';
+End If;
+IF (IP_MOBILE_NO is null or IP_MOBILE_NO ='')
+then
+set OP_ErrorCode = 8;       
+ set OP_ErrorDetail = 'User id  is having null value';
+End If;
+
+
+
+
+if(IP_COMMAND_SOURCE='ALEXA')
+then
+select ID INTO IP_USERID from user_mst_new where mobile=IP_MOBILE_NO;
+if(IP_USERID is null or IP_USERID ='')
+  then
+set OP_ErrorCode = 9;       
+ set OP_ErrorDetail = 'User id  is having null value';
+End If;
+
+INSERT INTO user_charging_log
+(user_id,
+mobile,
+vehicle_id,
+vehicle_number,
+charger_display_id,
+connector_no,
+id_tag,
+station_id,
+action,
+message_id,
+message_code,
+command_source,
+device_id,
+app_version,
+os_version,
+status,
+created_date,
+createdby,
+charging_status)
+VALUES(
+IP_USERID,
+IP_MOBILE_NO,
+IP_VEHICLE_ID,
+IP_VEHICLE_NO,
+IP_CHARGER_ID,
+IP_CONNECTOR_ID,
+IP_IDTAG,
+IP_STATION_ID,
+IP_ACTION,
+IP_MESSAGE_ID,
+IP_MESSAGE_CODE,
+IP_COMMAND_SOURCE,
+IP_DEVICE_ID,
+IP_APP_VERSION,
+IP_OS_VERSION,
+'Y',
+now(),
+IP_USERID,
+'A');
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+else
+
+SELECT COUNT(*) INTO IP_MESS_CODE FROM  user_charging_log WHERE message_code=IP_MESSAGE_CODE;
+  /*SELECT COUNT(1) INTO IP_ID_TAG FROM  user_charging_log WHERE id_tag=IP_IDTAG;*/
+IF(IP_MESS_CODE =0) 
+ then
+INSERT INTO user_charging_log
+(user_id,mobile,vehicle_id,vehicle_number,charger_display_id,connector_no,id_tag,station_id,action,message_id,
+message_code,command_source,device_id,app_version,os_version,status,
+created_date,createdby,charging_status)
+VALUES(
+IP_USER_ID,IP_MOBILE_NO,IP_VEHICLE_ID,IP_VEHICLE_NO,IP_CHARGER_ID,IP_CONNECTOR_ID,IP_IDTAG,IP_STATION_ID,IP_ACTION,IP_MESSAGE_ID,
+IP_MESSAGE_CODE,IP_COMMAND_SOURCE,IP_DEVICE_ID,IP_APP_VERSION,IP_OS_VERSION,'Y',
+now(),IP_USER_ID,'A');
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+end if;
+   END IF;
+
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_insert_RemoteStop_UserCharging_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_insert_RemoteStop_UserCharging_log`(
+IP_CHARGER_ID VARCHAR(200),
+IP_ACTION varchar(20),
+IP_CONNECTOR_ID int,
+IP_USER_ID int,
+IP_STATION_ID int,
+IP_COMMAND_SOURCE varchar(100),
+IP_DEVICE_ID varchar(30),
+IP_APP_VERSION varchar(30),
+IP_OS_VERSION varchar(30),
+IP_MOBILE_NO varchar(12),
+IP_VEHICLE_NO varchar(20),
+IP_VEHICLE_ID int,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+Declare IP_USERID int;
+/*IF (IP_MESSAGE_ID is null or IP_MESSAGE_ID ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;*/
+/*IF (IP_MESSAGE_CODE is null or IP_MESSAGE_CODE ='')
+then
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail = 'Message code  is having null value';
+End If;*/
+IF (IP_ACTION is null or IP_ACTION ='')
+then
+set OP_ErrorCode = 3;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 4;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+IF (IP_CONNECTOR_ID is null or IP_CONNECTOR_ID ='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail = 'Connector  is having null value';
+End If; 
+/*IF (IP_USER_ID is null or IP_USER_ID ='')
+then
+set OP_ErrorCode = 7;       
+ set OP_ErrorDetail = 'User id  is having null value';
+End If;*/
+
+
+
+if(IP_COMMAND_SOURCE='ALEXA')
+then
+select ID INTO IP_USERID from user_mst_new where mobile=IP_MOBILE_NO;
+
+ UPDATE user_charging_log  set user_id_stop=IP_USERID,mobile_stop=IP_MOBILE_NO,command_source_stop=IP_COMMAND_SOURCE,station_id=IP_STATION_ID,
+device_id_stop=IP_DEVICE_ID,app_version_stop=IP_APP_VERSION,os_version_stop=IP_OS_VERSION,
+vehicle_number=IP_VEHICLE_NO,vehicle_id=IP_VEHICLE_ID
+where  charger_display_id=IP_CHARGER_ID and connector_no=IP_CONNECTOR_ID and charging_status='A'; 
+
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Alexa record updated Successfully';
+else
+
+  UPDATE user_charging_log  set user_id_stop=IP_USER_ID,command_source_stop=IP_COMMAND_SOURCE,mobile_stop=IP_MOBILE_NO,
+device_id_stop=IP_DEVICE_ID,app_version_stop=IP_APP_VERSION,os_version_stop=IP_OS_VERSION
+where  charger_display_id=IP_CHARGER_ID and connector_no=IP_CONNECTOR_ID and charging_status='A';
+
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+end if;
+
+END$$
+
+DELIMITER ;
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_insert_meter_log`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_insert_meter_log`( 
+IP_ACTION varchar(20),
+IP_MESSAGE_ID int,
+IP_MESSAGE_CODE varchar(200),
+IP_CHARGER_ID VARCHAR(200),
+IP_CONNECTOR_ID VARCHAR(500),
+IP_TRANSACTION_ID bigint,
+IP_VALUE VARCHAR(200),
+IP_CONTEXT varchar(300),
+IP_FORMATE VARCHAR(300),
+IP_MEASURAND VARCHAR(300),
+IP_PHASE VARCHAR(100),
+IP_LOCATION VARCHAR(300),
+IP_UNIT VARCHAR(100),
+IP_VALUE_TIMESTAMP VARCHAR(300),  
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(50)
+)
+BEGIN
+IF (IP_ACTION is null or IP_ACTION ='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail = 'Action  is having null value';
+End If;
+IF (IP_MESSAGE_ID is null or IP_MESSAGE_ID='')
+then
+set OP_ErrorCode = 2;
+  set OP_ErrorDetail = 'Message id  is having null value';
+End If;
+IF (IP_MESSAGE_CODE is null or IP_MESSAGE_CODE='')
+then
+set OP_ErrorCode = 2;
+  set OP_ErrorDetail = 'Message code  is having null value';
+End If;
+
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID ='')
+then
+set OP_ErrorCode = 5;       
+ set OP_ErrorDetail = 'Charger id  is having null value';
+End If;
+
+
+INSERT INTO meter_log  
+(
+action,
+message_id,
+message_code,
+charger_id,
+value_timestamp,
+connector_id,
+transaction_id,
+value,
+context,
+format,
+location,
+measurand,
+phase,
+unit,
+active_transaction_status,
+created_on
+) 
+values (IP_ACTION,IP_MESSAGE_ID,IP_MESSAGE_CODE,IP_CHARGER_ID ,IP_VALUE_TIMESTAMP,IP_CONNECTOR_ID,IP_TRANSACTION_ID, 
+IP_VALUE,IP_CONTEXT ,IP_FORMATE,IP_LOCATION, IP_MEASURAND,IP_PHASE ,IP_UNIT,'Y',now() ) ;
+set OP_ErrorCode = 0;
+set OP_ErrorDetail = 'Success';
+
+END$$
+
+DELIMITER ;
+
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Proc_update_lastping_date`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Proc_update_lastping_date`(
+IP_CHARGER_ID varchar(20) ,
+IP_CONNECTOR int,
+out OP_ErrorCode int,
+out OP_ErrorDetail varchar(500)
+)
+BEGIN
+IF (IP_CHARGER_ID is null or IP_CHARGER_ID='')
+then
+set OP_ErrorCode = 1;       
+ set OP_ErrorDetail="ChargerId having null value";
+End If;
+
+  IF (IP_CONNECTOR is null or IP_CONNECTOR='')
+then
+    UPDATE exicharger.charger_connector_mapping set last_ping_datetime=now(),
+     modify_date=now()  where  charger_display_id=IP_CHARGER_ID and status='Y';
+        
+set OP_ErrorCode = 2;       
+ set OP_ErrorDetail="Last ping date updated with charger id succesfully";
+  else
+   UPDATE exicharger.charger_connector_mapping set last_ping_datetime=now()
+          where  charger_display_id=IP_CHARGER_ID and connector_no=IP_CONNECTOR and status='Y' ;
+         set OP_ErrorCode = 0; 
+      set OP_ErrorDetail="Last ping date updated with charger id and connector no.";
+End If;
+
+  #added 11 02 2021 chunky
+     update charger_serial_mst set last_ping_datetime=now() 
+     where name = IP_CHARGER_ID ;
+              
+
+  
+   
+    
+ 
+END$$
+
+DELIMITER ;
+
+
+#======================================
+
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Update_CardSerial_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Update_CardSerial_MstData`(
+IP_ID INT,
+IP_SERIAL_NO VARCHAR(20),
+IP_BATCH_ID int,
+IP_CHARGER_SERIAL_ID int,
+IP_CURRENT_FIRMWAREVERSION_ID int,
+IP_STATUS VARCHAR(10),
+IP_MODIFY_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+  set OP_ErrorCode = 1;       
+  /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_SERIAL_NO is null or IP_SERIAL_NO ='')
+then
+  set OP_ErrorCode = 2;       
+  /*set OP_ErrorDetail = 'Description  is having null value';*/
+End If;
+IF (IP_BATCH_ID is null or IP_BATCH_ID ='')
+then
+  set OP_ErrorCode = 3;       
+  /*set OP_ErrorDetail = 'Version id  is having null value';*/
+End If;
+
+IF (IP_CHARGER_SERIAL_ID is null or IP_CHARGER_SERIAL_ID ='')
+then
+  set OP_ErrorCode = 4;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_CURRENT_FIRMWAREVERSION_ID is null or IP_CURRENT_FIRMWAREVERSION_ID ='')
+then
+  set OP_ErrorCode = 5;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_STATUS is null or IP_STATUS ='')
+then
+  set OP_ErrorCode = 6;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_MODIFY_BY is null or IP_MODIFY_BY ='')
+then
+  set OP_ErrorCode = 7;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+
+   UPDATE exicharger.card_serial_mst 
+    set serial_no=IP_SERIAL_NO,    
+    batch_id=IP_BATCH_ID,
+    charger_serial_id=IP_CHARGER_SERIAL_ID,
+    current_firmware_version_id=IP_CURRENT_FIRMWAREVERSION_ID,
+        status=IP_STATUS,
+    modify_date=now(),
+    modifyby=IP_MODIFY_BY
+    where id=IP_ID ;
+     set OP_ErrorCode = 0; 
+
+
+END$$
+
+DELIMITER ;
+
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Update_ChargerBatch_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Update_ChargerBatch_MstData`(
+IP_ID INT,
+IP_NAME VARCHAR(50),
+IP_DES VARCHAR(100),
+IP_BATCHNO VARCHAR(20),
+IP_CLIENT_NO int,
+IP_STATUS VARCHAR(10),
+IP_MODIFY_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_NAME is null or IP_NAME ='')
+then
+  set OP_ErrorCode = 1;       
+  /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_DES is null or IP_DES ='')
+then
+  set OP_ErrorCode = 2;       
+  /*set OP_ErrorDetail = 'Description  is having null value';*/
+End If;
+IF (IP_STATUS is null or IP_STATUS ='')
+then
+  set OP_ErrorCode = 3;       
+  /*set OP_ErrorDetail = 'Version id  is having null value';*/
+End If;
+
+IF (IP_MODIFY_BY is null or IP_MODIFY_BY ='')
+then
+  set OP_ErrorCode = 4;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_BATCHNO is null or IP_BATCHNO ='')
+then
+  set OP_ErrorCode = 5;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_CLIENT_NO is null or IP_CLIENT_NO ='')
+then
+  set OP_ErrorCode = 9;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+if not exists(select cbm.id from charger_ota.charger_batch_mst cbm     
+              where cbm.id=IP_ID and cbm.status='Y') 
+    then
+              set OP_ErrorCode =  6;
+    
+    else
+   UPDATE exicharger.charger_batch_mst 
+    set name=IP_NAME,
+    description=IP_DES,
+    batch_no=IP_BATCHNO,
+    client_id=IP_CLIENT_NO,
+        status=IP_STATUS,
+    modify_date=now(),
+    modifyby=IP_MODIFY_BY
+    where id=IP_ID ;
+     set OP_ErrorCode = 0; 
+     end if;
+
+END$$
+
+DELIMITER ;
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Update_ChargerSerial_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Update_ChargerSerial_MstData`(
+IP_ID INT,
+IP_SERIAL_NO VARCHAR(20),
+IP_BATCH_ID int,
+IP_CURRENT_VERSION VARCHAR(10),
+IP_STATUS VARCHAR(10),
+IP_ADDRESS varchar(500),
+IP_LATITUDE decimal,
+IP_LANGITUDE decimal,
+IP_MODIFY_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID ='')
+then
+  set OP_ErrorCode = 1;       
+  /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_SERIAL_NO is null or IP_SERIAL_NO ='')
+then
+  set OP_ErrorCode = 2;       
+  /*set OP_ErrorDetail = 'Description  is having null value';*/
+End If;
+IF (IP_STATUS is null or IP_STATUS ='')
+then
+  set OP_ErrorCode = 3;       
+  /*set OP_ErrorDetail = 'Version id  is having null value';*/
+End If;
+
+IF (IP_MODIFY_BY is null or IP_MODIFY_BY ='')
+then
+  set OP_ErrorCode = 4;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_BATCH_ID is null or IP_BATCH_ID ='')
+then
+  set OP_ErrorCode = 5;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+IF (IP_CURRENT_VERSION is null or IP_CURRENT_VERSION ='')
+then
+  set OP_ErrorCode = 6;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+if not exists(select cbm.id from charger_ota.charger_batch_mst cbm     
+              where cbm.id=IP_ID and cbm.status='Y') 
+    then
+              set OP_ErrorCode =  7;
+    
+    else
+   UPDATE exicharger.charger_serial_mst 
+    set serial_no=IP_SERIAL_NO,    
+    batch_id=IP_BATCH_ID,
+    current_version=IP_CURRENT_VERSION,
+        status=IP_STATUS,
+       Address=IP_ADDRESS,
+       Lat=IP_LATITUDE,
+       Lng=IP_LANGITUDE,
+    modify_date=now(),
+    modifyby=IP_MODIFY_BY
+    where id=IP_ID ;
+     set OP_ErrorCode = 0; 
+     end if;
+
+END$$
+
+DELIMITER ;
+
+
+
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`Update_Client_MstData`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `Update_Client_MstData`(
+IP_ID INT,
+IP_NAME VARCHAR(50),
+IP_DES VARCHAR(100),
+IP_STATUS VARCHAR(10),
+IP_MODIFY_BY INT,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_NAME is null or IP_NAME ='')
+then
+  set OP_ErrorCode = 1;       
+  /*set OP_ErrorDetail = 'Name  is having null value';*/
+End If;
+IF (IP_DES is null or IP_DES ='')
+then
+  set OP_ErrorCode = 2;       
+  /*set OP_ErrorDetail = 'Description  is having null value';*/
+End If;
+IF (IP_STATUS is null or IP_STATUS ='')
+then
+  set OP_ErrorCode = 3;       
+  /*set OP_ErrorDetail = 'Version id  is having null value';*/
+End If;
+
+IF (IP_MODIFY_BY is null or IP_MODIFY_BY ='')
+then
+  set OP_ErrorCode = 4;       
+  /*set OP_ErrorDetail = 'Modify by  is having null value';*/
+End If;
+if not exists(select cm.id from charger_ota.client_mst cm     
+              where cm.id=IP_ID and cm.status='Y') 
+    then
+              set OP_ErrorCode =  5;
+    
+    else
+   UPDATE exicharger.client_mst 
+    set name=IP_NAME,
+    description=IP_DES,
+      status=IP_STATUS,
+    modify_date=now(),
+    modifyby=IP_MODIFY_BY
+    where id=IP_ID ;
+     set OP_ErrorCode = 0; 
+     end if;
+
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`deleteVersion_mappingdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `deleteVersion_mappingdata`(
+IP_ID int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select cm.id from exicharger.batch_version_mapping cm     
+              where cm.id=IP_ID and cm.Status='Y') 
+    then
+              set OP_ErrorCode =  2; 
+   else
+    DELETE FROM exicharger.batch_version_mapping WHERE id=IP_ID;
+     set OP_ErrorCode = 0; 
+   
+  end if; 
+END$$
+
+DELIMITER ;
+#======================================
+USE `exicharger`;
+DROP procedure IF EXISTS `exicharger`.`update_mappingdata`;
+
+DELIMITER $$
+USE `exicharger`$$
+CREATE DEFINER=`exicharger`@`%` PROCEDURE `update_mappingdata`(
+IP_BATCHNO varchar(20),
+IP_VERSION_ID int,
+IP_ID int ,
+IP_MODIFYBY int ,
+out OP_ErrorCode int
+)
+BEGIN
+IF (IP_BATCHNO is null or IP_BATCHNO ='' && IP_VERSION_ID is null or IP_VERSION_ID='' && IP_ID is null or IP_ID='')
+then
+set OP_ErrorCode = 1;       
+End If;
+if not exists(select cm.id from exicharger.batch_version_mapping cm     
+              where cm.id=IP_ID and cm.Status='Y') 
+    then
+              set OP_ErrorCode =  2;
+    else
+    UPDATE exicharger.batch_version_mapping set batch_no=IP_BATCHNO,version_id=IP_VERSION_ID,modify_date=now() where id=IP_ID ;
+     set OP_ErrorCode = 0; 
+    
+    End if;
+END$$
+
+DELIMITER ;
+#======================================
+CREATE TABLE charger_session_log (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  charger_display_id varchar(300) DEFAULT NULL,
+  session_id varchar(500) DEFAULT NULL,
+  up_datetime datetime DEFAULT NULL,
+  down_datetime datetime DEFAULT NULL,
+  remarks varchar(100) DEFAULT NULL,
+  reason varchar(100) DEFAULT NULL,  
+  created_date datetime DEFAULT NULL,
+  modify_date datetime DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1
+#======================================
+
+#======================================
+
+#======================================
+
+#======================================
+
+#======================================
+
+
+
+
+
+
