@@ -8,121 +8,117 @@ let jwt = require('jsonwebtoken');
 let config = require('../config/jwt.js');
 
 exports.authorize = (req, res) => {
+  debugger;
+  console.log("req==================>", req.body);
+
+  if (!req.body.user_name || !req.body.password) {
+    return res.status(400).send({
+      status: false,
+      message: "Invalid Input"
+    });
+  }
+
+  const { user_name, password, project_code } = req.body;
+
+  if (project_code == undefined) {
+    return res.status(400).send({
+      status: false,
+      message: 'project_code is missing.'
+    });
+  }
+
+  LoginUser.findByUsername(user_name, async (err, data) => {
     debugger;
-    // Validate request
-    console.log("req==================>",req.body);
-    if (!req.body.user_name || !req.body.password) {
-        res.status(200).send({
-            status: false,
-            message: "Invalid Input"
-        });
-    }
-    else {
-        const { user_name, password,project_code } = req.body;
 
-        if(project_code ==undefined) {
-            res.status(200).send({
-                status: false,
-                message: 'project_code is missing.'
+    if (err) {
+      if (err.kind === "not_found") {
+        return res.status(404).send({
+          status: false,
+          message: `Not found User with name  ` + user_name
+        });
+      } else {
+        return res.status(500).send({
+          status: false,
+          message: `Error retrieving User with username` + user_name
+        });
+      }
+    } else {
+      if (data.status) {
+        if (password === data.data.Password) {
+          if (data.data.is_verified == 'N') {
+            return res.status(403).send({
+              status: false,
+              message: 'User not verified'
             });
-        }
+          } else {
+            let token = jwt.sign(
+              { user_name: user_name },
+              config.secret,
+              { expiresIn: '48h' }
+            );
 
-        LoginUser.findByUsername(user_name, async (err, data) => {       
-            debugger;     
-            if (err) {
-                if (err.kind === "not_found") {
-                    res.status(200).send({
-                        status: false,
-                        message: `Not found User with name  ` + user_name
-                    });
-                } else {
-                    res.status(200).send({
-                        status: false,
-                        message: `Error retrieving User with username` + user_name
-                    });
-                }
-            } else {
+            let data2;
+            let vehicleResult = await VehicleView.getVehiclesByUserId(data.data.Id, data2);
+            let respProject;
+            let respNavList;
 
-                if(data.status){
-                    if (password === data.data.Password) {
-                        if(data.data.is_verified=='N'){
-                            res.status(200).send({
-                                status: false,
-                                message: 'User not verified'
-                            });
-                        }else{
-                            let token = jwt.sign({ user_name: user_name },
-                                config.secret,
-                                {
-                                    expiresIn: '48h' // expires in 24 hours
-                                }
-                            );
-        
-                            let data2;
-                            let vehicleResult = await VehicleView.getVehiclesByUserId(data.data.Id, data2);          
-                            let respProject;
-                            let respNavList;
-                                try {
-                                    respProject = await Master.getProjectsByCode(project_code);
-                                    
-                                    if(respProject.data.length<=0){
-                                        res.status(200).send({
-                                            status: false,
-                                            message: `project_code is incorrect`
-                                        });
-                                    }else{
-                                        debugger;
-                                        respNavList = await Master.getNavListByUserId(data.data.Id,respProject.data[0].id);
-                                      
-                                            res.json({
-                                                status: true,
-                                                message: 'Authentication successful!',
-                                                client_id: data.data.client_id,
-                                                client_name: data.data.client_name,
-                                                cpo_id : data.data.cpo_id,
-                                                //otp_authentication: data.data.otp_authentication,
-                                                id: data.data.Id,
-                                                f_Name: data.data.f_Name,
-                                                l_Name: data.data.l_Name,
-                                                email: data.data.email,
-                                                mobile: data.data.mobile,
-                                                user_name: data.data.User_Name,
-                                                role_id: data.data.role_id,
-                                                role_code : data.data.code,
-                                                role_name : data.data.name,
-                                                token: token,
-                                                project_id : respProject.data[0].id,
-                                                client_module_config : data.data.client_module_config,
-                                                vehicles: vehicleResult.data,
-                                                nav_list : !!respNavList.data ? respNavList.data :[]
-                                            });
-                                        // }
-                                    }
-                                } catch (e) {
-                                    res.status(200).send({
-                                        status: false,
-                                        message: e.code
-                                    });
-                                }finally{
-    
-                                }
-                        }
-                    } else {
-                        res.status(200).send({
-                            status: false,
-                            message: 'Incorrect username or password'
-                        });
-                    }
-                }else{
-                    res.status(200).send({
-                        status: false,
-                        message: data.message
-                    });
-                }
+            try {
+              respProject = await Master.getProjectsByCode(project_code);
+
+              if (respProject.data.length <= 0) {
+                return res.status(400).send({
+                  status: false,
+                  message: `project_code is incorrect`
+                });
+              } else {
+                debugger;
+                respNavList = await Master.getNavListByUserId(data.data.Id, respProject.data[0].id);
+
+                return res.status(200).json({
+                  status: true,
+                  message: 'Authentication successful!',
+                  client_id: data.data.client_id,
+                  client_name: data.data.client_name,
+                  cpo_id: data.data.cpo_id,
+                  id: data.data.Id,
+                  f_Name: data.data.f_Name,
+                  l_Name: data.data.l_Name,
+                  email: data.data.email,
+                  mobile: data.data.mobile,
+                  user_name: data.data.User_Name,
+                  role_id: data.data.role_id,
+                  role_code: data.data.code,
+                  role_name: data.data.name,
+                  token: token,
+                  project_id: respProject.data[0].id,
+                  client_module_config: data.data.client_module_config,
+                  vehicles: vehicleResult.data,
+                  nav_list: !!respNavList.data ? respNavList.data : []
+                });
+              }
+            } catch (e) {
+              return res.status(500).send({
+                status: false,
+                message: e.code
+              });
             }
+          }
+        } else {
+          return res.status(401).send({
+            status: false,
+            message: 'Incorrect username or password'
+          });
+        }
+      } else {
+        return res.status(403).send({
+          status: false,
+          message: data.message
         });
+      }
     }
+  });
 };
+
 
 exports.loginViaMobile = async (req, res) => {
     debugger;

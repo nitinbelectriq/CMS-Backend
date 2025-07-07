@@ -1769,9 +1769,9 @@ async function func_getChargersDynamicFilter(params) {
   When_to_Upgrade,Upgrade_Specific_Time,csm.is_available,
   csm.status,csm.created_date,csm.createdby,csm.modifyby,csm.modify_date,
   CASE
-    WHEN (TIMESTAMPDIFF(SECOND,last_ping_datetime,now()) <= heartbeat_interval) THEN "ONLINE"
-    ELSE "OFFLINE/UNAVALIABLE"
-  END as charger_status
+    WHEN (TIMESTAMPDIFF(SECOND, last_ping_datetime, NOW()) <= heartbeat_interval) THEN 'ONLINE'
+    ELSE 'OFFLINE/UNAVALIABLE'
+  END AS charger_status
   from ${_TABLE} csm 
   left join city_mst city on csm.city_id = city.id
   left join state_mst sm on csm.state_id = sm.id
@@ -1831,7 +1831,7 @@ async function func_getChargersDynamicFilter(params) {
   }
 }
 async function func_getChargersDynamicFilterCW(login_id, params) {
-
+debugger;
   let whereClause = '';
   if (params.cpo_id) whereClause += `  and chsm.cpo_id = ${params.cpo_id} `;
   if (params.station_id) whereClause += ` and csmap.station_id = ${params.station_id} `
@@ -1851,10 +1851,10 @@ async function func_getChargersDynamicFilterCW(login_id, params) {
       csm.Lat,csm.Lng,csm.OTA_Config,Periodic_Check_Ref_Time,Periodicity_in_hours,
       When_to_Upgrade,Upgrade_Specific_Time,csm.is_available,
       csm.status,csm.created_date,csm.createdby,csm.modifyby,csm.modify_date,
-      CASE
-        WHEN (TIMESTAMPDIFF(SECOND,last_ping_datetime,now()) <= heartbeat_interval) THEN "ONLINE"
-        ELSE "OFFLINE/UNAVALIABLE"
-      END as charger_status
+       CASE
+    WHEN (TIMESTAMPDIFF(SECOND, last_ping_datetime, NOW()) <= heartbeat_interval) THEN 'ONLINE'
+    ELSE 'OFFLINE/UNAVALIABLE'
+  END AS charger_status
       from ${_TABLE} csm 
       left join city_mst city on csm.city_id = city.id
       left join state_mst sm on csm.state_id = sm.id
@@ -1876,10 +1876,10 @@ async function func_getChargersDynamicFilterCW(login_id, params) {
       csm.Lat,csm.Lng,csm.OTA_Config,Periodic_Check_Ref_Time,Periodicity_in_hours,
       When_to_Upgrade,Upgrade_Specific_Time,csm.is_available,
       csm.status,csm.created_date,csm.createdby,csm.modifyby,csm.modify_date,
-      CASE
-        WHEN (TIMESTAMPDIFF(SECOND,last_ping_datetime,now()) <= heartbeat_interval) THEN "ONLINE"
-        ELSE "OFFLINE/UNAVALIABLE"
-      END as charger_status
+       CASE
+    WHEN (TIMESTAMPDIFF(SECOND, last_ping_datetime, NOW()) <= heartbeat_interval) THEN 'ONLINE'
+    ELSE 'OFFLINE/UNAVALIABLE'
+  END AS charger_status
       from ${_TABLE} csm 
       left join city_mst city on csm.city_id = city.id
       left join state_mst sm on csm.state_id = sm.id
