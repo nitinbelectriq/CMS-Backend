@@ -74,7 +74,7 @@ exports.create = (req, res) => {
 
 exports.update = (req, res) => {
   // Validate request
-
+debugger;
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!"

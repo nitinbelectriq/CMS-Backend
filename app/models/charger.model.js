@@ -5,162 +5,14 @@ const { registerPartial } = require("handlebars");
 
 // constructor
 const Charger = function (charger) {
-  this.id = charger.id,
-    this.name = charger.name,
-    this.serial_no = charger.serial_no,
-    this.batch_id = charger.batch_id,
-    this.station_id = charger.station_id,
-    this.model_id = charger.model_id,
-    this.current_version_id = charger.current_version_id,
-    this.no_of_guns = charger.no_of_guns,
-    this.address1 = charger.address1;
-  this.address2 = charger.address2;
-  this.PIN = charger.PIN;
-  this.landmark = charger.landmark;
-  this.city_id = charger.city_id;
-  this.state_id = charger.state_id;
-  this.country_id = charger.country_id;
-  this.Lat = charger.Lat,
-    this.Lng = charger.Lng,
-    this.OTA_Config = charger.OTA_Config,
-    this.Periodic_Check_Ref_Time = charger.Periodic_Check_Ref_Time,
-    this.Periodicity_in_hours = charger.Periodicity_in_hours,
-    this.When_to_Upgrade = charger.When_to_Upgrade,
-    this.Upgrade_Specific_Time = charger.Upgrade_Specific_Time,
-    this.is_available = charger.is_available,
-    this.status = charger.status,
-    this.created_date = charger.created_date,
-    this.created_by = charger.created_by,
-    this.modify_date = charger.modify_date,
-    this.modify_by = charger.modify_by,
-    this.connector_data = charger.connector_data,
-    this.can_renew_warranty = charger.can_renew_warranty,
-    this.can_renew_plan = charger.can_renew_plan,
-    this.remarks = charger.remarks,
-    this.request_id = charger.request_id
-};
-
-
-const ChargerStationMap = function (chargerStationMap) {
-  this.id = chargerStationMap.id,
-    this.charger_id = chargerStationMap.charger_id,
-    this.station_id = chargerStationMap.station_id,
-    this.is_available = chargerStationMap.is_available,
-    this.status = chargerStationMap.status,
-    this.created_date = chargerStationMap.created_date,
-    this.created_by = chargerStationMap.created_by,
-    this.modify_date = chargerStationMap.modify_date,
-    this.modify_by = chargerStationMap.modify_by,
-    this.charger_data = chargerStationMap.charger_data
-};
-
-const ClientChargerMap = function (clientChargerMap) {
-  this.id = clientChargerMap.id,
-    this.charger_id = clientChargerMap.charger_id,
-    this.client_id = clientChargerMap.client_id,
-    this.sub_client_id = clientChargerMap.sub_client_id,
-    this.is_private = clientChargerMap.is_private,
-    this.dispatch_status = clientChargerMap.dispatch_status,
-    this.dispatch_by = clientChargerMap.dispatch_by,
-    this.dispatch_date = clientChargerMap.dispatch_date,
-    this.status = clientChargerMap.status,
-    this.created_date = clientChargerMap.created_date,
-    this.created_by = clientChargerMap.created_by,
-    this.modify_date = clientChargerMap.modify_date,
-    this.modify_by = clientChargerMap.modify_by,
-    this.charger_data = clientChargerMap.charger_data
-
-};
-
-const Set_Schedule_BLE = function (set_Schedule_BLE) {
-  this.id = set_Schedule_BLE.id,
-    this.charger_serial_no = set_Schedule_BLE.charger_serial_no,
-    this.user_id = set_Schedule_BLE.user_id,
-    this.schedule_id = set_Schedule_BLE.schedule_id,
-    this.start_schedule_time = set_Schedule_BLE.start_schedule_time,
-    this.stop_schedule_time = set_Schedule_BLE.stop_schedule_time,
-    this.duration = set_Schedule_BLE.duration,
-    this.schedule_type = set_Schedule_BLE.schedule_type,
-    this.schedule_status = set_Schedule_BLE.schedule_status,
-    this.schedule_name = set_Schedule_BLE.schedule_name,
-    this.day_name = set_Schedule_BLE.day_name,
-    this.schedule_status=set_Schedule_BLE.schedule_status,
-    this.status = set_Schedule_BLE.status,
-    this.created_date = set_Schedule_BLE.created_date,
-    this.created_by = set_Schedule_BLE.created_by,
-    this.modify_date = set_Schedule_BLE.modify_date,
-    this.modify_by = set_Schedule_BLE.modify_by,
-    this.schedule = set_Schedule_BLE.schedule
-
-};
-
-
-const ChargingProfile = function (chargingProfile) {
-  this.id = chargingProfile.id,
-    this.stack_level = chargingProfile.stack_level,
-    this.charging_profile_name = chargingProfile.charging_profile_name,
-    this.charging_profile_kind_id = chargingProfile.charging_profile_kind_id,
-    this.recurrency_kind_id = chargingProfile.recurrency_kind_id,
-    this.charging_profile_purpose_id = chargingProfile.charging_profile_purpose_id,
-    this.valid_from = chargingProfile.valid_from,
-    this.valid_to = chargingProfile.valid_to,
-    this.charging_profile_id = chargingProfile.charging_profile_id,
-    this.duration = chargingProfile.duration,
-    this.start_schedule = chargingProfile.start_schedule,
-    this.charging_rate_unit_id = chargingProfile.charging_rate_unit_id,
-    this.mincharging_rate = chargingProfile.mincharging_rate,
-    this.charging_schedule_id = chargingProfile.charging_schedule_id,
-    this.start_period = chargingProfile.start_period,
-    this.period_limit = chargingProfile.period_limit,
-    this.numberof_phase_id = chargingProfile.numberof_phase_id,
-    this.name = chargingProfile.name,
-    this.role = chargingProfile.role,
-    this.offerings = chargingProfile.offerings,
-    this.projects = chargingProfile.projects,
-    this.remarks = chargingProfile.remarks,
-    this.status = chargingProfile.status,
-    this.created_by = chargingProfile.created_by,
-    this.created_date = chargingProfile.created_date,
-    this.modify_date = chargingProfile.modify_date,
-    this.modifyby = chargingProfile.modifyby,
-    this.scheduleData = chargingProfile.scheduleData
-
-};
-
-const AddChargerRequest = function (addChargerRequest) {
-  this.id = addChargerRequest.id,
-    this.charger_id = addChargerRequest.charger_id,
-    this.user_id = addChargerRequest.user_id,
-    this.station_name = addChargerRequest.station_name,
-    this.provider = addChargerRequest.provider,
-    this.model = addChargerRequest.model,
-    this.lat = addChargerRequest.lat,
-    this.lng = addChargerRequest.lng,
-    this.remarks = addChargerRequest.remarks,
-    this.charger_serial_no = addChargerRequest.charger_serial_no,
-    this.address1 = addChargerRequest.address1,
-    this.address2 = addChargerRequest.address2,
-    this.PIN = addChargerRequest.PIN,
-    this.landmark = addChargerRequest.landmark,
-    this.city_id = addChargerRequest.city_id,
-    this.state_id = addChargerRequest.state_id,
-    this.country_id = addChargerRequest.country_id,
-    this.image_url = addChargerRequest.image_url,
-    this.status = addChargerRequest.status,
-    this.created_date = addChargerRequest.created_date,
-    this.created_by = addChargerRequest.created_by,
-    this.modify_date = addChargerRequest.modify_date,
-    this.modify_by = addChargerRequest.modify_by,
-    this.request_id = addChargerRequest.request_id
-
-};
-
-const ChargerRenewalRequestBle = function (charger) {
-  this.id = charger.id,
-  this.name = charger.name,
-  this.serial_no = charger.serial_no,
-  this.station_id = charger.station_id,
-  this.model_id = charger.model_id,
+  this.id = charger.id;
+  this.name = charger.name;
+  this.serial_no = charger.serial_no;
+  this.batch_id = charger.batch_id;
+  this.station_id = charger.station_id;
+  this.model_id = charger.model_id;
+  this.current_version_id = charger.current_version_id;
+  this.no_of_guns = charger.no_of_guns;
   this.address1 = charger.address1;
   this.address2 = charger.address2;
   this.PIN = charger.PIN;
@@ -168,61 +20,262 @@ const ChargerRenewalRequestBle = function (charger) {
   this.city_id = charger.city_id;
   this.state_id = charger.state_id;
   this.country_id = charger.country_id;
-  this.Lat = charger.Lat,
-  this.Lng = charger.Lng,
-  this.status = charger.status,
-  this.created_date = charger.created_date,
-  this.created_by = charger.created_by,
-  this.modify_date = charger.modify_date,
-  this.modify_by = charger.modify_by,
-  this.can_renew_warranty = charger.can_renew_warranty,
-  this.can_renew_plan = charger.can_renew_plan,
-  this.remarks = charger.remarks,
-  this.request_id = charger.request_id,
-  this.visit_date = charger.visit_date,
-  this.charger_condition = charger.charger_condition,
-  this.charger_description = charger.charger_description
-  this.engineer_name = charger.engineer_name,
-  this.vendor_name = charger.vendor_name,
-  this.amount_collected = charger.amount_collected,
-  this.payment_mode = charger.payment_mode,
-  this.image_path = charger.image_path,
-  this.physical_visit = charger.physical_visit
+  this.Lat = charger.Lat;
+  this.Lng = charger.Lng;
+  this.OTA_Config = charger.OTA_Config;
+  this.Periodic_Check_Ref_Time = charger.Periodic_Check_Ref_Time;
+  this.Periodicity_in_hours = charger.Periodicity_in_hours;
+  this.When_to_Upgrade = charger.When_to_Upgrade;
+  this.Upgrade_Specific_Time = charger.Upgrade_Specific_Time;
+  this.is_available = charger.is_available;
+  this.status = charger.status;
+  this.created_date = charger.created_date;
+  this.created_by = charger.created_by;
+  this.modify_date = charger.modify_date;
+  this.modify_by = charger.modify_by;
+  this.connector_data = charger.connector_data;
+  this.can_renew_warranty = charger.can_renew_warranty;
+  this.can_renew_plan = charger.can_renew_plan;
+  this.remarks = charger.remarks;
+  this.request_id = charger.request_id;
 };
 
+const ChargerStationMap = function (chargerStationMap) {
+  this.id = chargerStationMap.id;
+  this.charger_id = chargerStationMap.charger_id;
+  this.station_id = chargerStationMap.station_id;
+  this.is_available = chargerStationMap.is_available;
+  this.status = chargerStationMap.status;
+  this.created_date = chargerStationMap.created_date;
+  this.created_by = chargerStationMap.created_by;
+  this.modify_date = chargerStationMap.modify_date;
+  this.modify_by = chargerStationMap.modify_by;
+  this.charger_data = chargerStationMap.charger_data;
+};
+
+const ClientChargerMap = function (clientChargerMap) {
+  this.id = clientChargerMap.id;
+  this.charger_id = clientChargerMap.charger_id;
+  this.client_id = clientChargerMap.client_id;
+  this.sub_client_id = clientChargerMap.sub_client_id;
+  this.is_private = clientChargerMap.is_private;
+  this.dispatch_status = clientChargerMap.dispatch_status;
+  this.dispatch_by = clientChargerMap.dispatch_by;
+  this.dispatch_date = clientChargerMap.dispatch_date;
+  this.status = clientChargerMap.status;
+  this.created_date = clientChargerMap.created_date;
+  this.created_by = clientChargerMap.created_by;
+  this.modify_date = clientChargerMap.modify_date;
+  this.modify_by = clientChargerMap.modify_by;
+  this.charger_data = clientChargerMap.charger_data;
+};
+
+const Set_Schedule_BLE = function (set_Schedule_BLE) {
+  this.id = set_Schedule_BLE.id;
+  this.charger_serial_no = set_Schedule_BLE.charger_serial_no;
+  this.user_id = set_Schedule_BLE.user_id;
+  this.schedule_id = set_Schedule_BLE.schedule_id;
+  this.start_schedule_time = set_Schedule_BLE.start_schedule_time;
+  this.stop_schedule_time = set_Schedule_BLE.stop_schedule_time;
+  this.duration = set_Schedule_BLE.duration;
+  this.schedule_type = set_Schedule_BLE.schedule_type;
+  this.schedule_status = set_Schedule_BLE.schedule_status;
+  this.schedule_name = set_Schedule_BLE.schedule_name;
+  this.day_name = set_Schedule_BLE.day_name;
+  this.status = set_Schedule_BLE.status;
+  this.created_date = set_Schedule_BLE.created_date;
+  this.created_by = set_Schedule_BLE.created_by;
+  this.modify_date = set_Schedule_BLE.modify_date;
+  this.modify_by = set_Schedule_BLE.modify_by;
+  this.schedule = set_Schedule_BLE.schedule;
+};
+
+const ChargingProfile = function (chargingProfile) {
+  this.id = chargingProfile.id;
+  this.stack_level = chargingProfile.stack_level;
+  this.charging_profile_name = chargingProfile.charging_profile_name;
+  this.charging_profile_kind_id = chargingProfile.charging_profile_kind_id;
+  this.recurrency_kind_id = chargingProfile.recurrency_kind_id;
+  this.charging_profile_purpose_id = chargingProfile.charging_profile_purpose_id;
+  this.valid_from = chargingProfile.valid_from;
+  this.valid_to = chargingProfile.valid_to;
+  this.charging_profile_id = chargingProfile.charging_profile_id;
+  this.duration = chargingProfile.duration;
+  this.start_schedule = chargingProfile.start_schedule;
+  this.charging_rate_unit_id = chargingProfile.charging_rate_unit_id;
+  this.mincharging_rate = chargingProfile.mincharging_rate;
+  this.charging_schedule_id = chargingProfile.charging_schedule_id;
+  this.start_period = chargingProfile.start_period;
+  this.period_limit = chargingProfile.period_limit;
+  this.numberof_phase_id = chargingProfile.numberof_phase_id;
+  this.name = chargingProfile.name;
+  this.role = chargingProfile.role;
+  this.offerings = chargingProfile.offerings;
+  this.projects = chargingProfile.projects;
+  this.remarks = chargingProfile.remarks;
+  this.status = chargingProfile.status;
+  this.created_by = chargingProfile.created_by;
+  this.created_date = chargingProfile.created_date;
+  this.modify_date = chargingProfile.modify_date;
+  this.modifyby = chargingProfile.modifyby;
+  this.scheduleData = chargingProfile.scheduleData;
+};
+
+const AddChargerRequest = function (addChargerRequest) {
+  this.id = addChargerRequest.id;
+  this.charger_id = addChargerRequest.charger_id;
+  this.user_id = addChargerRequest.user_id;
+  this.station_name = addChargerRequest.station_name;
+  this.provider = addChargerRequest.provider;
+  this.model = addChargerRequest.model;
+  this.lat = addChargerRequest.lat;
+  this.lng = addChargerRequest.lng;
+  this.remarks = addChargerRequest.remarks;
+  this.charger_serial_no = addChargerRequest.charger_serial_no;
+  this.address1 = addChargerRequest.address1;
+  this.address2 = addChargerRequest.address2;
+  this.PIN = addChargerRequest.PIN;
+  this.landmark = addChargerRequest.landmark;
+  this.city_id = addChargerRequest.city_id;
+  this.state_id = addChargerRequest.state_id;
+  this.country_id = addChargerRequest.country_id;
+  this.image_url = addChargerRequest.image_url;
+  this.status = addChargerRequest.status;
+  this.created_date = addChargerRequest.created_date;
+  this.created_by = addChargerRequest.created_by;
+  this.modify_date = addChargerRequest.modify_date;
+  this.modify_by = addChargerRequest.modify_by;
+  this.request_id = addChargerRequest.request_id;
+};
+
+const ChargerRenewalRequestBle = function (charger) {
+  this.id = charger.id;
+  this.name = charger.name;
+  this.serial_no = charger.serial_no;
+  this.station_id = charger.station_id;
+  this.model_id = charger.model_id;
+  this.address1 = charger.address1;
+  this.address2 = charger.address2;
+  this.PIN = charger.PIN;
+  this.landmark = charger.landmark;
+  this.city_id = charger.city_id;
+  this.state_id = charger.state_id;
+  this.country_id = charger.country_id;
+  this.Lat = charger.Lat;
+  this.Lng = charger.Lng;
+  this.status = charger.status;
+  this.created_date = charger.created_date;
+  this.created_by = charger.created_by;
+  this.modify_date = charger.modify_date;
+  this.modify_by = charger.modify_by;
+  this.can_renew_warranty = charger.can_renew_warranty;
+  this.can_renew_plan = charger.can_renew_plan;
+  this.remarks = charger.remarks;
+  this.request_id = charger.request_id;
+  this.visit_date = charger.visit_date;
+  this.charger_condition = charger.charger_condition;
+  this.charger_description = charger.charger_description;
+  this.engineer_name = charger.engineer_name;
+  this.vendor_name = charger.vendor_name;
+  this.amount_collected = charger.amount_collected;
+  this.payment_mode = charger.payment_mode;
+  this.image_path = charger.image_path;
+  this.physical_visit = charger.physical_visit;
+};
 
 const ChargerConfiguration = function (chargerConfiguration) {
-    this.id = chargerConfiguration.id,
-    this.charger_id = chargerConfiguration.charger_id,
-    this.charger_part_no_id = chargerConfiguration.charger_part_no_id,
-    this.charger_serial_no = chargerConfiguration.charger_serial_no,
-    this.charger_part_no = chargerConfiguration.charger_part_no,
-    this.card_id = chargerConfiguration.card_id,
-    this.card_part_no_id = chargerConfiguration.card_part_no_id,
-    this.card_serial_no = chargerConfiguration.card_serial_no,
-    this.card_part_no = chargerConfiguration.card_part_no,
-    this.current_ampere_value = chargerConfiguration.current_ampere_value,
-    this.user_id = chargerConfiguration.user_id,
-    this.fw_version_id = chargerConfiguration.fw_version_id,
-    this.fw_version_name = chargerConfiguration.fw_version_name,
-    this.board_type = chargerConfiguration.board_type,
-    this.source_app = chargerConfiguration.source_app,
-    this.project_id = chargerConfiguration.project_id,
-    this.status = chargerConfiguration.status,
-    this.created_by = chargerConfiguration.created_by,
-    this.created_date = chargerConfiguration.created_date,
-    this.modify_date = chargerConfiguration.modify_date,
-    this.modifyby = chargerConfiguration.modifyby,
-    this.configuration_key = chargerConfiguration.configuration_key,
-    this.current_fw_version_main_board = chargerConfiguration.current_fw_version_main_board,
-    this.current_fw_version_id_main_board = chargerConfiguration.current_fw_version_id_main_board,
-    this.current_fw_version_ocpp_board = chargerConfiguration.current_fw_version_ocpp_board,
-    this.current_fw_version_id_ocpp_board = chargerConfiguration.current_fw_version_id_ocpp_board,
-    this.current_ampere_value = chargerConfiguration.current_ampere_value
+  this.id = chargerConfiguration.id;
+  this.charger_id = chargerConfiguration.charger_id;
+  this.charger_part_no_id = chargerConfiguration.charger_part_no_id;
+  this.charger_serial_no = chargerConfiguration.charger_serial_no;
+  this.charger_part_no = chargerConfiguration.charger_part_no;
+  this.card_id = chargerConfiguration.card_id;
+  this.card_part_no_id = chargerConfiguration.card_part_no_id;
+  this.card_serial_no = chargerConfiguration.card_serial_no;
+  this.card_part_no = chargerConfiguration.card_part_no;
+  this.current_ampere_value = chargerConfiguration.current_ampere_value;
+  this.user_id = chargerConfiguration.user_id;
+  this.fw_version_id = chargerConfiguration.fw_version_id;
+  this.fw_version_name = chargerConfiguration.fw_version_name;
+  this.board_type = chargerConfiguration.board_type;
+  this.source_app = chargerConfiguration.source_app;
+  this.project_id = chargerConfiguration.project_id;
+  this.status = chargerConfiguration.status;
+  this.created_by = chargerConfiguration.created_by;
+  this.created_date = chargerConfiguration.created_date;
+  this.modify_date = chargerConfiguration.modify_date;
+  this.modifyby = chargerConfiguration.modifyby;
+  this.configuration_key = chargerConfiguration.configuration_key;
+  this.current_fw_version_main_board = chargerConfiguration.current_fw_version_main_board;
+  this.current_fw_version_id_main_board = chargerConfiguration.current_fw_version_id_main_board;
+  this.current_fw_version_ocpp_board = chargerConfiguration.current_fw_version_ocpp_board;
+  this.current_fw_version_id_ocpp_board = chargerConfiguration.current_fw_version_id_ocpp_board;
+  this.current_ampere_value = chargerConfiguration.current_ampere_value;
 };
 
 
 const _TABLE = 'charger_serial_mst';
+
+// Charger.create = async (newCharger, result) => {
+//   const datetime = new Date().toISOString().slice(0, 10);
+// debugger;
+//   const insertChargerQuery = `
+//     INSERT INTO ${_TABLE} (
+//       serial_no, name, model_id, station_id, current_version_id, no_of_guns,
+//       Lat, Lng, OTA_Config, Periodic_Check_Ref_Time, Periodicity_in_hours,
+//       When_to_Upgrade, Upgrade_Specific_Time, is_available,
+//       address1, address2, PIN, landmark, city_id, state_id, country_id,
+//       status, created_date, createdby
+//     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//   `;
+
+//   const insertValues = [
+//     newCharger.serial_no, newCharger.name, newCharger.model_id, newCharger.station_id,
+//     newCharger.current_version_id, newCharger.no_of_guns, newCharger.Lat, newCharger.Lng,
+//     newCharger.OTA_Config, newCharger.Periodic_Check_Ref_Time, newCharger.Periodicity_in_hours,
+//     newCharger.When_to_Upgrade, datetime, newCharger.is_available,
+//     newCharger.address1, newCharger.address2, newCharger.PIN, newCharger.landmark,
+//     newCharger.city_id, newCharger.state_id, newCharger.country_id,
+//     newCharger.status, datetime, newCharger.created_by
+//   ];
+
+//   let final_res;
+
+//   try {
+//     // Insert charger
+//     const resp = await pool.query(insertChargerQuery, insertValues);
+//     const insertId = resp.insertId;
+
+//     // Fetch connector config from charging_model_connector_map
+//     const modelConnectors= await pool.query(
+//       `SELECT * FROM charging_model_connector_map WHERE model_id = ? AND status = 'Y'`,
+//       [newCharger.model_id]
+//     );
+
+//     // Map to required structure
+//     const connectorData = modelConnectors.map((item) => ({
+//       connector_type_id: item.connector_type_id,
+//       status: 'Y',
+//     }));
+
+//     // Insert charger connector mappings
+//     await insertModelConnector(connectorData, insertId, newCharger.name, newCharger.created_by);
+
+//     final_res = {
+//       status: true,
+//       message: 'SUCCESS',
+//       data: [{ id: insertId }]
+//     };
+//   } catch (err) {
+//     final_res = {
+//       status: false,
+//       message: `ERROR: ${err.message}`,
+//       data: []
+//     };
+//   } finally {
+//     result(null, final_res);
+//   }
+// };
 
 Charger.create = async (newCharger, result) => {
   const datetime = new Date().toISOString().slice(0, 10);
@@ -238,53 +291,74 @@ debugger;
   `;
 
   const insertValues = [
-    newCharger.serial_no, newCharger.name, newCharger.model_id, newCharger.station_id,
-    newCharger.current_version_id, newCharger.no_of_guns, newCharger.Lat, newCharger.Lng,
-    newCharger.OTA_Config, newCharger.Periodic_Check_Ref_Time, newCharger.Periodicity_in_hours,
-    newCharger.When_to_Upgrade, datetime, newCharger.is_available,
-    newCharger.address1, newCharger.address2, newCharger.PIN, newCharger.landmark,
-    newCharger.city_id, newCharger.state_id, newCharger.country_id,
-    newCharger.status, datetime, newCharger.created_by
+    newCharger.serial_no,
+    newCharger.charger_display_id || newCharger.name,
+    newCharger.model_id,
+    newCharger.station_id || 0,
+    newCharger.current_version_id || null,
+    newCharger.no_of_guns || 1,
+    newCharger.Lat || 0,
+    newCharger.Lng || 0,
+    newCharger.OTA_Config || 0,
+    newCharger.Periodic_Check_Ref_Time || '2000-01-01 00:00:00',
+    newCharger.Periodicity_in_hours || 12,
+    newCharger.When_to_Upgrade || 'IMMEDIATE',
+    newCharger.Upgrade_Specific_Time || '00:00:00',
+    newCharger.is_available || 1,
+    newCharger.address1 || '',
+    newCharger.address2 || '',
+    newCharger.PIN || 0,
+    newCharger.landmark || '',
+    newCharger.city_id || 0,
+    newCharger.state_id || 0,
+    newCharger.country_id || 0,
+    newCharger.status || 'ACTIVE',
+    datetime,
+    newCharger.created_by || 0,
   ];
 
   let final_res;
 
   try {
-    // Insert charger
     const resp = await pool.query(insertChargerQuery, insertValues);
     const insertId = resp.insertId;
 
-    // Fetch connector config from charging_model_connector_map
-    const modelConnectors= await pool.query(
+    // Get connector types from charging_model_connector_map
+    const modelConnectors = await pool.query(
       `SELECT * FROM charging_model_connector_map WHERE model_id = ? AND status = 'Y'`,
       [newCharger.model_id]
     );
 
-    // Map to required structure
     const connectorData = modelConnectors.map((item) => ({
       connector_type_id: item.connector_type_id,
       status: 'Y',
     }));
 
-    // Insert charger connector mappings
-    await insertModelConnector(connectorData, insertId, newCharger.name, newCharger.created_by);
+    // Insert into charger_connector_mapping
+    await insertModelConnector(
+      connectorData,
+      insertId,
+      newCharger.charger_display_id || newCharger.name,
+      newCharger.created_by || 0
+    );
 
     final_res = {
       status: true,
       message: 'SUCCESS',
-      data: [{ id: insertId }]
+      data: [{ id: insertId }],
     };
   } catch (err) {
     final_res = {
       status: false,
       message: `ERROR: ${err.message}`,
-      data: []
+      data: [],
     };
   } finally {
     result(null, final_res);
   }
 };
 
+module.exports = Charger;
 
 
 Charger.update = async (newCharger, result) => {
@@ -373,91 +447,128 @@ debugger;
   }
 };
 
+ClientChargerMap.dispatchChargers = async (data) => {
+  const now = new Date();
+debugger;
+  const insertStmt = `
+    INSERT INTO client_charger_mapping 
+      (client_id, sub_client_id, charger_id, dispatch_status, dispatch_by, dispatch_date, status, createdby, created_date, warranty_start, warranty_end)
+    VALUES ?`;
 
+  const selectExistingStmt = `
+    SELECT charger_id FROM client_charger_mapping 
+    WHERE charger_id IN (?) AND status <> 'D'`;
 
-ClientChargerMap.dispatchChargers = async (data, result) => {
-  debugger;
-  var datetime = new Date();
-  let final_res;
-  let resp3;
-  let resp4;
-  let chargers_mapped = [];
-  let chargers_not_mapped = [];
-  let id_to_update = [];
+  const getChargerIdsStmt = `
+    SELECT id, serial_no FROM charger_serial_mst 
+    WHERE serial_no IN (?)`;
 
-  let stmt2 = `insert into client_charger_mapping (client_id,sub_client_id,charger_id,
-  dispatch_status,dispatch_by,dispatch_date,
-  status,createdby,created_date)
-  values ? `;
+  const updatePrivateStmt = `
+    UPDATE charger_serial_mst 
+    SET is_private = ? 
+    WHERE id IN (?)`;
 
-  let stmt3 = `select id from client_charger_mapping 
-    where charger_id = ? and status <>'D'`;
+  let insertValues = [];
+  let chargersMapped = [];
+  let chargersNotMapped = [];
+  let idsToUpdate = [];
 
-  let stmt4 = `update charger_serial_mst set is_private = ? where id in (?) `;
-
-  let values = [];
   try {
+    const isBulk = Array.isArray(data.charger_data);
+    const chargerData = isBulk ? data.charger_data : [data];
 
+    const serialNos = chargerData.map((ch) => ch.serial_no.trim());
 
-    for (let index = 0; index < data.charger_data.length; index++) {
+    // Safe destructuring: compatible with mysql and mysql2
+    const result1 = await pool.query(getChargerIdsStmt, [serialNos]);
+    const chargerRows = Array.isArray(result1[0]) ? result1[0] : result1;
 
-      resp3 = await pool.query(stmt3, [data.charger_data[index]])
+    const serialToIdMap = {};
+    for (const row of chargerRows) {
+      serialToIdMap[row.serial_no] = row.id;
+    }
 
-      if (resp3.length > 0) {
-        chargers_not_mapped.push({
-          id: data.charger_data[index].id,
-          serial_no: data.charger_data[index].serial_no,
-          remarks: 'DUPLICATE'
-        })
+    const chargerIds = Object.values(serialToIdMap);
+    if (chargerIds.length === 0) {
+      return {
+        status: false,
+        message: 'No valid serial numbers found.',
+        data: [],
+      };
+    }
 
-      } else {
-        values.push([data.client_id, data.sub_client_id, data.charger_data[index].id,
-        data.dispatch_status, data.dispatch_by, data.dispatch_date,
-        data.status, data.created_by, datetime])
+    const result2 = await pool.query(selectExistingStmt, [chargerIds]);
+    const existingRows = Array.isArray(result2[0]) ? result2[0] : result2;
+    const existingChargerIds = new Set(existingRows.map((r) => r.charger_id));
 
-        chargers_mapped.push({
-          id: data.charger_data[index].id,
-          serial_no: data.charger_data[index].serial_no,
-          remarks: 'SUCCESS'
+    for (const ch of chargerData) {
+      const serial = ch.serial_no.trim();
+      const chargerId = serialToIdMap[serial];
+
+      if (!chargerId) {
+        chargersNotMapped.push({
+          serial_no: serial,
+          remarks: 'NOT_FOUND_IN_DB',
         });
-
-        id_to_update.push(data.charger_data[index].id);
-
+        continue;
       }
+
+      if (existingChargerIds.has(chargerId)) {
+        chargersNotMapped.push({
+          serial_no: serial,
+          remarks: 'DUPLICATE',
+        });
+        continue;
+      }
+
+      insertValues.push([
+        data.client_id,
+        data.sub_client_id || 0,
+        chargerId,
+        data.dispatch_status,
+        data.dispatch_by,
+        data.dispatch_date,
+        data.status,
+        data.created_by,
+        now,
+        ch.warranty_start || null,
+        ch.warranty_end || null,
+      ]);
+
+      chargersMapped.push({
+        charger_id: chargerId,
+        serial_no: serial,
+        remarks: 'SUCCESS',
+      });
+
+      idsToUpdate.push(chargerId);
     }
 
-    // resp = await pool.query(stmt);
-
-
-    if (values.length > 0) {
-
-      resp2 = await pool.query(stmt2, [values]);
-
-
-      resp4 = await pool.query(stmt4, [data.is_private, id_to_update]);
-
-    } else {
+    if (insertValues.length > 0) {
+      await pool.query(insertStmt, [insertValues]);
+      await pool.query(updatePrivateStmt, [data.is_private, idsToUpdate]);
     }
 
-    final_res = {
-      status: values.length > 0 ? true : false,
-      message: values.length > 0 ? 'SUCCESS' : 'ALL_DUPLICATE',
-      data: [{
-        chargers_not_mapped: chargers_not_mapped,
-        chargers_mapped: chargers_mapped
-      }]
-    }
+    return {
+      status: insertValues.length > 0,
+      message: insertValues.length > 0 ? 'SUCCESS' : 'ALL_DUPLICATE_OR_INVALID',
+      data: [
+        {
+          chargers_mapped: chargersMapped,
+          chargers_not_mapped: chargersNotMapped,
+        },
+      ],
+    };
   } catch (err) {
-    final_res = {
+    console.error('dispatchChargers error:', err);
+    return {
       status: false,
-      message: `ERROR : ${err.code}`,
-      data: []
-    }
-  } finally {
-    result(null, final_res);
+      message: `ERROR: ${err.code || err.message}`,
+      data: [],
+    };
   }
-
 };
+
 
 ClientChargerMap.updateClientChargers = async (data, result) => {
   const datetime = new Date();
@@ -1500,11 +1611,64 @@ Charger.deleteChargerFromClient = async (id, user_id, result) => {
   }
 };
 
+// const insertModelConnector = async (data, charger_id, charger_display_id, created_by) => {
+//   const datetime = new Date().toISOString().slice(0, 10);
+
+//   const values = data.map((item, index) => [
+//     index + 1, // connector_no
+//     charger_id,
+//     item.connector_type_id,
+//     charger_display_id,
+//     item.status || 'Y',
+//     created_by,
+//     datetime
+//   ]);
+
+//   const deactivateStmt = `
+//     UPDATE charger_connector_mapping
+//     SET status = 'D', modify_date = ?, modifyby = ?
+//     WHERE charger_id = ? OR charger_display_id = ?
+//   `;
+
+//   const insertStmt = `
+//     INSERT INTO charger_connector_mapping (
+//       connector_no, charger_id, connector_type_id,
+//       charger_display_id, status, createdby, created_date
+//     ) VALUES ?
+//   `;
+
+//   try {
+//     // Deactivate old connectors
+//     await pool.query(deactivateStmt, [datetime, created_by, charger_id, charger_display_id]);
+
+//     // Insert new connectors
+//     const insertResult = await pool.query(insertStmt, [values]);
+
+//     return {
+//       status: true,
+//       message: "SUCCESS insert",
+//       inserted: insertResult.affectedRows || values.length
+//     };
+//   } catch (err) {
+//     return {
+//       status: false,
+//       message: "ERROR during insertModelConnector",
+//       error: err.message
+//     };
+//   }
+// };
 const insertModelConnector = async (data, charger_id, charger_display_id, created_by) => {
   const datetime = new Date().toISOString().slice(0, 10);
 
+  if (!data || data.length === 0) {
+    return {
+      status: false,
+      message: 'No connector data provided.'
+    };
+  }
+
   const values = data.map((item, index) => [
-    index + 1, // connector_no
+    index + 1,                      // connector_no
     charger_id,
     item.connector_type_id,
     charger_display_id,
@@ -1527,15 +1691,15 @@ const insertModelConnector = async (data, charger_id, charger_display_id, create
   `;
 
   try {
-    // Deactivate old connectors
+    // Deactivate old connector mappings
     await pool.query(deactivateStmt, [datetime, created_by, charger_id, charger_display_id]);
 
-    // Insert new connectors
+    // Insert new connector mappings
     const insertResult = await pool.query(insertStmt, [values]);
 
     return {
       status: true,
-      message: "SUCCESS insert",
+      message: "SUCCESS: Connector mappings inserted",
       inserted: insertResult.affectedRows || values.length
     };
   } catch (err) {
@@ -3915,8 +4079,8 @@ module.exports = {
   ChargerStationMap: ChargerStationMap,
   ClientChargerMap: ClientChargerMap,
   Set_Schedule_BLE: Set_Schedule_BLE,
-  ChargerRenewalRequestBle : ChargerRenewalRequestBle,
-  ChargerConfiguration : ChargerConfiguration,
+  ChargerRenewalRequestBle: ChargerRenewalRequestBle,
+  ChargerConfiguration: ChargerConfiguration,
   getMappedConnectors: getMappedConnectors,
   func_getChargers: func_getChargers
 };

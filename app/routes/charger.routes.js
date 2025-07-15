@@ -8,11 +8,12 @@ module.exports = app => {
     const uploadMultiple = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 3 }])
   
     // register a new vehicle
-    app.post("/charger/create",checkToken, chargers.create);
+   app.post("/charger/create", checkToken, upload.single('file'), chargers.create);
+
 
     // update register a new vehicle
     app.post("/charger/update",checkToken, chargers.update);
-    app.post("/charger/dispatchChargers",checkToken, chargers.dispatchChargers);
+    app.post("/charger/dispatchChargers",checkToken,upload.single('file'), chargers.dispatchChargers);
 
     //get all registered vehicles
     app.get("/charger/getChargers",checkToken, chargers.getChargers);
