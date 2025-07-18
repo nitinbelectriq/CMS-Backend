@@ -32,7 +32,8 @@ const ChargingStation = function (chargingStation) {
     this.created_date = chargingStation.created_date,
     this.created_by = chargingStation.created_by,
     this.modify_date = chargingStation.modify_date,
-    this.modify_by = chargingStation.modify_by
+    this.modify_by = chargingStation.modify_by,
+    this.amenities = chargingStation.amenities || [];
 };
 
 
@@ -69,30 +70,38 @@ const AddEvChargingStation = function (addEvChargingStation) {
 
 
 ChargingStation.create = async (newCs, result) => {
-  debugger;
-  var datetime = new Date();
   let final_res;
   let resp;
   let respCheck;
-  let stmtCheck = `select id from charging_station_mst 
-  where cpo_id = ${newCs.cpo_id} and name='${newCs.name}'  `;
+  const datetime = new Date();
+  const createdDate = datetime.toISOString().slice(0, 10);
 
-  let stmt = `insert into charging_station_mst ( cpo_id, name, code, description, 
-    address1  ,address2  ,PIN  ,landmark  ,city_id ,state_id ,country_id ,
-     lat, lng,location_type_id, cp_name,mobile,
-     email, commissioned_dt,register_as,electricity_line_id,
-     o_time,c_time,status,created_date,createdby)
-    VALUES ( ${newCs.cpo_id}, '${newCs.name}','${newCs.code}','${newCs.description}',
-    '${newCs.address1}','${newCs.address2}',${newCs.PIN},'${newCs.landmark}',${newCs.city_id},${newCs.state_id},${newCs.country_id},
-    ${newCs.lat},${newCs.lng},${newCs.location_type_id},'${newCs.cp_name}',${newCs.mobile},
-    '${newCs.email}','${newCs.commissioned_dt}',${newCs.register_as},${newCs.electricity_line_id},
-    '${newCs.o_time}','${newCs.c_time}',
-    '${newCs.status}','${datetime.toISOString().slice(0, 10)}',${newCs.created_by}) `;
+  const stmtCheck = `
+    SELECT id FROM charging_station_mst 
+    WHERE cpo_id = ${newCs.cpo_id} AND name='${newCs.name}'
+  `;
+
+  const stmt = `
+    INSERT INTO charging_station_mst (
+      cpo_id, name, code, description,
+      address1, address2, PIN, landmark,
+      city_id, state_id, country_id,
+      lat, lng, location_type_id, cp_name, mobile,
+      email, commissioned_dt, register_as, electricity_line_id,
+      o_time, c_time, status, created_date, createdby
+    ) VALUES (
+      ${newCs.cpo_id}, '${newCs.name}', '${newCs.code}', '${newCs.description}',
+      '${newCs.address1}', '${newCs.address2}', ${newCs.PIN}, '${newCs.landmark}',
+      ${newCs.city_id}, ${newCs.state_id}, ${newCs.country_id},
+      ${newCs.lat}, ${newCs.lng}, ${newCs.location_type_id}, '${newCs.cp_name}', ${newCs.mobile},
+      '${newCs.email}', '${newCs.commissioned_dt}', ${newCs.register_as}, ${newCs.electricity_line_id},
+      '${newCs.o_time}', '${newCs.c_time}', '${newCs.status}', '${createdDate}', ${newCs.created_by}
+    )
+  `;
 
   try {
-
+    // Check if station already exists
     respCheck = await pool.query(stmtCheck);
-
     if (respCheck.length > 0) {
       final_res = {
         status: false,
@@ -100,89 +109,128 @@ ChargingStation.create = async (newCs, result) => {
         message: 'Station already added for this CPO',
         count: 0,
         data: []
-      }
-    } else {
-      resp = await pool.query(stmt);
+      };
+      return result(null, final_res);
+    }
 
-      final_res = {
-        status: resp.insertId > 0 ? true : false,
-        err_code: `ERROR : 0`,
-        message: resp.insertId > 0 ? 'SUCCESS' : 'FAILED',
-        count: 1,
-        data: [{ id: resp.insertId }]
+    // Insert station
+    resp = await pool.query(stmt);
+    const stationId = resp.insertId;
+
+    // Insert amenities if provided
+    if (stationId && Array.isArray(newCs.amenities) && newCs.amenities.length > 0) {
+      for (let amenityId of newCs.amenities) {
+        const insertAmenityStmt = `
+          INSERT INTO station_amenity_mapping
+          (station_id, amenity_id, status, created_date, createdby)
+          VALUES (${stationId}, ${amenityId}, 'Y', '${createdDate}', ${newCs.created_by})
+        `;
+        await pool.query(insertAmenityStmt);
       }
     }
-  } catch (err) {
 
+    final_res = {
+      status: stationId > 0,
+      err_code: `ERROR : 0`,
+      message: stationId > 0 ? 'SUCCESS' : 'FAILED',
+      count: 1,
+      data: [{ id: stationId }]
+    };
+  } catch (err) {
     final_res = {
       status: false,
       err_code: `ERROR : ${err.code}`,
       message: `ERROR : ${err.message}`,
       count: 0,
       data: []
-    }
-  } finally {
-    result(null, final_res);
+    };
   }
+
+  result(null, final_res);
 };
 
 ChargingStation.update = async (newCs, result) => {
-  var datetime = new Date();
+  debugger;
+  const datetime = new Date();
   let final_res;
-  let resp;
-  let respCheck;
-debugger;
-  let stmtCheck = `select id from charging_station_mst 
-  where cpo_id = ${newCs.cpo_id} and name='${newCs.name}' and id<>${newCs.id} `;
-
-  let stmt = `update charging_station_mst set 
-    cpo_id = ${newCs.cpo_id}, name = '${newCs.name}', code = '${newCs.code}',
-    description = '${newCs.description}', address1='${newCs.address1}' ,
-    address2 ='${newCs.address2}' ,PIN =${newCs.PIN} ,landmark ='${newCs.landmark}' ,
-    city_id=${newCs.city_id} ,state_id=${newCs.state_id} , country_id=${newCs.country_id} ,
-    lat=${newCs.lat}, lng =${newCs.lng},location_type_id= ${newCs.location_type_id},
-    cp_name = '${newCs.cp_name}',mobile = ${newCs.mobile},email = '${newCs.email}',
-    commissioned_dt = '${newCs.commissioned_dt}',register_as = ${newCs.register_as},
-    electricity_line_id = ${newCs.electricity_line_id},o_time = '${newCs.o_time}',c_time = '${newCs.c_time}',
-    status = '${newCs.status}',modifyby = ${newCs.modify_by},modify_date = '${datetime.toISOString().slice(0, 10)}' 
-    where id =  ${newCs.id}`;
 
   try {
-    respCheck = await pool.query(stmtCheck);
+    // Check duplicate station name for the same CPO
+    const duplicateCheck = await pool.query(`
+      SELECT id FROM charging_station_mst 
+      WHERE cpo_id = ? AND name = ? AND id <> ?
+    `, [newCs.cpo_id, newCs.name, newCs.id]);
 
-    if (respCheck.length > 0) {
-      final_res = {
+    if (duplicateCheck.length > 0) {
+      return result(null, {
         status: false,
-        err_code: `ERROR : 1`,
-        message: 'Station with same name already added for another CPO',
+        err_code: 'ERROR : 1',
+        message: 'Station with same name already added for this CPO',
         count: 0,
         data: []
+      });
+    }
+
+    // Update charging station
+    await pool.query(`
+      UPDATE charging_station_mst SET 
+        cpo_id = ?, name = ?, code = ?, description = ?, address1 = ?, address2 = ?, PIN = ?,
+        landmark = ?, city_id = ?, state_id = ?, country_id = ?, lat = ?, lng = ?, 
+        location_type_id = ?, cp_name = ?, mobile = ?, email = ?, commissioned_dt = ?, 
+        register_as = ?, electricity_line_id = ?, o_time = ?, c_time = ?, status = ?, 
+        modify_date = ?, modifyby = ?
+      WHERE id = ?
+    `, [
+      newCs.cpo_id, newCs.name, newCs.code, newCs.description, newCs.address1, newCs.address2, newCs.PIN,
+      newCs.landmark, newCs.city_id, newCs.state_id, newCs.country_id, newCs.lat, newCs.lng,
+      newCs.location_type_id, newCs.cp_name, newCs.mobile, newCs.email, newCs.commissioned_dt,
+      newCs.register_as, newCs.electricity_line_id, newCs.o_time, newCs.c_time, newCs.status,
+      datetime.toISOString().slice(0, 19).replace('T', ' '), newCs.modify_by, newCs.id
+    ]);
+
+    // Remove old amenities
+    await pool.query(`DELETE FROM station_amenity_mapping WHERE station_id = ?`, [newCs.id]);
+
+    // Insert new amenities
+    if (Array.isArray(newCs.amenities) && newCs.amenities.length > 0) {
+      for (const amenity_id of newCs.amenities) {
+        try {
+          await pool.query(`
+            INSERT INTO station_amenity_mapping (station_id, amenity_id, status, created_date, createdby)
+            VALUES (?, ?, 'A', ?, ?)
+          `, [newCs.id, amenity_id,newCs.status, datetime.toISOString().slice(0, 10), newCs.modify_by]);
+
+          console.log(`Amenity inserted: station ${newCs.id}, amenity ${amenity_id}`);
+        } catch (insertErr) {
+          console.error(`Amenity insert failed for ID ${amenity_id}`, insertErr.message);
+        }
       }
     } else {
-      resp = await pool.query(stmt);
-
-      final_res = {
-        status: resp.affectedRows > 0 ? true : false,
-        err_code: `ERROR : 0`,
-        message: resp.affectedRows > 0 ? 'SUCCESS' : 'FAILED',
-        count: 1,
-        data: [{ id: newCs.id }]
-      }
+      console.log('No amenities provided.');
     }
-
-  } catch (err) {
 
     final_res = {
+      status: true,
+      err_code: 'ERROR : 0',
+      message: 'SUCCESS',
+      count: 1,
+      data: [{ id: newCs.id }]
+    };
+
+  } catch (err) {
+    console.error('Update failed:', err);
+    final_res = {
       status: false,
-      err_code: `ERROR : ${err.code}`,
-      message: `ERROR : ${err.message}`,
+      err_code: `ERROR : ${err.code || 'UNKNOWN'}`,
+      message: `ERROR : ${err.message || 'Internal Server Error'}`,
       count: 0,
       data: []
-    }
-  } finally {
-    result(null, final_res);
+    };
   }
+
+  result(null, final_res);
 };
+
 
 ChargingStation.getChargingStations = async result => {
 
@@ -2733,7 +2781,29 @@ AddEvChargingStation.LikeDislikeRequest = async (data, result) => {
   }
 };
 
+ChargingStation.getAllAmenities = async (result) => {
+  let stmt = `SELECT id, name, icon_url FROM amenity_mst`;
+  let final_res;
 
+  try {
+    const resp = await pool.query(stmt);
+    final_res = {
+      status: resp.length > 0,
+      err_code: resp.length > 0 ? 'ERROR : 0' : 'ERROR : 1',
+      message: resp.length > 0 ? 'SUCCESS' : 'DATA_NOT_FOUND',
+      data: resp
+    };
+  } catch (err) {
+    final_res = {
+      status: false,
+      err_code: `ERROR : ${err.code}`,
+      message: `ERROR : ${err.message}`,
+      data: []
+    };
+  } finally {
+    result(null, final_res);
+  }
+};
 
 
 

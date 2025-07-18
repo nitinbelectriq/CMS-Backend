@@ -447,9 +447,12 @@ debugger;
   }
 };
 
+// Updated dispatchChargers model function compatible with both single and bulk dispatch
+// Accepts either serial_no or id inside charger_data items
+
 ClientChargerMap.dispatchChargers = async (data) => {
   const now = new Date();
-debugger;
+
   const insertStmt = `
     INSERT INTO client_charger_mapping 
       (client_id, sub_client_id, charger_id, dispatch_status, dispatch_by, dispatch_date, status, createdby, created_date, warranty_start, warranty_end)
@@ -459,9 +462,13 @@ debugger;
     SELECT charger_id FROM client_charger_mapping 
     WHERE charger_id IN (?) AND status <> 'D'`;
 
-  const getChargerIdsStmt = `
+  const getChargerIdsBySerialStmt = `
     SELECT id, serial_no FROM charger_serial_mst 
     WHERE serial_no IN (?)`;
+
+  const getChargerSerialsByIdStmt = `
+    SELECT id, serial_no FROM charger_serial_mst 
+    WHERE id IN (?)`;
 
   const updatePrivateStmt = `
     UPDATE charger_serial_mst 
@@ -477,37 +484,63 @@ debugger;
     const isBulk = Array.isArray(data.charger_data);
     const chargerData = isBulk ? data.charger_data : [data];
 
-    const serialNos = chargerData.map((ch) => ch.serial_no.trim());
+    // Collect unique ids or serial numbers
+    const serialNumbers = chargerData
+      .filter((ch) => ch.serial_no)
+      .map((ch) => ch.serial_no.trim());
+    const chargerIdsOnly = chargerData
+      .filter((ch) => ch.id)
+      .map((ch) => ch.id);
 
-    // Safe destructuring: compatible with mysql and mysql2
-    const result1 = await pool.query(getChargerIdsStmt, [serialNos]);
-    const chargerRows = Array.isArray(result1[0]) ? result1[0] : result1;
+    let chargerRows = [];
 
-    const serialToIdMap = {};
-    for (const row of chargerRows) {
-      serialToIdMap[row.serial_no] = row.id;
+    // Fetch rows by serial_no if provided
+    if (serialNumbers.length > 0) {
+      const resultSerials = await pool.query(getChargerIdsBySerialStmt, [serialNumbers]);
+      chargerRows = chargerRows.concat(Array.isArray(resultSerials[0]) ? resultSerials[0] : resultSerials);
     }
 
-    const chargerIds = Object.values(serialToIdMap);
-    if (chargerIds.length === 0) {
+    // Fetch rows by id if provided
+    if (chargerIdsOnly.length > 0) {
+      const resultIds = await pool.query(getChargerSerialsByIdStmt, [chargerIdsOnly]);
+      chargerRows = chargerRows.concat(Array.isArray(resultIds[0]) ? resultIds[0] : resultIds);
+    }
+
+    if (!Array.isArray(chargerRows) || chargerRows.length === 0) {
       return {
         status: false,
-        message: 'No valid serial numbers found.',
+        message: 'No matching chargers found by id or serial_no.',
         data: [],
       };
     }
 
-    const result2 = await pool.query(selectExistingStmt, [chargerIds]);
+    const serialToIdMap = {};
+    const idToSerialMap = {};
+    for (const row of chargerRows) {
+      serialToIdMap[row.serial_no] = row.id;
+      idToSerialMap[row.id] = row.serial_no;
+    }
+
+    const allChargerIds = Object.values(serialToIdMap).concat(Object.keys(idToSerialMap).map(Number));
+
+    const result2 = await pool.query(selectExistingStmt, [allChargerIds]);
     const existingRows = Array.isArray(result2[0]) ? result2[0] : result2;
     const existingChargerIds = new Set(existingRows.map((r) => r.charger_id));
 
     for (const ch of chargerData) {
-      const serial = ch.serial_no.trim();
-      const chargerId = serialToIdMap[serial];
+      let chargerId;
+      let serial;
 
-      if (!chargerId) {
+      if (ch.serial_no && serialToIdMap[ch.serial_no.trim()]) {
+        serial = ch.serial_no.trim();
+        chargerId = serialToIdMap[serial];
+      } else if (ch.id && idToSerialMap[ch.id]) {
+        chargerId = ch.id;
+        serial = idToSerialMap[ch.id];
+      } else {
         chargersNotMapped.push({
-          serial_no: serial,
+          id: ch.id,
+          serial_no: ch.serial_no || '',
           remarks: 'NOT_FOUND_IN_DB',
         });
         continue;

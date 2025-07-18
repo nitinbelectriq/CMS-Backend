@@ -58,4 +58,7 @@ module.exports = app => {
     app.post("/chargingStation/approveRejectChargerStationRequest", chargingStations.approveRejectChargerStationRequest); 
     app.delete("/chargingStation/deleteChargerStationRequest/:id/:modify_by", chargingStations.deleteChargerStationRequest);
     app.post("/chargingStation/LikeDislikeRequest", chargingStations.LikeDislikeRequest);
+
+
+    app.get("/getAllAmenities",checkToken,chargingStations.getAllAmenities)
   };

@@ -26,7 +26,11 @@ const Client = function (client) {
     this.created_date = client.created_date,
     this.created_by = client.created_by,
     this.modify_date = client.modify_date,
-    this.modify_by = client.modify_by
+    this.modify_by = client.modify_by,
+    this.bank= client.bank ,
+    this.ifsc= client.ifsc ,
+    this.account= client.account ,
+    this.account_holder_name= client.account_holder_name 
 };
 
 const ClientModuleMapping = function (clientModuleMapping) {
@@ -46,134 +50,142 @@ const ClientModuleMapping = function (clientModuleMapping) {
 };
 
 Client.create = async (newClient, result) => {
-  var datetime = new Date();
   let final_res;
   let resp;
-debugger;
-  // let stmt = `insert into client_mst (name,description,gst_no,tin_no,
-  //   address1  ,address2  ,PIN  ,landmark  ,city_id ,state_id ,country_id ,
-  //   logoPath,  mobile,email,cp_name,status,created_date,createdby )
-  //   VALUES ('${newClient.name}','${newClient.description}','${newClient.gst_no}','${newClient.tin_no}',
-  //   '${newClient.address1}','${newClient.address2}',${newClient.PIN},'${newClient.landmark}',${newClient.city_id},${newClient.state_id},${newClient.country_id},
-  //   '${newClient.logoPath}',  '${newClient.mobile}','${newClient.email}','${newClient.cp_name}',
-  //   '${newClient.status}',?,${newClient.created_by}) `;
 
-
-  let stmt = `call pCMSAddClient('${newClient.name}','${newClient.description}','${newClient.gst_no}','${newClient.tin_no}',
-     '${newClient.address1}','${newClient.address2}',${newClient.PIN},'${newClient.landmark}',${newClient.city_id},${newClient.state_id},${newClient.country_id},
-     '${newClient.logoPath}',  '${newClient.mobile}','${newClient.email}','${newClient.cp_name}',
-     '${newClient.status}',${newClient.created_by}, @OP_ErrorCode,@OP_ErrorDetail);select @OP_ErrorCode as OP_ErrorCode,  @OP_ErrorDetail as OP_ErrorDetail`
+  // Call stored procedure with bank details added at the end
+  let stmt = `call pCMSAddClient(
+    '${newClient.name}',
+    '${newClient.description}',
+    '${newClient.gst_no}',
+    '${newClient.tin_no}',
+    '${newClient.address1}',
+    '${newClient.address2}',
+    ${newClient.PIN},
+    '${newClient.landmark}',
+    ${newClient.city_id},
+    ${newClient.state_id},
+    ${newClient.country_id},
+    '${newClient.logoPath}',
+    '${newClient.mobile}',
+    '${newClient.email}',
+    '${newClient.cp_name}',
+    '${newClient.status}',
+    ${newClient.created_by},
+    '${newClient.bank || ''}',
+    '${newClient.ifsc || ''}',
+    '${newClient.account || ''}',
+    '${newClient.account_holder_name || ''}',
+    @OP_ErrorCode,
+    @OP_ErrorDetail
+  );
+  select @OP_ErrorCode as OP_ErrorCode, @OP_ErrorDetail as OP_ErrorDetail`;
 
   try {
     resp = await pool.query(stmt);
 
-    if (resp.length = 2) {
+    if (resp.length == 2) {
       final_res = {
-
-        status: resp[1][0].OP_ErrorCode > 0 ? true : false,
+        status: resp[1][0].OP_ErrorCode > 0,
         err_code: `ERROR : 0`,
-        message: resp[1][0].OP_ErrorCode> 0 ? 'SUCCESS' : 'FAILED',
-        count : 1,
-        data: [{id:resp[1][0].OP_ErrorCode}]
-      }
+        message: resp[1][0].OP_ErrorCode > 0 ? 'SUCCESS' : 'FAILED',
+        count: 1,
+        data: [{ id: resp[1][0].OP_ErrorCode }]
+      };
+    } else {
+      final_res = {
+        status: false,
+        err_code: `ERROR : UNKNOWN`,
+        message: 'Unexpected response',
+        count: 0,
+        data: []
+      };
     }
-    else{
-
-    }
-    // final_res = {
-
-    //   status: resp[0].insertId > 0 ? true : false,
-    //   err_code: `ERROR : 0`,
-    //   message: resp[0].insertId > 0 ? 'SUCCESS' : 'FAILED',
-    //   count : 1,
-    //   data: [{id:resp[0].insertId}]
-    // }
   } catch (err) {
     final_res = {
       status: false,
       err_code: `ERROR : ${err.code}`,
       message: `ERROR : ${err.message}`,
-      count : 0,
+      count: 0,
       data: []
-    }
+    };
   } finally {
     result(null, final_res);
   }
-
-  // sql.query(stmt, (err, res) => {
-
-  //   if (err) {
-  //     result(err, null);
-  //     return;
-  //   }
-
-  //   result(null, { id: res.insertId, ...newClient });
-  // });
 };
 
 Client.update = async (newClient, result) => {
-  var datetime = new Date();
   let final_res;
   let resp;
+debugger;
+  // Escape and handle nulls safely
+  const escape = (val) => (val !== undefined && val !== null ? `'${val}'` : 'NULL');
 
-  // let stmt = `update client_mst set 
-  // name = '${newClient.name}',description = '${newClient.description}',gst_no = '${newClient.gst_no}',tin_no = '${newClient.tin_no}',
-  // address1='${newClient.address1}'  ,address2 ='${newClient.address2}' ,PIN =${newClient.PIN} ,
-  // landmark ='${newClient.landmark}' ,city_id=${newClient.city_id} ,state_id=${newClient.state_id} ,
-  // country_id=${newClient.country_id} ,
-  // logoPath = '${newClient.logoPath}',mobile = '${newClient.mobile}',email = '${newClient.email}',
-  // cp_name = '${newClient.cp_name}',status = '${newClient.status}',
-  // modifyby = ${newClient.modify_by},modify_date = ? 
-  // where id =  ${newClient.id}`;
-
-  let stmt = `call pCMSUpdateClient('${newClient.id}','${newClient.name}','${newClient.description}','${newClient.gst_no}','${newClient.tin_no}',
-  '${newClient.address1}','${newClient.address2}',${newClient.PIN},'${newClient.landmark}',${newClient.city_id},${newClient.state_id},${newClient.country_id},
-  '${newClient.logoPath}',  '${newClient.mobile}','${newClient.email}','${newClient.cp_name}',
-  '${newClient.status}',${newClient.modify_by}, @OP_ErrorCode,@OP_ErrorDetail);select @OP_ErrorCode as OP_ErrorCode,  @OP_ErrorDetail as OP_ErrorDetail`
-
+  const stmt = `
+    CALL pCMSUpdateClient(
+      ${escape(newClient.id)},
+      ${escape(newClient.name)},
+      ${escape(newClient.description)},
+      ${escape(newClient.gst_no)},
+      ${escape(newClient.tin_no)},
+      ${escape(newClient.address1)},
+      ${escape(newClient.address2)},
+      ${newClient.PIN || 0},
+      ${escape(newClient.landmark)},
+      ${newClient.city_id || 0},
+      ${newClient.state_id || 0},
+      ${newClient.country_id || 0},
+      ${escape(newClient.logoPath)},
+      ${escape(newClient.mobile)},
+      ${escape(newClient.email)},
+      ${escape(newClient.cp_name)},
+      ${escape(newClient.status)},
+      ${newClient.modify_by || 0},
+      ${escape(newClient.bank || '')},
+      ${escape(newClient.ifsc || '')},
+      ${escape(newClient.account || '')},
+      ${escape(newClient.account_holder_name || '')},
+      @OP_ErrorCode,
+      @OP_ErrorDetail
+    );
+    SELECT @OP_ErrorCode AS OP_ErrorCode, @OP_ErrorDetail AS OP_ErrorDetail;
+  `;
 
   try {
-   // resp = await pool.query(stmt,[datetime]);
+    resp = await pool.query(stmt);
 
-   resp = await pool.query(stmt);
+    if (resp.length >= 2 && resp[1][0]) {
+      const output = resp[1][0];
 
-   if (resp.length = 2) {
       final_res = {
-        status: resp[1][0].OP_ErrorCode > 0 ? true : false,
-        err_code: `ERROR : 0`,
-        message: resp[1][0].OP_ErrorCode > 0 ? 'SUCCESS' : 'FAILED',
-        count : 1,
-        data: [{id:newClient.id}]
-      }
+        status: output.OP_ErrorCode > 0,
+        err_code: `ERROR: ${output.OP_ErrorCode}`,
+        message: output.OP_ErrorCode > 0 ? 'SUCCESS' : output.OP_ErrorDetail || 'FAILED',
+        count: 1,
+        data: [{ id: newClient.id }]
+      };
+    } else {
+      final_res = {
+        status: false,
+        err_code: 'ERROR: UNKNOWN',
+        message: 'Unexpected response from stored procedure',
+        count: 0,
+        data: []
+      };
     }
-    else{
-
-    }
-
-  
   } catch (err) {
-    
     final_res = {
       status: false,
-      err_code: `ERROR : ${err.code}`,
-      message: `ERROR : ${err.message}`,
-      count : 0,
+      err_code: `ERROR: ${err.code}`,
+      message: `ERROR: ${err.message}`,
+      count: 0,
       data: []
-    }
+    };
   } finally {
     result(null, final_res);
   }
-
-  // sql.query(stmt, (err, res) => {
-
-  //   if (err) {
-  //     result(err, null);
-  //     return;
-  //   }
-
-  //   result(null, { id: res.insertId, ...newClient });
-  // });
 };
+
 
 
 Client.getClients =async(result) => {

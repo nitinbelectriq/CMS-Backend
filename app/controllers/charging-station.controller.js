@@ -4,118 +4,87 @@ const ChargingStation = myModule.ChargingStation;
 const AddEvChargingStation = myModule.AddEvChargingStation;
 
 exports.create = (req, res) => {
-  // Validate request
-  debugger;
   if (!req.body) {
-    res.status(400).send({
+    return res.status(400).send({
       message: "Content can not be empty!"
     });
   }
 
-  // Create a Vehicle
-  const chargingStation = new ChargingStation({
-    cpo_id: req.body.cpo_id,
-    name: req.body.name,
-    code: req.body.code,
-    description: req.body.description,
+  // Construct charging station object
+const chargingStation = new ChargingStation({
+  id: req.body.id,
+  cpo_id: req.body.cpo_id,
+  name: req.body.name,
+  code: req.body.code,
+  description: req.body.description,
+  address1: req.body.address1 || '',
+  address2: req.body.address2 || '',
+  PIN: req.body.PIN || 0,
+  landmark: req.body.landmark || '',
+  city_id: req.body.city_id || 0,
+  state_id: req.body.state_id || 0,
+  country_id: req.body.country_id || 0,
+  lat: req.body.lat,
+  lng: req.body.lng,
+  location_type_id: req.body.location_type_id,
+  cp_name: req.body.cp_name,
+  mobile: req.body.mobile,
+  email: req.body.email,
+  commissioned_dt: req.body.commissioned_dt || '',
+  register_as: req.body.register_as,
+  electricity_line_id: req.body.electricity_line_id,
+  o_time: req.body.o_time,
+  c_time: req.body.c_time,
+  status: req.body.status,
+  created_date: req.body.created_date,
+  created_by: req.body.created_by,
+  modify_date: req.body.modified_date, // ✅ fix this
+  modify_by: req.body.modified_by,     // ✅ fix this
+  amenities: Array.isArray(req.body.amenities) ? req.body.amenities : []
+});
 
-    // address : req.body.address,
-    // pin : req.body.pin,
-    address1: !!req.body.address1 ? req.body.address1 : '',
-    address2: !!req.body.address2 ? req.body.address2 : '',
-    PIN: !!req.body.PIN ? req.body.PIN : 0,
-    landmark: !!req.body.landmark ? req.body.landmark : '',
-    city_id: !!req.body.city_id ? req.body.city_id : 0,
-    state_id: !!req.body.state_id ? req.body.state_id : 0,
-    country_id: !!req.body.country_id ? req.body.country_id : 0,
 
-    lat: req.body.lat,
-    lng: req.body.lng,
-    location_type_id: req.body.location_type_id,
-    cp_name: req.body.cp_name,
-    mobile: req.body.mobile,
-    email: req.body.email,
-    commissioned_dt: !!req.body.commissioned_dt ? req.body.commissioned_dt : '',
-    register_as: req.body.register_as,
-    electricity_line_id: req.body.electricity_line_id,
-    o_time: req.body.o_time,
-    c_time: req.body.c_time,
-    status: req.body.status,
-    created_date: req.body.created_date,
-    created_by: req.body.created_by,
-    modify_date: req.body.modify_date,
-    modify_by: req.body.modify_by
-
-  });
-
-  // Save Customer in the database
+  // Save to DB
   ChargingStation.create(chargingStation, (err, data) => {
-    // if (err)
-    //   res.status(500).send({
-    //     message:
-    //       err.message || "Some error occurred while creating the Customer."
-    //   });
-    // else res.send(data);
+    if (err) {
+      return res.status(500).send({
+        message: err.message || "Some error occurred while creating the Charging Station."
+      });
+    }
     res.send(data);
   });
 };
+
 
 exports.update = (req, res) => {
-  // Validate request
   debugger;
+
   if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    });
+    return res.status(400).send({ message: "Content can not be empty!" });
   }
 
-  // Create a Vehicle
+  // Log amenities for debugging
+  console.log("Received amenities:", req.body.amenities);
+
   const chargingStation = new ChargingStation({
-    id: req.body.id,
-    cpo_id: req.body.cpo_id,
-    name: req.body.name,
-    code: req.body.code,
-    description: req.body.description,
-
-    // address : req.body.address,
-    // pin : req.body.pin,
-    address1: !!req.body.address1 ? req.body.address1 : '',
-    address2: !!req.body.address2 ? req.body.address2 : '',
-    PIN: !!req.body.PIN ? req.body.PIN : 0,
-    landmark: !!req.body.landmark ? req.body.landmark : '',
-    city_id: !!req.body.city_id ? req.body.city_id : 0,
-    state_id: !!req.body.state_id ? req.body.state_id : 0,
-    country_id: !!req.body.country_id ? req.body.country_id : 0,
-
-    lat: req.body.lat,
-    lng: req.body.lng,
-    location_type_id: req.body.location_type_id,
-    cp_name: req.body.cp_name,
-    mobile: req.body.mobile,
-    email: req.body.email,
-    commissioned_dt: req.body.commissioned_dt,
-    register_as: req.body.register_as,
-    electricity_line_id: req.body.electricity_line_id,
-    o_time: req.body.o_time,
-    c_time: req.body.c_time,
-    status: req.body.status,
-    created_date: req.body.created_date,
-    created_by: req.body.created_by,
-    modify_date: req.body.modify_date,
-    modify_by: req.body.modify_by
+    ...req.body,
+    address1: req.body.address1 || '',
+    address2: req.body.address2 || '',
+    PIN: req.body.PIN || 0,
+    landmark: req.body.landmark || '',
+    city_id: req.body.city_id || 0,
+    state_id: req.body.state_id || 0,
+    country_id: req.body.country_id || 0,
+    commissioned_dt: req.body.commissioned_dt || '',
+    modify_by: req.body.modified_by,
+    amenities: Array.isArray(req.body.amenities) ? req.body.amenities : []
   });
 
-  // Save Customer in the database
   ChargingStation.update(chargingStation, (err, data) => {
-    // if (err)
-    //   res.status(500).send({
-    //     message:
-    //       err.message || "Some error occurred while creating the Customer."
-    //   });
-    // else res.send(data);
     res.send(data);
   });
 };
+
 
 exports.getChargingStations = (req, res) => {
   ChargingStation.getChargingStations((err, data) => {
@@ -688,8 +657,21 @@ exports.LikeDislikeRequest = (req, res) => {
   AddEvChargingStation.LikeDislikeRequest(request, (err, data) => {
     res.send(data);
   });
-
+}
+exports.getAllAmenities = (req, res) => {
+  ChargingStation.getAllAmenities((err, data) => {
+    if (err) {
+      return res.status(500).send({
+        status: false,
+        err_code: 'ERROR : 500',
+        message: 'Internal Server Error',
+        data: []
+      });
+    }
+    res.send(data);
+  });
 };
+
 
 
 

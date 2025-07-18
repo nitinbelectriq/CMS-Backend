@@ -34,7 +34,11 @@ debugger;
     created_date : req.body.created_date ,
     created_by : req.body.created_by,
     modify_date : req.body.modify_date ,
-    modify_by : req.body.modify_by
+    modify_by : req.body.modify_by,
+    bank: req.body.bankName,
+    ifsc: req.body.ifsc,
+    account: req.body.accountNumber,
+    account_holder_name: req.body.accountHolderName
   });
 
   // Save Customer in the database
@@ -49,52 +53,52 @@ debugger;
 };
 
 exports.update = (req, res) => {
-  // Validate request
   if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!"
+    return res.status(400).send({
+      message: "Content cannot be empty!"
     });
   }
-
-  // Create a Vehicle
+debugger;
   const client = new Client({
-    id : req.body.id,
-    name : req.body.name ,
-    description : req.body.description,
-    gst_no:req.body.gst_no,
-    tin_no:req.body.tin_no,
+    id: req.body.id,
+    name: req.body.name,
+    description: req.body.description || '',
+    gst_no: req.body.gst_no || '',
+    tin_no: req.body.tin_no || '',
+    address1: req.body.address1 || '',
+    address2: req.body.address2 || '',
+    PIN: req.body.PIN || '',
+    landmark: req.body.landmark || '',
+    city_id: req.body.city_id || 0,
+    state_id: req.body.state_id || 0,
+    country_id: req.body.country_id || 0,
+    logoPath: req.body.logoPath || '',
+    mobile: req.body.mobile,
+    email: req.body.email,
+    cp_name: req.body.cp_name,
+    status: req.body.status || 'Y',
+    created_date: req.body.created_date || null,
+    created_by: req.body.created_by || null,
+    modify_date: req.body.modify_date || new Date(),
+    modify_by: req.body.modify_by || null,
 
-    // address : req.body.address,
-    address1  :  !!req.body.address1 ? req.body.address1 : '' ,
-    address2  :  !!req.body.address2 ? req.body.address2 : '' ,
-    PIN  :  !!req.body.PIN ? req.body.PIN : 0 ,
-    landmark  :  !!req.body.landmark ? req.body.landmark : '' ,
-    city_id  :  !!req.body.city_id ? req.body.city_id : 0 ,
-    state_id  :  !!req.body.state_id ? req.body.state_id : 0 ,
-    country_id  :  !!req.body.country_id ? req.body.country_id : 0 ,
-
-    logoPath : req.body.logoPath,
-    mobile : req.body.mobile,
-    email : req.body.email,
-    cp_name : req.body.cp_name,
-    status : req.body.status ,
-    created_date : req.body.created_date ,
-    created_by : req.body.created_by,
-    modify_date : req.body.modify_date ,
-    modify_by : req.body.modify_by
+    // Bank Details - handle empty gracefully
+    bank: req.body.bankName || '',
+    ifsc: req.body.ifsc || '',
+    account: req.body.accountNumber || '',
+    account_holder_name: req.body.accountHolderName || ''
   });
 
-  // Save Customer in the database
   Client.update(client, (err, data) => {
-    // if (err)
-    //   res.status(500).send({
-    //     message:
-    //       err.message || "Some error occurred while creating the Customer."
-    //   });
-    // else res.send(data);
-     res.send(data);
+    if (err) {
+      return res.status(500).send({
+        message: err.message || "Some error occurred while updating the client."
+      });
+    }
+    res.send(data);
   });
 };
+
 
 exports.getClients = (req, res) => {
 

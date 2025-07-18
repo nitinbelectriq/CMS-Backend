@@ -140,13 +140,15 @@ exports.update = (req, res) => {
   });
 };
 
-exports.dispatchChargers = (req, res) => {
-  // multer saves file info to req.file (single file) or req.files (multiple)
-  const file = req.file || (req.files && req.files.file?.[0]);
 
+// UPDATED CONTROLLER: dispatchChargers.js
+
+exports.dispatchChargers = (req, res) => {
+  const file = req.file || (req.files && req.files.file?.[0]);
+debugger;
   // BULK dispatch from CSV
   if (file) {
-    if (!file.originalname.endsWith('.csv')) {
+    if (!file.originalname.toLowerCase().endsWith('.csv')) {
       return res.status(400).send({ status: false, message: 'Only CSV files allowed for bulk upload.' });
     }
 
@@ -159,7 +161,6 @@ exports.dispatchChargers = (req, res) => {
         results.push(row);
       })
       .on('end', async () => {
-        // Clean up uploaded file
         fs.unlinkSync(filePath);
 
         if (results.length === 0) {
@@ -169,17 +170,17 @@ exports.dispatchChargers = (req, res) => {
         const bulkData = {
           client_id: req.body.client_id,
           sub_client_id: req.body.sub_client_id || 0,
-          is_private: req.body.public === '0' ? 0 : 1, // assuming you send public='0' for true
+          is_private: req.body.public === '0' ? 0 : 1,
           dispatch_status: req.body.status || 'Y',
           dispatch_by: req.body.dispatch_by,
           dispatch_date: req.body.dispatch_date,
           status: req.body.status || 'Y',
           created_by: req.body.dispatch_by,
           charger_data: results.map((row) => ({
-            serial_no: row.serial_no?.trim(),
+            serial_no: row.serial_no ? row.serial_no.trim() : '',
             warranty_start: row.warranty_start_date || null,
             warranty_end: row.warranty_end_date || null,
-          })),
+          }))
         };
 
         try {
@@ -195,30 +196,33 @@ exports.dispatchChargers = (req, res) => {
 
   // SINGLE dispatch
   const body = req.body;
-  // Check that mandatory fields exist for single dispatch
-  if (!body || !body.charger_id || !body.client_id) {
+
+  if (!body || !Array.isArray(body.charger_data) || body.charger_data.length === 0 || !body.client_id) {
     return res.status(400).send({
       status: false,
-      message: 'Required fields missing for single dispatch.',
+      message: 'Required fields missing for single dispatch. client_id and charger_data are mandatory.',
     });
   }
+
+  const chargerItem = body.charger_data[0];
 
   const singleData = {
     client_id: body.client_id,
     sub_client_id: body.sub_client_id || 0,
-    is_private: body.public === '0' ? 0 : 1,
-    dispatch_status: body.status || 'Y',
+    is_private: body.is_private,
+    dispatch_status: body.dispatch_status || 'Y',
     dispatch_by: body.dispatch_by,
     dispatch_date: body.dispatch_date,
     status: body.status || 'Y',
-    created_by: body.dispatch_by,
+    created_by: body.created_by,
+    modify_by: body.modify_by,
     charger_data: [
       {
-        serial_no: body.charger_id, // assuming serial_no passed as charger_id
-        warranty_start: body.warranty_start || null,
-        warranty_end: body.warranty_end || null,
-      },
-    ],
+        id: chargerItem.id,
+        warranty_start: chargerItem.warranty_start || null,
+        warranty_end: chargerItem.warranty_end || null,
+      }
+    ]
   };
 
   ClientChargerMap.dispatchChargers(singleData)
