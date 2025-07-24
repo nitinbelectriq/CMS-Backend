@@ -449,7 +449,7 @@ VModel_CType.getAllPublishedVModel = result => {
       inner join vehicle_model_mst vmm on  ctvmm.vm_id = vmm.id
       inner join vehicle_type_mst vtm on  ctvmm.vType_id = vtm.id
       inner join vehicle_brand_mst vbm on vmm.brand_id = vbm.id
-      where ctvmm.status = 'Y'
+      where ctvmm.status <> 'D'
       order by ctvmm.id desc`, (err, res) => {
     if (err) {
 

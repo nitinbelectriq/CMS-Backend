@@ -74,7 +74,7 @@ require("./app/routes/login.routes")(app);
 require("./app/routes/charger-type.routes")(app);
 // require("./app/routes/charger-batch.routes")(app);
  require("./app/routes/version.routes")(app);
-// require("./app/routes/charger-monitoring.routes")(app);
+require("./app/routes/charger-monitoring.routes")(app);
  require("./app/routes/rf-id.routes")(app);
 require("./app/routes/user-management.routes")(app);
  require("./app/routes/role-management.routes")(app);
