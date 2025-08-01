@@ -13,7 +13,7 @@ module.exports = app => {
 
     // update register a new vehicle
     app.post("/charger/update",checkToken, chargers.update);
-    app.post("/charger/dispatchChargers",checkToken,upload.single('file'), chargers.dispatchChargers);
+    app.post("/charger/dispatchChargers",checkToken, chargers.dispatchChargers);
 
     //get all registered vehicles
     app.get("/charger/getChargers",checkToken, chargers.getChargers);

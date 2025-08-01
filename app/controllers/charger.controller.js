@@ -1,260 +1,126 @@
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parser');
-// const myModule = require("../models/charger.model.js");
-// const Charger = myModule.Charger;
-const {Charger, ClientChargerMap} = require('../models/charger.model');
+const { query } = require("express");
+const myModule = require("../models/charger.model.js");
+const _utility = require("../utility/_utility");
+
+const Charger = myModule.Charger;
+const ChargerRenewalRequestBle = myModule.ChargerRenewalRequestBle;
+const ChargingProfile = myModule.ChargingProfile;
+const ChargerStationMap = myModule.ChargerStationMap;
+const ClientChargerMap = myModule.ClientChargerMap;
+const AddChargerRequest = myModule.AddChargerRequest;
+const Set_Schedule_BLE = myModule.Set_Schedule_BLE;
+const ChargerConfiguration = myModule.ChargerConfiguration;
+
 exports.create = (req, res) => {
-  // Handle bulk CSV upload
-  const file = req.file || (req.files && req.files.file?.[0]);
-  if (file) {
-    if (!file.originalname.endsWith('.csv')) {
-      return res.status(400).send({ status: false, message: 'Only CSV files allowed for bulk upload.' });
-    }
-
-    const results = [];
-    const errors = [];
-    const filePath = file.path;
-
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', (row) => {
-        results.push(row);
-      })
-      .on('end', () => {
-        let insertedCount = 0;
-        let processedCount = 0;
-
-        if (results.length === 0) {
-          return res.status(400).send({ status: false, message: "CSV file is empty" });
-        }
-
-        // Process each row sequentially with callback style
-        function processRow(index) {
-          if (index >= results.length) {
-            // All rows processed
-            return res.status(200).send({
-              status: true,
-              message: 'Bulk upload complete.',
-              insertedCount,
-              errors,
-            });
-          }
-
-          const row = results[index];
-          if (!row.serial_no || !row.charger_display_id) {
-            errors.push({ row, reason: 'Missing serial_no or charger_display_id' });
-            processRow(index + 1);
-            return;
-          }
-
-          const chargerData = {
-            serial_no: row.serial_no,
-            charger_display_id: row.charger_display_id,
-            model_id: req.body.model_id,
-            current_version_id: req.body.current_version_id,
-            is_available: req.body.is_available === '1' ? '1' : '0',
-            status: req.body.status === 'Y' ? 'Y' : 'N',
-            created_by: req.body.created_by
-          };
-
-          Charger.create(chargerData, (err, data) => {
-            processedCount++;
-            if (err) {
-              errors.push({ row, reason: err.message });
-            } else {
-              insertedCount++;
-            }
-            processRow(index + 1);
-          });
-        }
-
-        processRow(0);
-      });
-
-    return;
-  }
-
-  // Handle single creation
-  const body = req.body;
-  if (!body || !body.serial_no || !body.model_id) {
-    return res.status(400).send({
-      status: false,
-      message: 'Required fields missing for single creation.',
-    });
-  }
-
-  Charger.create(body, (err, data) => {
-    if (err) {
-      return res.status(500).send({ status: false, message: err.message });
-    }
-    res.status(200).send({ status: true, message: 'Charger created successfully.', data });
-  });
-};
-
-exports.update = (req, res) => {
+  // Validate request
   if (!req.body) {
-    return res.status(400).send({ message: "Content can not be empty!" });
-  }
-
-  const charger = new Charger({
-    id: req.body.id ?? null,
-    name: req.body.charger_display_id,
-    serial_no: req.body.serial_no,
-    batch_id: req.body.batch_id ?? null,
-    model_id: req.body.model_id,
-    station_id: req.body.station_id ?? null,
-    current_version_id: req.body.current_version_id ?? null,
-    no_of_guns: req.body.no_of_guns ?? 0,
-    address1: req.body.address1 ?? '',
-    address2: req.body.address2 ?? '',
-    PIN: req.body.PIN ?? 0,
-    landmark: req.body.landmark ?? '',
-    city_id: req.body.city_id ?? 0,
-    state_id: req.body.state_id ?? 0,
-    country_id: req.body.country_id ?? 0,
-    Lat: req.body.Lat ?? 0,
-    Lng: req.body.Lng ?? 0,
-    OTA_Config: req.body.OTA_Config ?? '',
-    Periodic_Check_Ref_Time: req.body.Periodic_Check_Ref_Time ?? null,
-    Periodicity_in_hours: req.body.Periodicity_in_hours ?? 0,
-    When_to_Upgrade: req.body.When_to_Upgrade ?? '',
-    Upgrade_Specific_Time: req.body.Upgrade_Specific_Time ?? '',
-    is_available: req.body.is_available ?? '0',
-    status: req.body.status ?? 'Y',
-    created_date: req.body.created_date ?? null,
-    created_by: req.body.created_by ?? null,
-    modify_date: req.body.modify_date ?? new Date().toISOString().slice(0, 10),
-    modify_by: req.body.modify_by ?? null,
-    connector_data: req.body.connector_data ?? []
-  });
-
-  Charger.update(charger, (err, data) => {
-    if (err) {
-      return res.status(500).send({
-        status: false,
-        message: err.message || "Some error occurred during update."
-      });
-    }
-    res.send(data);
-  });
-};
-
-
-// UPDATED CONTROLLER: dispatchChargers.js
-
-exports.dispatchChargers = (req, res) => {
-  const file = req.file || (req.files && req.files.file?.[0]);
-debugger;
-  // BULK dispatch from CSV
-  if (file) {
-    if (!file.originalname.toLowerCase().endsWith('.csv')) {
-      return res.status(400).send({ status: false, message: 'Only CSV files allowed for bulk upload.' });
-    }
-
-    const results = [];
-    const filePath = file.path;
-
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', (row) => {
-        results.push(row);
-      })
-      .on('end', async () => {
-        fs.unlinkSync(filePath);
-
-        if (results.length === 0) {
-          return res.status(400).send({ status: false, message: 'CSV file is empty' });
-        }
-
-        const bulkData = {
-          client_id: req.body.client_id,
-          sub_client_id: req.body.sub_client_id || 0,
-          is_private: req.body.public === '0' ? 0 : 1,
-          dispatch_status: req.body.status || 'Y',
-          dispatch_by: req.body.dispatch_by,
-          dispatch_date: req.body.dispatch_date,
-          status: req.body.status || 'Y',
-          created_by: req.body.dispatch_by,
-          charger_data: results.map((row) => ({
-            serial_no: row.serial_no ? row.serial_no.trim() : '',
-            warranty_start: row.warranty_start_date || null,
-            warranty_end: row.warranty_end_date || null,
-          }))
-        };
-
-        try {
-          const response = await ClientChargerMap.dispatchChargers(bulkData);
-          return res.status(200).send(response);
-        } catch (err) {
-          console.error('Bulk dispatch error:', err);
-          return res.status(500).send({ status: false, message: 'Bulk dispatch failed.' });
-        }
-      });
-    return;
-  }
-
-  // SINGLE dispatch
-  const body = req.body;
-
-  if (!body || !Array.isArray(body.charger_data) || body.charger_data.length === 0 || !body.client_id) {
-    return res.status(400).send({
-      status: false,
-      message: 'Required fields missing for single dispatch. client_id and charger_data are mandatory.',
-    });
-  }
-
-  const chargerItem = body.charger_data[0];
-
-  const singleData = {
-    client_id: body.client_id,
-    sub_client_id: body.sub_client_id || 0,
-    is_private: body.is_private,
-    dispatch_status: body.dispatch_status || 'Y',
-    dispatch_by: body.dispatch_by,
-    dispatch_date: body.dispatch_date,
-    status: body.status || 'Y',
-    created_by: body.created_by,
-    modify_by: body.modify_by,
-    charger_data: [
-      {
-        id: chargerItem.id,
-        warranty_start: chargerItem.warranty_start || null,
-        warranty_end: chargerItem.warranty_end || null,
-      }
-    ]
-  };
-
-  ClientChargerMap.dispatchChargers(singleData)
-    .then((response) => {
-      return res.status(200).send({
-        status: response.status,
-        message: response.message || 'Dispatch successful.',
-        result: response.data,
-      });
-    })
-    .catch((err) => {
-      console.error('Single dispatch error:', err);
-      return res.status(500).send({
-        status: false,
-        message: err.message || 'Server error',
-      });
-    });
-};
-
-
-exports.updateClientChargers = (req, res) => {
-  if (!req.body) {
-    return res.status(400).send({
+    res.status(400).send({
       message: "Content can not be empty!"
     });
   }
 
+
+  // Create a Vehicle
+  const charger = new Charger({
+    name: req.body.name,
+    serial_no: req.body.serial_no,
+    batch_id: req.body.batch_id,
+    station_id: req.body.station_id,
+    model_id: req.body.model_id,
+    current_version_id: req.body.current_version_id,
+    no_of_guns: req.body.no_of_guns,
+
+    address1: !!req.body.address1 ? req.body.address1 : '',
+    address2: !!req.body.address2 ? req.body.address2 : '',
+    PIN: !!req.body.PIN ? req.body.PIN : 0,
+    landmark: !!req.body.landmark ? req.body.landmark : '',
+    city_id: !!req.body.city_id ? req.body.city_id : 0,
+    state_id: !!req.body.state_id ? req.body.state_id : 0,
+    country_id: !!req.body.country_id ? req.body.country_id : 0,
+
+    Lat: req.body.Lat,
+    Lng: req.body.Lng,
+    OTA_Config: !!req.body.OTA_Config ? req.body.OTA_Config : 0,
+    Periodic_Check_Ref_Time: !!req.body.Periodic_Check_Ref_Time ? req.body.Periodic_Check_Ref_Time : '2000-01-01 00:00:00',
+    Periodicity_in_hours: !!req.body.Periodicity_in_hours ? req.body.Periodicity_in_hours : 12,
+    When_to_Upgrade: !!req.body.When_to_Upgrade ? req.body.When_to_Upgrade : 'IMMEDIATE',
+    Upgrade_Specific_Time: !!req.body.Upgrade_Specific_Time ? req.body.Upgrade_Specific_Time : '00:00:00',
+    is_available: req.body.is_available,
+    status: req.body.status,
+    created_date: req.body.created_date,
+    created_by: req.body.created_by,
+    modify_date: req.body.modify_date,
+    modify_by: req.body.modify_by,
+    connector_data: req.body.connector_data
+
+  });
+
+  // Save Customer in the database
+  Charger.create(charger, (err, data) => {
+    res.send(data);
+  });
+};
+
+exports.update = (req, res) => {
+  // Validate request
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+  // Create a Vehicle
+  const charger = new Charger({
+    id: req.body.id,
+    name: req.body.name,
+    serial_no: req.body.serial_no,
+    batch_id: req.body.batch_id,
+    model_id: req.body.model_id,
+    station_id: req.body.station_id,
+    current_version_id: req.body.current_version_id,
+    no_of_guns: req.body.no_of_guns,
+    address1: !!req.body.address1 ? req.body.address1 : '',
+    address2: !!req.body.address2 ? req.body.address2 : '',
+    PIN: !!req.body.PIN ? req.body.PIN : 0,
+    landmark: !!req.body.landmark ? req.body.landmark : '',
+    city_id: !!req.body.city_id ? req.body.city_id : 0,
+    state_id: !!req.body.state_id ? req.body.state_id : 0,
+    country_id: !!req.body.country_id ? req.body.country_id : 0,
+    Lat: req.body.Lat,
+    Lng: req.body.Lng,
+    OTA_Config: req.body.OTA_Config,
+    Periodic_Check_Ref_Time: req.body.Periodic_Check_Ref_Time,
+    Periodicity_in_hours: req.body.Periodicity_in_hours,
+    When_to_Upgrade: req.body.When_to_Upgrade,
+    Upgrade_Specific_Time: req.body.Upgrade_Specific_Time,
+    is_available: req.body.is_available,
+    status: req.body.status,
+    created_date: req.body.created_date,
+    created_by: req.body.created_by,
+    modify_date: req.body.modify_date,
+    modify_by: req.body.modify_by,
+    connector_data: req.body.connector_data
+  });
+
+  // Save Customer in the database
+  Charger.update(charger, (err, data) => {
+    res.send(data);
+  });
+};
+
+exports.dispatchChargers = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+  debugger;
+  // Create a Vehicle
   const clientChargerMap = new ClientChargerMap({
     id: req.body.id,
-    charger_id: req.body.charger_id, // may not be used if array
+    charger_id: req.body.charger_id,
     client_id: req.body.client_id,
-    sub_client_id: req.body.sub_client_id || 0,
+    sub_client_id: req.body.sub_client_id,
+    is_private: req.body.is_private,
     dispatch_status: req.body.dispatch_status,
     dispatch_by: req.body.dispatch_by,
     dispatch_date: req.body.dispatch_date,
@@ -263,9 +129,43 @@ exports.updateClientChargers = (req, res) => {
     created_by: req.body.created_by,
     modify_date: req.body.modify_date,
     modify_by: req.body.modify_by,
-    charger_data: req.body.charger_data // should be array of { id }
+    warrantyStart :req.body.warranty_start ,
+    warrantyEnd :req.body.warranty_end,
+    charger_data: req.body.charger_data
   });
 
+  // Save Customer in the database
+  ClientChargerMap.dispatchChargers(clientChargerMap, (err, data) => {
+    res.send(data);
+  });
+};
+
+exports.updateClientChargers = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({
+      message: "Content can not be empty!"
+    });
+  }
+  debugger;
+  // Create a Vehicle
+ const clientChargerMap = new ClientChargerMap({
+    id: req.body.id,
+    charger_id: req.body.charger_id,
+    client_id: req.body.client_id,
+    sub_client_id: req.body.sub_client_id,
+    is_private: req.body.is_private,
+    dispatch_status: req.body.dispatch_status,
+    dispatch_by: req.body.dispatch_by,
+    dispatch_date: req.body.dispatch_date,
+    status: req.body.status,
+    created_date: req.body.created_date,
+    created_by: req.body.created_by,
+    modify_date: req.body.modify_date,
+    modify_by: req.body.modify_by,
+    warrantyStart :req.body.warranty_start ,
+    warrantyEnd :req.body.warranty_end
+  });
+  // Save Customer in the database
   ClientChargerMap.updateClientChargers(clientChargerMap, (err, data) => {
     res.send(data);
   });
@@ -305,14 +205,10 @@ exports.addChargerToStation = (req, res) => {
 
 
 exports.addChargerToStationMultiple = (req, res) => {
-  // Validate request
   if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    });
+    return res.status(400).send({ message: "Content can not be empty!" });
   }
-
-  // Create a Vehicle
+debugger;
   const chargerStationMap = new ChargerStationMap({
     id: req.body.id,
     charger_id: req.body.charger_id,
@@ -326,12 +222,14 @@ exports.addChargerToStationMultiple = (req, res) => {
     charger_data: req.body.charger_data
   });
 
-  // Save Customer in the database
   ChargerStationMap.addChargerToStationMultiple(chargerStationMap, (err, data) => {
-
+    if (err) {
+      return res.status(500).send(err);
+    }
     res.send(data);
   });
 };
+
 
 exports.removeChargerFromStation = (req, res) => {
   // Validate request
@@ -361,7 +259,7 @@ exports.removeChargerFromStation = (req, res) => {
 };
 
 exports.getChargers = (req, res) => {
-debugger;
+
   Charger.getChargers((err, data) => {
     if (err) {
       if (err.kind === "not_found") {
@@ -428,34 +326,23 @@ exports.getPlantChargers = (req, res) => {
   });
 };
 
-exports.getClientChargers = async (req, res) => {
-  try {
-    const login_id = req.params.login_id;
-    const data = await Charger.getClientChargers(login_id);
-
-    if (!data || data.length === 0) {
-      return res.status(200).send({
-        status: 'fail',
-        message: 'No chargers found for this client.',
-        data: []
-      });
-    }
-
-    res.send({
-      status: 'success',
-      message: 'Client chargers fetched successfully.',
-      data: data
-    });
-
-  } catch (error) {
-    console.error("Error in getClientChargers:", error);
-    res.status(500).send({
-      status: 'error',
-      message: 'Error retrieving chargers.'
-    });
-  }
+exports.getClientChargers = (req, res) => {
+  let userDetails = req.body.userDetails[0];
+  let login_id = req.params.login_id;
+  Charger.getClientChargers(login_id, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(200).send({
+          message: `NOT_FOUND`
+        });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving Customer with id "
+        });
+      }
+    } else res.send(data);
+  });
 };
-
 
 exports.getClientChargersNotMappedToAnyStation = (req, res) => {
   let client_id = req.params.client_id;

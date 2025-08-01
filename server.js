@@ -4,6 +4,7 @@ const { sql } = require("./app/models/db.js");
 const bodyParser = require("body-parser");
 const cors = require('cors');
 const nocache = require("nocache");
+const path = require("path");
 
 const environmentModule = require("./app/utility/environment.js");
 const environment = environmentModule.environment;
@@ -32,32 +33,17 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // === Middlewares ===
 app.use(nocache());
-app.use(cors()); // If you want to restrict, pass corsOptions
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// === CORS Whitelist Option (Not used currently) ===
-/*
-const whitelist = ['http://localhost:5300','http://localhost:3000'];
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  }
-};
-*/
-
 // === Base Route ===
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.json({ message: "Backend" });
 });
 
-// === Load Routes ===
-// require("./app/routes/customer.routes")(app);
- require("./app/routes/brand.routes")(app);
+// === Load API Routes ===
+require("./app/routes/brand.routes")(app);
 require("./app/routes/vehicle.routes")(app);
 require("./app/routes/charger.routes")(app);
 require("./app/routes/connector.routes")(app);
@@ -72,31 +58,23 @@ require("./app/routes/communication-protocol.routes")(app);
 require("./app/routes/charger-model-type.routes")(app);
 require("./app/routes/login.routes")(app);
 require("./app/routes/charger-type.routes")(app);
-// require("./app/routes/charger-batch.routes")(app);
- require("./app/routes/version.routes")(app);
+require("./app/routes/version.routes")(app);
 require("./app/routes/charger-monitoring.routes")(app);
- require("./app/routes/rf-id.routes")(app);
+require("./app/routes/rf-id.routes")(app);
 require("./app/routes/user-management.routes")(app);
- require("./app/routes/role-management.routes")(app);
- require("./app/routes/master.routes")(app);
-// require("./app/routes/alexa.routes")(app);
-// require("./app/routes/sub-client.routes")(app);
-// require("./app/routes/analytics.routes")(app);
-// require("./app/routes/call_back_request.routes")(app);
-// require("./app/routes/report.routes")(app);
-// require("./app/routes/error_log.routes")(app);
-// require("./app/routes/menu.routes")(app);
-// require("./app/routes/payment.route")(app);
-// require("./app/routes/ble.routes")(app);
-// require("./app/routes/order.route")(app);
-// require("./app/routes/booking.routes")(app);
+require("./app/routes/role-management.routes")(app);
+require("./app/routes/master.routes")(app);
 require("./app/routes/brand-model.routes")(app);
-// require("./app/routes/ev-component-dealer.routes")(app);
-// require("./app/routes/subsidy.routes")(app);
-// require("./app/routes/ev-dealer.routes")(app);
 
+// === Serve Angular frontend from dist/ ===
+app.use(express.static(path.join(__dirname, 'dist')));
 
-// === App Port ===
+// === Fallback to Angular index.html for unknown routes ===
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// === Start Server ===
 const PORT = process.env.PORT || 5500;
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}.`);
