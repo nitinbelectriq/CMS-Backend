@@ -67,11 +67,12 @@ require("./app/routes/master.routes")(app);
 require("./app/routes/brand-model.routes")(app);
 
 // === Serve Angular frontend from dist/ ===
-app.use(express.static(path.join(__dirname, 'dist')));
+const angularDistPath = path.join(__dirname, 'dist', 'belectriq-portal', 'browser');
+app.use(express.static(angularDistPath));
 
 // === Fallback to Angular index.html for unknown routes ===
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(angularDistPath, 'index.html'));
 });
 
 // === Start Server ===
