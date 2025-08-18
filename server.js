@@ -65,6 +65,7 @@ require("./app/routes/user-management.routes")(app);
 require("./app/routes/role-management.routes")(app);
 require("./app/routes/master.routes")(app);
 require("./app/routes/brand-model.routes")(app);
+require("./app/routes/menu.routes.js")(app);
 
 // === Serve Angular frontend from dist/ ===
 const angularDistPath = path.join(__dirname, 'dist', 'belectriq-portal', 'browser');

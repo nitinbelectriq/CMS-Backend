@@ -158,7 +158,6 @@ RoleMenu.roleMenuMapping = async (params, result) => {
   let stmtSelect = `Select map_id,status from role_menu_mapping where role_id = ? and menu_id = ? `;
   let stmtSelectActive = `Select map_id from role_menu_mapping where role_id = ? and status ='Y' and map_id not in (?)  `;
   let stmtInsert = `insert into role_menu_mapping (role_id,menu_id,status,created_date,createdby) VALUES ? `;
-
   let stmtUpdate = `update role_menu_mapping set role_id = ? ,menu_id = ?,status = ?,modify_date = ? ,modifyby =  ?
     where map_id = ? ; `;
   let stmtUpdateDelete = `update role_menu_mapping set status = 'D',modify_date = ? ,modifyby =  ?
@@ -166,10 +165,7 @@ RoleMenu.roleMenuMapping = async (params, result) => {
 
   let values = [];
   try {
-
-
     for (let i = 0; i < params.menus.length; i++) {
-
       respSelect = await pool.query(stmtSelect, [params.role_id, params.menus[i].menu_id]);
 
       if (respSelect.length == 0) {
@@ -177,28 +173,24 @@ RoleMenu.roleMenuMapping = async (params, result) => {
       } else {
         id_to_keep_status_active.push(respSelect[0].map_id);
 
-        //update only in case of record is not in Y state because if its in already Y state hen it would be unnecessary to make it Y
+        // update only if current status is not 'Y'
         if (respSelect[0].status != 'Y') {
-
-          respUpdate = await pool.query(stmtUpdate, [params.role_id, params.menus[i].menu_id,
-          params.status, datetime, params.created_by, respSelect[0].map_id])
+          await pool.query(stmtUpdate, [params.role_id, params.menus[i].menu_id,
+            params.status, datetime, params.created_by, respSelect[0].map_id]);
         }
       }
     }
 
-
     if (id_to_keep_status_active.length > 0) {
-
       respSelectActive = await pool.query(stmtSelectActive, [params.role_id, id_to_keep_status_active]);
 
       if (respSelectActive.length > 0) {
-        respUpdateDelete = await pool.query(stmtUpdateDelete, [datetime, params.created_by, params.role_id, id_to_keep_status_active]);
+        await pool.query(stmtUpdateDelete, [datetime, params.created_by, params.role_id, id_to_keep_status_active]);
       }
     }
 
-
     if (values.length > 0) {
-      resp = await pool.query(stmtInsert, [values]);
+      await pool.query(stmtInsert, [values]);
     }
 
     final_res = {
@@ -207,22 +199,21 @@ RoleMenu.roleMenuMapping = async (params, result) => {
       message: 'SUCCESS',
       count: 0,
       data: []
-    }
-    // clean upp all other
+    };
 
   } catch (e) {
-
     final_res = {
       status: false,
-      err_code: `ERROR : ${err.code}`,
-      message: `ERROR : ${err.message}`,
+      err_code: `ERROR : ${e.code}`,
+      message: `ERROR : ${e.message}`,
       count: 0,
       data: []
-    }
+    };
   } finally {
     result(null, final_res);
   }
 };
+
 
 Menu.update = async (newClient, result) => {
   var datetime = new Date();

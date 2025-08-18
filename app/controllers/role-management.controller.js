@@ -3,6 +3,7 @@ const myModule = require("../models/role-management.model.js");
 const Role = myModule.Role;  
 
 exports.create = (req, res) => {
+  debugger;
     // Validate request
     if (!req.body) {
       res.status(400).send({

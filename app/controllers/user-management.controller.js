@@ -278,6 +278,7 @@ exports.getChargingHistoryCW = (req, res) => {
 };
 
 exports.delete = (req, res) => {
+  debugger;
   User.delete(req.params.id, req.params.user_id, (err, data) => {
 
     res.send(data);

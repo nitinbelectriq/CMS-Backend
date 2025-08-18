@@ -1036,7 +1036,7 @@ User.getChargingHistoryCW = async (login_id, params, result) => {
 };
 
 User.delete = async (id, user_id, result) => {
-
+debugger;
   var datetime = new Date();
   let resp1;
   let resp
