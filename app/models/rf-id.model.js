@@ -398,7 +398,7 @@ RFid.getRFidsByCpoId = async (cpo_id, result) => {
   // where crm.cpo_id = ? and crm.status<>'D' order by crm.cpo_id ;`;
 
   let stmt = `select crm.id as map_id,  cr.name as rfid_name ,cr.description,cr.rf_id_no,cr.expiry_date,
-  CRM.CLIENT_ID, cm.name as cpo_name, clm.name as client_name,crm.cpo_id,
+  crm.CLIENT_ID, cm.name as cpo_name, clm.name as client_name,crm.cpo_id,
   crm.status,crm.created_date,crm.createdby,crm.modifyby,crm.modify_date
   from  cpo_rfid_mapping  crm inner join charger_rfid cr on crm.rfid_id=cr.id  and cr.status = 'Y'
   inner join cpo_mst cm on crm.cpo_id = cm.id and cm.status = 'Y'
