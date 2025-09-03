@@ -263,7 +263,7 @@ VModel_CType.vModel_CTypeMap = (data, result) => {
   var datetime = new Date();
 
   let values = [];
-debugger;
+//;
   for (let index = 0; index < data.ct_id.length; index++) {
     values.push([data.ct_id[index], data.vm_id, data.vType_id, data.status, 1, datetime.toISOString().slice(0, 10)])
   }

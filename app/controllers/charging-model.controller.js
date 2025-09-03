@@ -4,8 +4,8 @@ const ChargingModel = myModule.ChargingModel;
 
 exports.create = async (req, res) => {
   const data = req.body;
-  debugger;
-debugger;
+  //;
+//;
   // Basic validation
   if (!data || Object.keys(data).length === 0) {
     return res.status(400).json({ message: "Request body cannot be empty." });
@@ -98,7 +98,7 @@ exports.getChargingModels = async (req, res) => {
 
 
 exports.getChargingModelsAll = (req, res) => {
-  debugger;
+  //;
   ChargingModel.getChargingModelsAll( (err, data) => {
     if (err) {
       if (err.kind === "not_found") {

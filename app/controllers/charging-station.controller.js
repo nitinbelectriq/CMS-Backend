@@ -57,7 +57,7 @@ const chargingStation = new ChargingStation({
 
 
 exports.update = (req, res) => {
-  debugger;
+  //;
 
   if (!req.body) {
     return res.status(400).send({ message: "Content can not be empty!" });
@@ -115,7 +115,7 @@ exports.getChargingStationsByUserRoleAndLatLongUW = (req, res) => {
 };
 exports.getChargingStationsByUserRoleAndLatLongUW1 = (req, res) => {
   let user_id = req.params.user_id;
-debugger;
+//;
   ChargingStation.getChargingStationsByUserRoleAndLatLongUW1(user_id, req.body, (err, data) => {
     res.status(200).send(data)
   });
@@ -159,7 +159,7 @@ exports.getAllChargingStationsWithChargersAndConnectorsCCS = (req, res) => {
 
 exports.getActiveChargingStationsWithChargersAndConnectorsCW = (req, res) => {
   let login_id = req.params.login_id;
-debugger;
+//;
   ChargingStation.getActiveChargingStationsWithChargersAndConnectorsCW(login_id, (err, data) => {
     res.status(200).send(data)
   });
@@ -425,7 +425,7 @@ exports.createEvChargingStationRequest = (req, res) => {
 }
 
 exports.getEvChargingStationRequestByCityId = (req, res) => {
-  debugger;
+  //;
   let city_id = req.params.city_id;
   let user_id =req.params.user_id;
 
@@ -616,7 +616,7 @@ exports.deleteChargerStationRequest = (req, res) => {
 
 exports.LikeDislikeRequest = (req, res) => {
   let resp;
- debugger;
+ //;
   if (!req.body) {
     resp = {
       status: false,

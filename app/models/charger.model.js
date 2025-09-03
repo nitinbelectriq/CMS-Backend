@@ -226,7 +226,9 @@ const ChargerConfiguration = function (chargerConfiguration) {
 const _TABLE = 'charger_serial_mst';
 
 Charger.create = async (newCharger, result) => {
+  //;
   var datetime = new Date();
+  let query = `select * from charging_model_connector_map where model_id =?`;
   let stmt = `insert into ${_TABLE} (serial_no,name,model_id,station_id,
     current_version_id,no_of_guns,Lat,Lng,
     OTA_Config,Periodic_Check_Ref_Time,Periodicity_in_hours,
@@ -241,9 +243,11 @@ Charger.create = async (newCharger, result) => {
     '${newCharger.status}','${datetime.toISOString().slice(0, 10)}',${newCharger.created_by}) `;
 
   let final_res;
-  let resp;
+  let resp,queryResp;
   try {
+    queryResp = await pool.query(query,newCharger.model_id);
     resp = await pool.query(stmt);
+
     final_res = {
       status: true,
       message: 'SUCCESS',
@@ -251,7 +255,7 @@ Charger.create = async (newCharger, result) => {
         id: resp
       }]
     }
-    await insertModelConnector(newCharger.connector_data, resp.insertId, newCharger.name, newCharger.created_by);
+    await insertModelConnector(queryResp, resp.insertId, newCharger.name, newCharger.created_by);
   } catch (err) {
     final_res = {
       status: false,
@@ -266,7 +270,8 @@ Charger.create = async (newCharger, result) => {
 
 Charger.update = async (newCharger, result) => {
   var datetime = new Date();
-
+debugger;
+  let query = `select * from charging_model_connector_map where model_id =?`;
   let stmt = `update ${_TABLE} set 
   serial_no = '${newCharger.serial_no}', name = '${newCharger.name}',
   model_id = ${newCharger.model_id},station_id = ${newCharger.station_id}, 
@@ -282,7 +287,7 @@ Charger.update = async (newCharger, result) => {
   let final_res;
   let resp;
   try {
-
+  queryResp = await pool.query(query,newCharger.model_id);
     resp = await pool.query(stmt);
     final_res = {
       status: true,
@@ -291,7 +296,8 @@ Charger.update = async (newCharger, result) => {
         id: resp
       }]
     }
-    await insertModelConnector(newCharger.connector_data, newCharger.id, newCharger.name, newCharger.modify_by);
+     
+    await insertModelConnector(queryResp, newCharger.id, newCharger.name, newCharger.modify_by);
   } catch (err) {
     final_res = {
       status: false,
@@ -305,7 +311,7 @@ Charger.update = async (newCharger, result) => {
 };
 
 ClientChargerMap.dispatchChargers = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp3;
@@ -496,7 +502,7 @@ ChargerStationMap.addChargerToStationMultiple = async (data, result) => {
   let chargers_mapped = [];
   let chargers_not_mapped = [];
   let values = [];
-debugger;
+//;
   if (!data.charger_data || data.charger_data.length === 0) {
     return result(null, {
       status: false,
@@ -1265,7 +1271,7 @@ Charger.getChargerByDisplayId = (display_id, result) => {
       left join charger_batch_mst cbm on csm.batch_id = cbm.id
       left join location_type_mst ltm on chsm.location_type_id = ltm.id
       where csm.name = ?  and csm.status<>'D'`;
-  debugger;
+  //;
   //26 10 2021 : changes are : sending station address details 
   // let stmt = `select 
   // csm.id, csm.serial_no, case when csm.name is null then csm.serial_no else csm.name end as name,
@@ -1422,40 +1428,81 @@ Charger.deleteChargerFromClient = async (id, user_id, result) => {
   }
 };
 
+// async function insertModelConnector(data, charger_id, charger_display_id, created_by) {
+//   //;
+//   var datetime = new Date();
+//   let values = [];
+//   for (let index = 0; index < data.length; index++) {
+//     values.push([(index + 1), charger_id, data[index].connector_type_id, charger_display_id,
+//     data[index].status, created_by, datetime.toISOString().slice(0, 10)])
+//   }
+
+//   let stmt = `update charger_connector_mapping set 
+//       status = 'D' ,
+//       modify_date = '${datetime.toISOString().slice(0, 10)}' , modifyby = ${created_by} 
+//       where (charger_id = ${charger_id} or charger_display_id='${charger_display_id}'  )`;
+//   let stmt2 = `insert into charger_connector_mapping (connector_no,charger_id,connector_type_id,charger_display_id,
+//     status,createdby,created_date)
+//     values  ? `;
+
+//   let promise = new Promise((resolve, reject) => {
+//     sql.query(stmt, [values], (err, res) => {
+//       if (err) {
+//         reject({ message: "ERROR", error: err });
+//       }
+
+//       sql.query(stmt2, [values], (err, res) => {
+//         if (err) {
+//           reject({ message: "ERROR", error: err });
+//         }
+
+//         resolve({ message: "SUCCESS insert", id: res.insertId });
+//       });
+//     });
+//   })
+//   return await promise;
+
+// }
 async function insertModelConnector(data, charger_id, charger_display_id, created_by) {
-  debugger;
   var datetime = new Date();
   let values = [];
+  debugger;
+  // total connector count
+
   for (let index = 0; index < data.length; index++) {
-    values.push([(index + 1), charger_id, data[index].connector_type_id, charger_display_id,
-    data[index].status, created_by, datetime.toISOString().slice(0, 10)])
+    values.push([
+      index + 1,                  // connector_no = total count
+      charger_id,                       // new charger id
+      data[index].connector_type_id,    // from query
+      charger_display_id,               // charger display id
+      data[index].status,               // status from query
+      created_by,
+      datetime.toISOString().slice(0, 10)
+    ]);
   }
 
-  let stmt = `update charger_connector_mapping set 
-      status = 'D' ,
-      modify_date = '${datetime.toISOString().slice(0, 10)}' , modifyby = ${created_by} 
-      where (charger_id = ${charger_id} or charger_display_id='${charger_display_id}'  )`;
-  let stmt2 = `insert into charger_connector_mapping (connector_no,charger_id,connector_type_id,charger_display_id,
-    status,createdby,created_date)
-    values  ? `;
+  let stmt = `update charger_connector_mapping 
+              set status = 'D',
+                  modify_date = '${datetime.toISOString().slice(0, 10)}',
+                  modifyby = ${created_by} 
+              where charger_id = ${charger_id} 
+                 or charger_display_id='${charger_display_id}'`;
 
-  let promise = new Promise((resolve, reject) => {
-    sql.query(stmt, [values], (err, res) => {
-      if (err) {
-        reject({ message: "ERROR", error: err });
-      }
+  let stmt2 = `insert into charger_connector_mapping 
+                (connector_no, charger_id, connector_type_id, charger_display_id,
+                 status, createdby, created_date)
+               values ?`;
+
+  return new Promise((resolve, reject) => {
+    sql.query(stmt, (err) => {
+      if (err) return reject({ message: "ERROR", error: err });
 
       sql.query(stmt2, [values], (err, res) => {
-        if (err) {
-          reject({ message: "ERROR", error: err });
-        }
-
+        if (err) return reject({ message: "ERROR", error: err });
         resolve({ message: "SUCCESS insert", id: res.insertId });
       });
     });
-  })
-  return await promise;
-
+  });
 }
 
 
@@ -1836,7 +1883,7 @@ async function func_getChargersDynamicFilterCW(login_id, params) {
 }
 
 async function func_getChargersByMappedStationId(station_id) {
-  debugger;
+  //;
   let stmt = ` select chsm.id as map_id,chsm.station_id ,cst.name as station_name, csm.id as charger_id,csm.nick_name as charger_nick_name,
     csm.serial_no, case when csm.name is null then csm.serial_no else csm.name end as name, csm.model_id  ,
     csm.current_version_id, vm.name as version_name , csm.no_of_guns, cst.address1  ,cst.address2  ,cst.PIN  ,cst.landmark  ,
@@ -2248,7 +2295,7 @@ ChargingProfile.ChargingSchedulePeriodDelete = async (id, modifyby, result) => {
 
 };
 ChargingProfile.UpdateChargingProfile = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -2282,7 +2329,7 @@ ChargingProfile.UpdateChargingProfile = async (data, result) => {
 };
 
 ChargingProfile.UpdateChargingSchedule = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -2317,7 +2364,7 @@ ChargingProfile.UpdateChargingSchedule = async (data, result) => {
 };
 
 ChargingProfile.UpdateChargingSchedulePeriod = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_resp;
   let resp;
@@ -2386,7 +2433,7 @@ ChargingProfile.getAllEVChargingProviderList = async result => {
   }
 }
 ChargingProfile.CreateEVChargingProvider = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_resp;
@@ -2683,7 +2730,7 @@ ChargerRenewalRequestBle.updateBleChargerStatus = async (request,user_id, result
 };
 
 Charger.updateChargerAddressBLE = async (data, result) => {
-  debugger;
+  //;
   //all chargers mapped to a user
   var datetime = new Date();
   let final_resp;
@@ -2774,7 +2821,7 @@ crl.landmark, crl.PIN,crl.remarks,crl.request_type,csm.created_date 'activation_
 
 
 Charger.checkChargerMappedToStationBySrNo = async (serial_no, result) => {
-  debugger;
+  //;
   let final_resp;
   let resp;
   let resp1;
@@ -2819,7 +2866,7 @@ Charger.checkChargerMappedToStationBySrNo = async (serial_no, result) => {
 };
 
 AddChargerRequest.createChargerRequest = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp1;
   let resp;
@@ -2833,7 +2880,7 @@ AddChargerRequest.createChargerRequest = async (data, result) => {
   data.model, data.lat, data.lng, data.address1, data.address2, data.PIN, data.landmark, data.city_id,
   data.state_id, data.country_id, data.image_url, data.remarks, data.status, datetime, data.created_by];
   try {
-    debugger;
+    //;
     resp = await pool.query(stmt, data.charger_serial_no);
     if (resp.length > 0) {
       final_resp = {
@@ -2904,7 +2951,7 @@ AddChargerRequest.getAllModerateChargerRequest = async (result) => {
 };
 
 AddChargerRequest.approveRejectChargerRequest = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp1;
   let final_resp;
@@ -2972,7 +3019,7 @@ AddChargerRequest.getAllApproveRejectChargerRequest = async (result) => {
 };
 
 AddChargerRequest.updateChargerRequest = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp1;
   let final_resp;
@@ -3084,7 +3131,7 @@ AddChargerRequest.getModerateChargerRequestByUserId = async (user_id, result) =>
 };
 
 AddChargerRequest.deleteChargerRequest = async (id, modify_by, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_resp;
@@ -3113,7 +3160,7 @@ AddChargerRequest.deleteChargerRequest = async (id, modify_by, result) => {
 }
 
 Set_Schedule_BLE.createScheduleBLE = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let resp1;
@@ -3217,7 +3264,7 @@ Set_Schedule_BLE.getAllScheduleBLE = async (result) => {
 };
 
 Set_Schedule_BLE.getScheduleBLEByChargerSerialNo = async (charger_serial_no, result) => {
- debugger;
+ //;
   let final_resp;
   let resp;
 
@@ -3279,7 +3326,7 @@ Set_Schedule_BLE.getScheduleBLEByUserId = async (user_id, result) => {
 };
 
 Set_Schedule_BLE.ScheduleBLEByChargerSerialNoAndUserId = async (user_id,charger_serial_no,schedule_type, result) => {
-  debugger;
+  //;
 
   let final_resp;
   let resp;
@@ -3304,7 +3351,7 @@ Set_Schedule_BLE.ScheduleBLEByChargerSerialNoAndUserId = async (user_id,charger_
   try {
     resp = await pool.query(stmt);
 
-    debugger;
+    //;
 
     for (let i = 0; i < resp.length; i++) {
       ele = resp[i];
@@ -3415,7 +3462,7 @@ Set_Schedule_BLE.ScheduleBLEByChargerSerialNoAndUserId = async (user_id,charger_
 };
 
 Set_Schedule_BLE.deleteScheduleBLE = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_resp;
@@ -3451,7 +3498,7 @@ Set_Schedule_BLE.deleteScheduleBLE = async (data, result) => {
 }
 
 Set_Schedule_BLE.updateScheduleBLE = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let resp2;
@@ -3506,7 +3553,7 @@ else{
 }
 
 Set_Schedule_BLE.updateEnableDisableScheduleBLE = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp,resp1;
   let final_resp;
@@ -3540,7 +3587,7 @@ Set_Schedule_BLE.updateEnableDisableScheduleBLE = async (data, result) => {
 }
 
 Set_Schedule_BLE.updateScheduleStatusBLE = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_resp;
@@ -3603,7 +3650,7 @@ ChargerConfiguration.setChargerConfiguration = async(data,result)=>{
     values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
 
   try{
-debugger;
+//;
   resp1 = await pool.query(stmt1,data.charger_serial_no);
   if(resp1.length<=0){
     final_res={
@@ -3686,7 +3733,7 @@ ChargerConfiguration.getAllChargerConfiguration = async (result) => {
 
   let final_resp;
   let resp;
-  debugger;
+  //;
   let stmt = `SELECT id,charger_id,charger_part_no_id,charger_serial_no,
   charger_part_no,card_id,card_part_no_id,card_serial_no,card_part_no,current_ampere_value,user_id,fw_version_id,
   fw_version_name,board_type,source_app,project_id,status,created_date,createdby from 
@@ -3716,7 +3763,7 @@ ChargerConfiguration.getChargerConfigurationByCharger_serial_no = async (result)
 
   let final_resp;
   let resp;
-  debugger;
+  //;
   let stmt = `SELECT id,charger_id,charger_part_no_id,charger_serial_no,
   charger_part_no,card_id,card_part_no_id,card_serial_no,card_part_no,current_ampere_value,user_id,fw_version_id,
   fw_version_name,board_type,source_app,project_id,status,created_date,createdby from 
@@ -3757,7 +3804,7 @@ ChargerConfiguration.updateChargerNickName = async (body, result) => {
   try {
     resp = await pool.query(queries);
 
-    debugger;
+    //;
 
     final_resp = {
       status: resp.length > 0 ? true:false,

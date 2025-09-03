@@ -80,7 +80,7 @@ Report.getTransactionReportCW = async (login_id, params, result) => {
 
   }
 
-  debugger;
+  //;
   //--------------------------------
   try {
 
@@ -200,7 +200,7 @@ Report.getTransactionReportCCS = async (params, result) => {
     
   }  
 
-  debugger;
+  //;
   //--------------------------------
   try {
 
@@ -537,7 +537,7 @@ Report.getChargerStatusDetailViewCW = async (login_id, params, result) => {
     resp = await pool.query(stmt);
     resp2 = await pool.query(stmt2);
 
-    debugger;
+    //;
 
     if (resp.length>0) {
       let is_true = resp.filter(x => x.charger_status == 'OFFLINE');
@@ -759,7 +759,7 @@ Report.getChargerStatusDetailViewCCS = async (params, result) => {
     resp = await pool.query(stmt);
     resp2 = await pool.query(stmt2);
 
-    debugger;
+    //;
 
     if (resp.length>0) {
       let is_true = resp.filter(x => x.charger_status == 'OFFLINE');
@@ -1087,7 +1087,7 @@ Report.otpLogsBLE = async (login_id, result) => {
 
   //--------------------------------
   try {
-    debugger;
+    //;
     resp = await pool.query(qry);
 
     final_res = {
@@ -1115,7 +1115,7 @@ Report.otpLogsBLE = async (login_id, result) => {
 };
 
 Report.successfulTransactionsBLE = async (data ,result) => {
-  debugger;
+  //;
 var datetime= new Date();
 let resp;
 let final_res;

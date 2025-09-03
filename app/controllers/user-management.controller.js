@@ -74,14 +74,14 @@ exports.create = (req, res) => {
 
 exports.update = (req, res) => {
   // Validate request
-debugger;
+//;
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!"
     });
   }
 
-  debugger;
+  //;
 
   const user = new User({
     id: req.body.id,
@@ -159,7 +159,7 @@ exports.UserStationMappingV1 = (req, res) => {
 
   // Save Customer in the database
   UserStation.UserStationMappingV1(userStation, (err, data) => {
-    debugger;
+    //;
     res.send(data);
   });
 };
@@ -278,7 +278,7 @@ exports.getChargingHistoryCW = (req, res) => {
 };
 
 exports.delete = (req, res) => {
-  debugger;
+  //;
   User.delete(req.params.id, req.params.user_id, (err, data) => {
 
     res.send(data);
@@ -640,7 +640,7 @@ exports.updateUserStationMappingV1 = (req, res) => {
 
   // Save Customer in the database
   UserStation.updateUserStationMappingV1(userStation, (err, data) => {
-    debugger;
+    //;
     res.send(data);
   });
 };
@@ -657,7 +657,7 @@ exports.getStationListWithStationAssignedToUser = (req, res) => {
   });
 };
 exports.userChargerMappingBLESync = (req, res) => {
-  debugger;
+  //;
   if (!req.body) {
     res.status(200).send({
       message: "Content can not be empty!"
@@ -687,7 +687,7 @@ exports.userChargerMappingBLESync = (req, res) => {
   });
 };
 exports.revokeChargerAccessBLE = (req, res) => {
-  debugger;
+  //;
   if (!req.body) {
     res.status(200).send({
       message: "Content can not be empty!"
@@ -830,7 +830,7 @@ exports.userChargingSummaryBle = (req, res) => {
 
 
 exports.userChargingSummaryBleMode = (req, res) => {
-  debugger;
+  //;
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!"
@@ -855,7 +855,7 @@ exports.GetMonthlyStatisticsList = (req, res) => {
 
 
 exports.getUserByMobileAndEmail = (req, res) => {
-  debugger;
+  //;
   let resp;
   let validated=false;
 

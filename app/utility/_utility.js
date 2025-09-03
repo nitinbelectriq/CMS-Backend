@@ -253,7 +253,7 @@ async function sendOTP_Anonymous_V1(action, otp, mobile_no, email, country_code,
 
 //---use for send sms notification
 async function sendSMSDynamic(action, txtMsg, mobile_no, email) {
-  debugger
+  //
   let text;
   let entity_id = '1401366180000014430';
   // let template_id = '1407159912792781073';
@@ -330,7 +330,7 @@ async function sendSMSDynamic(action, txtMsg, mobile_no, email) {
 }
 
 async function sendSMSDynamic_V1(action, txtMsg, mobile_no, email, country_id, template_id) {
-  debugger
+  //
   let text;
   let entity_id = '1401366180000014430';
   let user_id_gupshup = 2000196180;
@@ -425,7 +425,7 @@ async function getClientIdAndRoleByUserId(user_id) {
   //   left join user_role_mapping urm on umn.id = urm.user_id and urm.status = 'Y'
   //   left join role_mst rm on urm.role_id = rm.id and rm.status = 'Y'
   //   where umn.id = ${user_id} and umn.status='Y'  order by role_id; `;
-  debugger;
+  //;
   try {
     resp = await pool.query(stmt);
 
@@ -523,7 +523,7 @@ async function getAppSettingConfiguration(settingtype) {
 }
 
 function getTimeDifference(current_date, to_time, from_time) {
-  debugger;
+  //;
   from_time = new Date(current_date + ' ' + from_time);
   to_time = new Date(current_date + ' ' + to_time);
 
@@ -543,7 +543,7 @@ function getDayDifference(f_date, t_date) {
 }
 
 function getYYYYMMDDHHMMSSfromDate() {
-  debugger;
+  //;
   const date = new Date();
   const currentTime = date.getFullYear() + '' + (date.getMonth() + 1)
     + date.getDate() + date.getHours() + date.getMinutes() + date.getSeconds();
@@ -552,7 +552,7 @@ function getYYYYMMDDHHMMSSfromDate() {
 }
 
 function convertDatetimeToStringYYYYMMDDHHMMSS() {
-  debugger;
+  //;
   const date = new Date();
   const currentTime = `${date.getFullYear()}-${(date.getMonth() + 1)}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
 
@@ -569,7 +569,7 @@ function isLessThan24Hrs(startDate) {
   let msIn24Hrs = 86400000;
   let differenceInMs;
   let result = false;
-  debugger;
+  //;
 
   differenceInMs = (new Date() - new Date(startDate));
 

@@ -18,17 +18,17 @@ exports.create = (req, res) => {
       message: "Content can not be empty!"
     });
   }
-
+//;
 
   // Create a Vehicle
   const charger = new Charger({
-    name: req.body.name,
+    name: req.body.charger_display_id,
     serial_no: req.body.serial_no,
-    batch_id: req.body.batch_id,
-    station_id: req.body.station_id,
+    batch_id: req.body.batch_id || null,
+    station_id: req.body.station_id || null,
     model_id: req.body.model_id,
     current_version_id: req.body.current_version_id,
-    no_of_guns: req.body.no_of_guns,
+    no_of_guns: req.body.no_of_guns || null,
 
     address1: !!req.body.address1 ? req.body.address1 : '',
     address2: !!req.body.address2 ? req.body.address2 : '',
@@ -38,8 +38,8 @@ exports.create = (req, res) => {
     state_id: !!req.body.state_id ? req.body.state_id : 0,
     country_id: !!req.body.country_id ? req.body.country_id : 0,
 
-    Lat: req.body.Lat,
-    Lng: req.body.Lng,
+    Lat: req.body.Lat || 0,
+    Lng: req.body.Lng || 0,
     OTA_Config: !!req.body.OTA_Config ? req.body.OTA_Config : 0,
     Periodic_Check_Ref_Time: !!req.body.Periodic_Check_Ref_Time ? req.body.Periodic_Check_Ref_Time : '2000-01-01 00:00:00',
     Periodicity_in_hours: !!req.body.Periodicity_in_hours ? req.body.Periodicity_in_hours : 12,
@@ -68,16 +68,17 @@ exports.update = (req, res) => {
       message: "Content can not be empty!"
     });
   }
+  debugger;
   // Create a Vehicle
   const charger = new Charger({
     id: req.body.id,
-    name: req.body.name,
+   name: req.body.charger_display_id,
     serial_no: req.body.serial_no,
-    batch_id: req.body.batch_id,
-    model_id: req.body.model_id,
-    station_id: req.body.station_id,
+    batch_id: req.body.batch_id || null,
+    station_id: req.body.station_id || null,
+     model_id: req.body.model_id,
     current_version_id: req.body.current_version_id,
-    no_of_guns: req.body.no_of_guns,
+    no_of_guns: req.body.no_of_guns || null,
     address1: !!req.body.address1 ? req.body.address1 : '',
     address2: !!req.body.address2 ? req.body.address2 : '',
     PIN: !!req.body.PIN ? req.body.PIN : 0,
@@ -85,14 +86,14 @@ exports.update = (req, res) => {
     city_id: !!req.body.city_id ? req.body.city_id : 0,
     state_id: !!req.body.state_id ? req.body.state_id : 0,
     country_id: !!req.body.country_id ? req.body.country_id : 0,
-    Lat: req.body.Lat,
-    Lng: req.body.Lng,
-    OTA_Config: req.body.OTA_Config,
-    Periodic_Check_Ref_Time: req.body.Periodic_Check_Ref_Time,
-    Periodicity_in_hours: req.body.Periodicity_in_hours,
-    When_to_Upgrade: req.body.When_to_Upgrade,
-    Upgrade_Specific_Time: req.body.Upgrade_Specific_Time,
-    is_available: req.body.is_available,
+    Lat: req.body.Lat || 0,
+    Lng: req.body.Lng || 0,
+    OTA_Config: req.body.OTA_Config || null,
+    Periodic_Check_Ref_Time: req.body.Periodic_Check_Ref_Time || null,
+    Periodicity_in_hours: req.body.Periodicity_in_hours || null,
+    When_to_Upgrade: req.body.When_to_Upgrade || null,
+    Upgrade_Specific_Time: req.body.Upgrade_Specific_Time || null,
+    is_available: req.body.is_available || null,
     status: req.body.status,
     created_date: req.body.created_date,
     created_by: req.body.created_by,
@@ -113,7 +114,7 @@ exports.dispatchChargers = (req, res) => {
       message: "Content can not be empty!"
     });
   }
-  debugger;
+  //;
   // Create a Vehicle
   const clientChargerMap = new ClientChargerMap({
     id: req.body.id,
@@ -146,7 +147,7 @@ exports.updateClientChargers = (req, res) => {
       message: "Content can not be empty!"
     });
   }
-  debugger;
+  //;
   // Create a Vehicle
  const clientChargerMap = new ClientChargerMap({
     id: req.body.id,
@@ -208,7 +209,7 @@ exports.addChargerToStationMultiple = (req, res) => {
   if (!req.body) {
     return res.status(400).send({ message: "Content can not be empty!" });
   }
-debugger;
+//;
   const chargerStationMap = new ChargerStationMap({
     id: req.body.id,
     charger_id: req.body.charger_id,
@@ -608,7 +609,7 @@ exports.ChargingSchedulePeriodDelete = (req, res) => {
   });
 };
 exports.UpdateChargingProfile = (req, res) => {
-  debugger;
+  //;
   // Validate request
   if (!req.body) {
     res.status(400).send({
@@ -634,7 +635,7 @@ exports.UpdateChargingProfile = (req, res) => {
 };
 
 exports.UpdateChargingSchedule = (req, res) => {
-  debugger;
+  //;
   // Validate request
   if (!req.body) {
     res.status(400).send({
@@ -860,7 +861,7 @@ exports.checkChargerMappedToStationBySrNo = (req, res) => {
 };
 
 exports.createChargerRequest = (req, res) => {
-  debugger;
+  //;
   let resp;
   let params;
   if (!req.body) {
@@ -1004,7 +1005,7 @@ exports.getAllApproveRejectChargerRequest = (req, res) => {
 };
 
 exports.updateChargerRequest = (req, res) => {
-  debugger;
+  //;
   let resp;
   let params;
   if (!req.body) {
@@ -1117,7 +1118,7 @@ exports.deleteChargerRequest = (req, res) => {
 
 
 exports.createScheduleBLE = (req, res) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let params;
@@ -1156,7 +1157,7 @@ exports.createScheduleBLE = (req, res) => {
     return;
   }
   else if (req.body.schedule_type == 'ONE_TIME') {
-    debugger;
+    //;
     if (!_utility.isLessThan24Hrs(req.body.start_schedule_time)) {
       resp = {
         status: false,
@@ -1220,7 +1221,7 @@ exports.ScheduleBLEByChargerSerialNoAndUserId = (req, res) => {
   let user_id = req.body.user_id;
   let charger_serial_no = req.body.charger_serial_no;
   let schedule_type = req.body.schedule_type;
-  debugger;
+  //;
   if (!req.body) {
     resp = {
       status: false,
@@ -1267,7 +1268,7 @@ exports.ScheduleBLEByChargerSerialNoAndUserId = (req, res) => {
   }
 }
 exports.updateScheduleBLE = (req, res) => {
-  debugger;
+  //;
   let resp;
   let params;
 
@@ -1294,7 +1295,7 @@ exports.updateScheduleBLE = (req, res) => {
     return;
   }
   else if (req.body.schedule_type == 'one-time') {
-    debugger;
+    //;
     if (!_utility.isLessThan24Hrs(req.body.start_schedule_time)) {
       resp = {
         status: false,
@@ -1384,7 +1385,7 @@ exports.updateScheduleStatusBLE = (req, res) => {
 
 exports.deleteScheduleBLE = (req, res) => {
   let resp;
-  debugger;
+  //;
   if (!req.body) {
     resp = {
       status: false,

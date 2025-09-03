@@ -69,7 +69,7 @@ const User = function (user) {
 };
 
 // LoginUser.findByUsername = (User_Name, result) => {
-//  debugger;
+//  //;
 //   let resp;
 //   let final_resp;
 //   let stmt2 = `SELECT id,client_id,booking_allowed,payment_allowed,reward_allowed,
@@ -136,7 +136,7 @@ const User = function (user) {
 
 
 LoginUser.findByUsername = async (User_Name, result) => {
-  debugger;
+  //;
   const stmt2 = `SELECT id, client_id, booking_allowed, payment_allowed, reward_allowed,
     penalty_allowed, otp_authentication, invoice_allowed, status,
     created_date, created_by, modified_date, modified_by
@@ -192,7 +192,7 @@ LoginUser.findByUsername = async (User_Name, result) => {
 
 
 LoginUser.findByMobile = (mobile, result) => {
- debugger;
+ //;
   let resp;
   let final_resp;
   let stmt2 = `SELECT id,client_id,booking_allowed,payment_allowed,reward_allowed,
@@ -283,7 +283,7 @@ LoginUser.findByUserId = (params, result) => {
         left join client_mst cm on umn.client_id = cm.id and cm.status='Y'
         WHERE umn.ble_user_id =? and user_type<>'SPIN_ADMIN' and umn.status='Y'  `;
     }
-debugger;
+//;
   sql.query(stmt3, params.ble_user_id, async (err, res) => {
     
     if (err) {
@@ -546,7 +546,7 @@ User.updatePasswordNewBLE =  async(newUser, result) => {
     }
  // return  result(null, final_result);
   }
-debugger
+//
   let stmt = `update user_mst_new set 
         password = '${newUser.password}',registration_origin = '${newUser.registration_origin}',     
         modifyby = ${newUser.modify_by},modify_date = '${datetime.toISOString().slice(0, 10)}' 
@@ -669,7 +669,7 @@ User.registerNew = async (newUser, result) => {
     '${newUser.status}',?,${newUser.created_by}) `;
 
   try {
-debugger
+//
     resp = await pool.query(stmt, [datetime]);
 
     if (resp.insertId > 0) {
@@ -749,7 +749,7 @@ User.registerNewBLE = async (newUser, result) => {
     '${newUser.hint_answer}','${newUser.employee_code}','N','${newUser.registration_origin}',
     '${newUser.address1}','${newUser.address2}',${newUser.PIN},'${newUser.landmark}',${newUser.city_id},${newUser.state_id},${newUser.country_id},'${newUser.fcm_id}',
     '${newUser.status}',?,${newUser.created_by}) `;
-debugger;
+//;
   try {
 
     resp = await pool.query(stmt, [datetime]);
@@ -1013,7 +1013,7 @@ User.getOTPAnonymous = async (newUser, result) => {
   let otp = await _utility.generateOTP();
   let resp;
   try {
-debugger;
+//;
     let response_send_otp = await _utility.sendOTP('OTP_FOR_ANONYMOUS', otp, newUser.mobile, newUser.email);
 
     if (response_send_otp.message == "SUCCESS") {
@@ -1214,7 +1214,7 @@ User.verifyUserNewBLE = async (newUser, result) => {
         respValidate = await pool.query(stmtValidate, [datetime, resp[0].user_id, resp[0].user_id]);
 
         //added for BLE sync
-        debugger;
+        //;
         respBLE = await poolMG.query(stmtBLE, [ newUser.mobile]);
         //added for BLE sync
 
@@ -1224,10 +1224,10 @@ User.verifyUserNewBLE = async (newUser, result) => {
         respValidate = await pool.query(stmtValidate, [datetime, resp[0].user_id, resp[0].user_id]);
 
 
-        debugger;
+        //;
         //call login api spin
         respLoginApi = await callSPINLoginApi(respUserDetails,newUser);
-        debugger;
+        //;
 
         final_res = {
           status: status,
@@ -1387,7 +1387,7 @@ callSPINLoginApi = async (params,params2) => {
   let resp;
   let resp1;
   
-  debugger;
+  //;
   resp = await axios.post('https://spinapistaging.in/v1/api/v1/loginNew', {
     email: params[0].email,
     password: params[0].password,
@@ -1399,11 +1399,11 @@ callSPINLoginApi = async (params,params2) => {
     checkPassword:0
   })
   .then(function (response) {
-    debugger
+    //
     resp1=response;
   })
   .catch(function (error) {
-    debugger;
+    //;
     console.log(error);
   });
 
@@ -1424,7 +1424,7 @@ updateLoginDetails = async (params,id) => {
   try {
 
     resp = await pool.query(stmt);
-debugger;
+//;
 
 if(resp.affectedRows>0){
   final_res = {

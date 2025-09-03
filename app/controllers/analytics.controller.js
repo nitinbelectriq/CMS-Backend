@@ -124,7 +124,7 @@ exports.getChargerWiseAlarmCountCW = (req, res) => {
   });
 };
 exports.getTotalAlarmCountCW = (req, res) => {
-  debugger;
+  //;
   let login_id = req.params.login_id;
   TransactionList.getTotalAlarmCountCW(login_id, req.body, (err, data) => {
      res.send(data);
@@ -132,7 +132,7 @@ exports.getTotalAlarmCountCW = (req, res) => {
 };
 
 exports.getTotalAlarmCountCCS = (req, res) => {
-  debugger;
+  //;
   let params ={
     login_id : req.params.login_id,
     client_id : req.params.client_id,

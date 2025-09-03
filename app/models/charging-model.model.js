@@ -45,7 +45,7 @@ const ChargingModelConnector = function (chargingModelConnector) {
 
 ChargingModel.create = async (model, result) => {
   const currentDate = new Date().toISOString().slice(0, 10);
-debugger;
+//;
   const insertQuery = `
     INSERT INTO charging_model_mst (
       charger_type_id,
@@ -219,7 +219,7 @@ ChargingModel.getChargingModels = async () => {
 
 
 ChargingModel.getChargingModelsAll = async (result) => {
-  debugger;
+  //;
   let stmt = `select cpom.id, cpom.charger_type_id,ctm.name as charger_type_name, cpom.manufacturer_id ,
     mm.name as manufacturer_name,
     cpom.charger_model_type_id, cmtm.name as charger_model_type_name ,

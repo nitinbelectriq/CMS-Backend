@@ -16,7 +16,7 @@ const Role = function (role) {
 
 Role.create = async (newRole, result) => {
   var datetime = new Date();
-debugger;
+//;
   let stmt3 = ` select client_id,project_id,status from role_mst 
     where client_id =${newRole.client_id} and code='${newRole.code}'
     and project_id=${newRole.project_id} and  status='Y'`;

@@ -8,7 +8,7 @@ let jwt = require('jsonwebtoken');
 let config = require('../config/jwt.js');
 
 exports.authorize = (req, res) => {
-  debugger;
+  //;
   console.log("req==================>", req.body);
 
   if (!req.body.user_name || !req.body.password) {
@@ -28,7 +28,7 @@ exports.authorize = (req, res) => {
   }
 
   LoginUser.findByUsername(user_name, async (err, data) => {
-    debugger;
+    //;
 
     if (err) {
       if (err.kind === "not_found") {
@@ -71,7 +71,7 @@ exports.authorize = (req, res) => {
                   message: `project_code is incorrect`
                 });
               } else {
-                debugger;
+                //;
                 respNavList = await Master.getNavListByUserId(data.data.Id, respProject.data[0].id);
 
                 return res.status(200).json({
@@ -121,7 +121,7 @@ exports.authorize = (req, res) => {
 
 
 exports.loginViaMobile = async (req, res) => {
-    debugger;
+    //;
     
     //verify OTP function
 
@@ -129,7 +129,7 @@ exports.loginViaMobile = async (req, res) => {
         mobile: !!req.body.mobile ? req.body.mobile : '',
         otp: !!req.body.otp ? req.body.otp : ''
     });
-    debugger;
+    //;
     const { project_code } = req.body;
 
     // Validate request
@@ -143,11 +143,11 @@ exports.loginViaMobile = async (req, res) => {
         User.verifyOTPNew(user, (err, data) => {
             //res.send(data);
             //do on success
-            debugger;
+            //;
             if (data.status) {
                 //START in part 2=====================
                 LoginUser.findByMobile(user.mobile, async (err, data) => {       
-                   debugger;     
+                   //;     
                    if (err) {
                        if (err.kind === "not_found") {
                            res.status(200).send({
@@ -190,7 +190,7 @@ exports.loginViaMobile = async (req, res) => {
                                                    message: `project_code is incorrect`
                                                });
                                            }else{
-                                               debugger;
+                                               //;
                                                respNavList = await Master.getNavListByUserId(data.data.Id,respProject.data[0].id);
                                              
                                                    res.json({
@@ -281,7 +281,7 @@ exports.authorizeBLE = (req, res) => {
         // }
 
         LoginUser.findByUserId(req.body, async (err, data) => { 
-            debugger;           
+            //;           
             if (err) {
                 if (err.kind === "not_found") {
                     res.status(200).send({
@@ -298,11 +298,11 @@ exports.authorizeBLE = (req, res) => {
 
                 if(data.status){
 
-                    debugger;
+                    //;
                     //update device id fcm id in users table
                     let resp_updateUser = await updateLoginDetails(req.body,data.data.Id);
                    
-                            debugger;
+                            //;
                             let token = jwt.sign({ ble_user_id: ble_user_id },
                                 config.secret,
                                 {

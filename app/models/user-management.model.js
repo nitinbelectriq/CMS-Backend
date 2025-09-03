@@ -142,7 +142,7 @@ const BLE_Session = function (ble_session) {
 
 
 User.create = async (newUser, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -172,7 +172,7 @@ User.create = async (newUser, result) => {
   VALUES (?,${newUser.station_id},'Y','Y',?,${newUser.created_by});`;
 
   try {
-  debugger;
+  //;
     resp = await pool.query(stmt, [datetime]);
     resp1 = await pool.query(stmt2, [resp.insertId, datetime]);
 
@@ -255,7 +255,7 @@ User.update = async (newUserdtl, result) => {
   // default_station = 'N',modify_date = ?, modifyby =${newUserdtl.modify_by}  
   // where user_id = ${newUserdtl.id}`;
 
-  debugger;
+  //;
   try {
 
     resp = await pool.query(stmt, [datetime]);
@@ -1036,7 +1036,7 @@ User.getChargingHistoryCW = async (login_id, params, result) => {
 };
 
 User.delete = async (id, user_id, result) => {
-debugger;
+//;
   var datetime = new Date();
   let resp1;
   let resp
@@ -1168,7 +1168,7 @@ User.userPreferedStationMapping = async (newPrefranc, result) => {
   try {
     resp2 = await pool.query(stmt3)
     //resp = await pool.query(stmt, [datetime])
-    debugger;
+    //;
     if (resp2.length > 0) {
       final_res = {
         status: false,
@@ -1272,7 +1272,7 @@ User.updateUserPreferedStationMapping = async (newUser, result) => {
   where user_id = ${newUser.id} and station_id = ${newUser.station_id}`;
 
   try {
-    debugger;
+    //;
     resp = await pool.query(stmt, [datetime]);
 
     final_res = {
@@ -1399,7 +1399,7 @@ User.cpoStationDetailsByClientId = async (login_id, client_id, data, result) => 
   let cpos = [];
   let item;
   let check = false;
-debugger;
+//;
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
 
   if (!clientAndRoleDetails.status) {
@@ -1481,7 +1481,7 @@ debugger;
 
             check = false;
             cpos.forEach(e2 => {
-              debugger;
+              //;
               if (e2.cpo_id == item.cpo_id) {
                 check = true;
               }
@@ -1525,7 +1525,7 @@ debugger;
         }
       }
     } catch (err) {
-      debugger;
+      //;
       final_res = {
         status: false,
         err_code: `ERROR : ${err.code}`,
@@ -2042,7 +2042,7 @@ UserStation.getAllUserStationMapping = async (login_id, result) => {
 };
 
 UserStation.updateUserStationMappingV1 = async (userStation, result) => {
-  debugger;
+  //;
   var datetime = new Date();
 
   let stmt = `update user_station_mapping set 
@@ -2081,7 +2081,7 @@ UserStation.getStationListWithStationAssignedToUser = async (cpo_id, user_id, re
   let resp;
   let stmt;
 
-  debugger;
+  //;
   stmt = ` select csm.id as station_id, csm.cpo_id,csm.name as station_name,
   usm.id as map_id  , usm.user_id,usm.default_station,usm.status as map_status,usm.created_date,usm.createdby,usm.modify_date,usm.modifyby
   from charging_station_mst csm 
@@ -2115,7 +2115,7 @@ UserStation.getStationListWithStationAssignedToUser = async (cpo_id, user_id, re
 
 };
 UserCharging.userChargerMappingBLESync = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -2142,7 +2142,7 @@ UserCharging.userChargerMappingBLESync = async (data, result) => {
 
 
   try {
-debugger;
+//;
     resp = await pool.query(stmt, [data.serial_no]);
 
     if (resp.length > 0) {
@@ -2150,7 +2150,7 @@ debugger;
       resp3 = await pool.query(stmt3, [resp[0].charger_id]);
 
       // if (resp3.length > 0) { 
-      debugger;
+      //;
       if (resp3.length > 0 && !!data.map_as_child != 1) { // 04 04 2022 data.map_as_child added as spin have functionality to add charger to multiple user
         final_res = {
           status: false,
@@ -2163,7 +2163,7 @@ debugger;
 
         resp4 = await pool.query(stmt4, [data.user_id]);
 
-        debugger;
+        //;
         values1 = [resp4[0].id, resp[0].charger_id, data.map_as_child, data.status, datetime, data.createdby];
         resp1 = await pool.query(stmt1, values1);
 
@@ -2212,7 +2212,7 @@ debugger;
 };
 
 UserCharging.revokeChargerAccessBLE = async(data,result)=>{
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -2233,7 +2233,7 @@ UserCharging.revokeChargerAccessBLE = async(data,result)=>{
     resp1 = await pool.query(stmt1,[datetime,resp4[0].id,resp5[0].id]);
 
     if(resp1.affectedRows>0){
-      debugger;
+      //;
     resp = await poolMG.query(stmt,datetime);
     resp3 = await poolMG.query(stmt2,datetime);
     final_res={
@@ -2348,7 +2348,7 @@ UserCharging.ChargerRenewalRequestBle = async (ud, req, result) => {
       }]
     }
   } catch (err) {
-    debugger
+    //
     final_res = {
       status: false,
       message: 'ERROR',
@@ -2362,7 +2362,7 @@ UserCharging.ChargerRenewalRequestBle = async (ud, req, result) => {
 };
 
 UserMenu.createUserMenu = async (params, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let respSelect;
@@ -2443,14 +2443,14 @@ UserMenu.createUserMenu = async (params, result) => {
     
     let id_tag = await _utility.getYYYYMMDDHHMMSSfromDate();
     let user_id_tag = id_tag + '' + user_id;
-  debugger;
+  //;
     let resp = await pool.query(stmt,[user_id,user_id_tag,'Y',datetime,created_by]);
     return { res: resp,user_id_tag };
   }
   
 
   User.userChargingHistoryBle = async (params, result) => {
-  debugger;
+  //;
     let stmt = `SELECT chr.nick_name,chr.serial_no, ucl.meter_start_time,ucl.energy_consumed, ucl.duration
     FROM user_charging_log ucl 
    INNER JOIN summary_chargers_report chr ON
@@ -2571,7 +2571,7 @@ UserMenu.createUserMenu = async (params, result) => {
 
 
   User.userChargingSummaryBleMode = async (params, result) => {
-    debugger;
+    //;
     let stmt = ''
     let stmt1 = ''
     let stmt2 = ''
@@ -2826,12 +2826,12 @@ resLastSession = await pool.query(qryLastSession);
    };
    
   User.getUserByMobileAndEmail=async (data,result)=>{
-    debugger;
+    //;
     let resp;
     let final_res;
     let whereClause='';
     if(data.key=='BOTH'){
-      debugger;
+      //;
       whereClause = `where status<>'D' and (mobile='${data.mobile}' or email='${data.email}')`;
     }else if(data.key=='EMAIL'){
       whereClause = `where status<>'D' and email='${data.email}'`;
@@ -2863,7 +2863,7 @@ finally{
   }
 
   User.getUserNotificationList=async (user_id,result)=>{
-    debugger;
+    //;
     let resp;
     let final_res;
     let stmt = `SELECT nl.id,event_name,notification_message,nl.created_date FROM
@@ -2895,7 +2895,7 @@ finally{
   }
 
   User.updateUSerNotificationStatus=async (id,result)=>{
-    debugger;
+    //;
     let resp;
     let final_res;
     let stmt = `UPDATE notification_log SET STATUS ='R' WHERE id =${id}`;
@@ -2988,7 +2988,7 @@ finally{
   };
   User.Get_Detail_Used_Statistics = async (params, result) => {
     console.log( params.userid);
-    debugger;
+    //;
      let qry = "SET @OP_ErrorCode = 0; call Get_Detail_Used_Statistics(" + params.userid + ",'"+params.serialno+"',"+params.monthValue+", @OP_ErrorCode,@OP_ErrorDetail);select @OP_ErrorCode as OP_ErrorCode,  @OP_ErrorDetail as OP_ErrorDetail "
      let res;
      let final_res;

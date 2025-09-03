@@ -3,7 +3,7 @@ const myModule = require("../models/ev-dealer.model");
 const EvDealer = myModule.Dealer;
 exports.create=(req,res)=>{
 let resp;
-debugger;
+//;
 if (!req.body) {
   resp = {
     status: false,
@@ -80,7 +80,7 @@ if (!req.body) {
     });
   };
   exports.updateEvDealer = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -117,7 +117,7 @@ if (!req.body) {
       });
   };
   exports.publishEvDealer = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -139,7 +139,7 @@ if (!req.body) {
   };
 
   exports.moderateEvDealer = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -162,7 +162,7 @@ if (!req.body) {
 
   exports.getModerateEvDealerListByKeys = (req, res) => {
     let key = req.params.key;
-    debugger;
+    //;
     EvDealer.getModerateEvDealerListByKeys(key, (err, data) => {
   
       res.send(data);

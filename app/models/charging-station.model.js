@@ -150,7 +150,7 @@ ChargingStation.create = async (newCs, result) => {
 };
 
 ChargingStation.update = async (newCs, result) => {
-  debugger;
+  //;
   const datetime = new Date();
   let final_res;
 
@@ -252,7 +252,7 @@ ChargingStation.getChargingStationsByUserRoleAndLatLongUW = async (user_id, para
   result(null, ress);
 };
 ChargingStation.getChargingStationsByUserRoleAndLatLongUW1 = async (user_id, params, result) => {
-  debugger;
+  //;
   let ress = await func_getChargingStationsByUserRoleAndLatLongUW1(user_id, params);
   result(null, ress);
 };
@@ -341,7 +341,7 @@ ChargingStation.getAllChargingStationsWithChargersAndConnectorsCCS = async (para
 
 ChargingStation.getActiveChargingStationsWithChargersAndConnectorsCW = async (login_id, result) => {
   let stations_details;
-  debugger;
+  //;
   try {
 
     stations_details = await func_activeChargingStationsWithChargersAndConnectorsCW(login_id);
@@ -757,7 +757,7 @@ async function func_allChargingStationsWithChargersAndConnectorsUW1(user_id) {
 }
 async function func_allChargingStationsWithChargersAndConnectorsCW(user_id) {
   try {
-    debugger;
+    //;
     const clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(user_id);
     const userRoles = clientAndRoleDetails.data;
     const client_id = userRoles[0]?.client_id;
@@ -2157,7 +2157,7 @@ async function func_getChargingStationsByUserRoleAndLatLongUW(user_id, params) {
 
 }
 async function func_getChargingStationsByUserRoleAndLatLongUW1(user_id, params) {
-  debugger;
+  //;
   let stmt = '';
   let final_res = [];
   let lat = params.lat;
@@ -2440,7 +2440,7 @@ AddEvChargingStation.createEvChargingStationRequest = async (data, result) => {
 AddEvChargingStation.getEvChargingStationRequestByCityId = async (user_id, city_id, result) => {
   let resp;
   let final_res;
-  debugger;
+  //;
   let stmt = `select ecsr.id,ecsr.user_id,umn.username as user_name,ecsr.mobile,ecsr.email,ecsr.lat,
   ecsr.lng,ecsr.address1,ecsr.address2,ecsr.landmark,ecsr.PIN,ecsr.city_id,cm.name as city_name,ecsr.state_id,
   sm.name as state_name,ecsr.country_id,cmt.name as country_name,ecsr.volume_of_ev_user,
@@ -2516,7 +2516,7 @@ AddEvChargingStation.getEvChargingStationRequestByUserIdCityId = async (user_id,
 
 
 AddEvChargingStation.updateEvChargingStationRequest = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -2556,7 +2556,7 @@ AddEvChargingStation.updateEvChargingStationRequest = async (data, result) => {
 AddEvChargingStation.getApproveRejectEvChargingStationRequestByCityId = async (user_id, city_id, result) => {
   let resp;
   let final_res;
-debugger;
+//;
   let stmt = `select ecsr.id,ecsr.user_id,umn.username as user_name,ecsr.mobile,ecsr.email,ecsr.lat,
   ecsr.lng,ecsr.address1,ecsr.address2,ecsr.landmark,ecsr.PIN,ecsr.city_id,cm.name as city_name,ecsr.state_id,
   sm.name as state_name,ecsr.country_id,cmt.name as country_name,ecsr.volume_of_ev_user,
@@ -2596,7 +2596,7 @@ debugger;
 AddEvChargingStation.getApproveRejectEvChargingStationRequestByUserIdCityId = async (user_id, city_id, result) => {
   let resp;
   let final_res;
- debugger;
+ //;
   let stmt = `select ecsr.id,ecsr.user_id,umn.username as user_name,ecsr.mobile,ecsr.email,ecsr.lat,
   ecsr.lng,ecsr.address1,ecsr.address2,ecsr.landmark,ecsr.PIN,ecsr.city_id,cm.name as city_name,ecsr.state_id,
   sm.name as state_name,ecsr.country_id,cmt.name as country_name,ecsr.volume_of_ev_user,
@@ -2633,7 +2633,7 @@ AddEvChargingStation.getApproveRejectEvChargingStationRequestByUserIdCityId = as
 }
 
 AddEvChargingStation.approveRejectChargerStationRequest = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_resp;
@@ -2689,7 +2689,7 @@ AddEvChargingStation.deleteChargerStationRequest = async(id,modify_by, result) =
 }
 
 AddEvChargingStation.LikeDislikeRequest = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let dynamicQuery = ``;
@@ -2734,7 +2734,7 @@ AddEvChargingStation.LikeDislikeRequest = async (data, result) => {
           data: [{ id: data.id }]
         }
       }else{
-        debugger;
+        //;
         final_res = {
           status:  true ,
           err_code:'ERROR : 0',

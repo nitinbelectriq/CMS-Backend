@@ -3,7 +3,7 @@ const myModule = require("../models/ev-component-dealer.model");
 const ComponentDealer = myModule.EvComponent;
 
   exports.create = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -80,7 +80,7 @@ const ComponentDealer = myModule.EvComponent;
     });
   };
   exports.updateEvComponentDealer = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -115,7 +115,7 @@ const ComponentDealer = myModule.EvComponent;
       });
   };
   exports.publishEvComponentDealer = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -150,7 +150,7 @@ const ComponentDealer = myModule.EvComponent;
       });
   };
   exports.moderateComponentDealer = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({

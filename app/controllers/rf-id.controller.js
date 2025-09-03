@@ -70,7 +70,7 @@ exports.update = (req, res) => {
 
 
 exports.createCpoRfidMapping = (req, res) => {
-  debugger;
+  //;
   if (!req.body || !req.body.client_id || !req.body.cpo_id || !Array.isArray(req.body.rfid_data)) {
     return res.status(400).send({
       status: false,
@@ -150,7 +150,7 @@ exports.getRFids = (req, res) => {
 
 
 exports.getCpoRFidMappingCW = (req, res) => {
-  debugger;
+  //;
   let login_id = req.params.login_id;
   RFNO.getCpoRFidMappingCW(login_id,(err, data) => {
     if (err) {

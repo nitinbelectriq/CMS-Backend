@@ -117,7 +117,7 @@ Client.create = async (newClient, result) => {
 Client.update = async (newClient, result) => {
   let final_res;
   let resp;
-debugger;
+//;
   // Escape and handle nulls safely
   const escape = (val) => (val !== undefined && val !== null ? `'${val}'` : 'NULL');
 
@@ -235,7 +235,7 @@ Client.getClients =async(result) => {
 
 
 Client.getClientsCW = async (login_id,result) => {
-debugger;
+//;
   let stmt='';
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
   let client_id = clientAndRoleDetails.data[0].client_id;
@@ -311,7 +311,7 @@ debugger;
 };
 
 Client.getActiveClientsCW = async (login_id,result) => {
-  debugger;
+  //;
 
   let stmt='';
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);

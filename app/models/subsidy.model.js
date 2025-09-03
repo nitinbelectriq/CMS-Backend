@@ -78,7 +78,7 @@ const { sql, pool } = require("./db.js");
      
       };
       // Subsidy.getSubsidyByVehicleTypeId = async (id, result) => {
-      //      debugger;
+      //      //;
       //   let stmt =`SELECT ss.id,ss.state_id,sm.name as state_name,ss.per_KWh_of_battery,ss.capacity,ss.max_subsidy,ss.road_tax_exemption,ss.vehicle_type_id,vtm.name as vehicle_type,
       //            ss.status,ss.created_date,ss.createdby
       //            FROM statewise_subsidy ss 
@@ -184,7 +184,7 @@ const { sql, pool } = require("./db.js");
       
       };
       Subsidy.updateSubsidy = async (newSubsidy, result) => {
-       debugger;
+       //;
         var datetime = new Date();
         let final_res;
         let resp;

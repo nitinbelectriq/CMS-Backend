@@ -1,6 +1,6 @@
 const { checkToken } = require('../middleware/jwt.js')
 module.exports = app => {
-  debugger;
+  //;
     const evDealer = require("../controllers/ev-dealer.controller.js");
       //---23-03-2022 cerate a new vehicle brand---
     app.post("/evDealer/evDealer",checkToken, evDealer.create);

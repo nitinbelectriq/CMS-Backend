@@ -672,7 +672,7 @@ TransactionList.getChargerWiseAlarmCountCW = async (login_id, params, result) =>
 };
 
 TransactionList.getTotalAlarmCountCW = async (login_id, params, result) => {
-debugger;
+//;
   let stmt = '';
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
   let client_id = clientAndRoleDetails.data[0].client_id;
@@ -777,7 +777,7 @@ debugger;
 };
 
 TransactionList.getTotalAlarmCountCCS = async ( params, result) => {
-debugger;
+//;
   let stmt = '';
   let final_res;
   let resp;
@@ -921,7 +921,7 @@ TransactionList.getChargerStatusCW = async (login_id, result) => {
   let resp_modified = [];
   let resp;
   let resp2;
-debugger;
+//;
   if (isSA) {
     stmt = ` select count(*) as count,CASE
       WHEN (TIMESTAMPDIFF(SECOND,last_ping_datetime,now()) <= (heartbeat_interval+10)) THEN "ONLINE"
@@ -1080,7 +1080,7 @@ TransactionList.getChargerStatusCCS = async (params, result) => {
   let resp_modified = [];
   let resp;
   let resp2;
-debugger;
+//;
   // if (isSA) {
   //   stmt = ` select count(*) as count,CASE
   //     WHEN (TIMESTAMPDIFF(SECOND,last_ping_datetime,now()) <= (heartbeat_interval+10)) THEN "ONLINE"
@@ -1208,7 +1208,7 @@ debugger;
   }
 
   try {
-debugger;
+//;
     resp = await pool.query(stmt);
     resp2 = await pool.query(stmt2);
     final_resp = resp;
@@ -1577,7 +1577,7 @@ TransactionList.getActiveConnectorStatusCW = async (login_id, result) => {
   try {
     resp = await pool.query(stmt);
     //final_resp = resp;
-debugger
+//
 countCharging = resp.filter(x => x.current_status == 'Charging');
 
     final_res = {
@@ -1700,7 +1700,7 @@ TransactionList.getActiveConnectorStatusCCS = async (params, result) => {
     }  
 
   // }
-  debugger;
+  //;
  
   try {
     resp = await pool.query(stmt);
@@ -5047,7 +5047,7 @@ TransactionList.getVehicleChargingStatusCW = async (login_id, result) => {
     total_vehicles = respTotal[0].total_vehicles,
     total_vehicles_charging = respChargingCount[0].total_vehicles_charging,
     total_vehicles_not_charging = total_vehicles - total_vehicles_charging
-    debugger;
+    //;
     final_res = {
       total_vehicles :total_vehicles,
       total_vehicles_charging : total_vehicles_charging,

@@ -1,7 +1,7 @@
 const myModule = require("../models/brand-model.model.js");
 
 const VehicleModel = myModule.VehicleModel;
-debugger;
+//;
   exports.create = (req, res) => {
     // Validate request
     if (!req.body) {
@@ -9,7 +9,7 @@ debugger;
         message: "Content can not be empty!"
       });
     }
-  debugger;
+  //;
     // Create a VehicleModel
     const vehicle = new VehicleModel({
       id : req.body.id,
@@ -51,7 +51,7 @@ debugger;
     });
   };
   exports.getVehicleManufacturesByVehicleType = (req, res) => {
-debugger;
+//;
     let vehicle_type = req.params.vehicle_type;
     VehicleModel.getVehicleManufacturesByVehicleType(vehicle_type, (err, data) => {
   
@@ -89,7 +89,7 @@ debugger;
       });
   };
   exports.publishVehicleModel = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({
@@ -109,7 +109,7 @@ debugger;
 }
 
   exports.moderateVehicleModel = (req, res) => {
-    debugger;
+    //;
     // Validate request
     if (!req.body) {
       res.status(400).send({

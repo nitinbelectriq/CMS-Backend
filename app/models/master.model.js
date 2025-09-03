@@ -222,7 +222,7 @@ Country.createCountry = async (data, result) => {
 };
 
 Country.updateCountry = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -438,7 +438,7 @@ State.updateState = async (data, result) => {
 };
 
 State.deleteState = async (id, user_id, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -644,7 +644,7 @@ StatePIN.getAllStatePINMapping = async result => {
 
   try {
     resp = await pool.query(stmt);
-debugger;
+//;
     final_res = {
       status: resp.length > 0 ? true : false,
       message: resp.length > 0 ? 'SUCCESS' : 'NOT FOUND',
@@ -736,7 +736,7 @@ StatePIN.createStatePINMapping = async (data, result) => {
   let resp;
   let PIN_not_mapped = [];
   let PIN_mapped = [];
-  debugger;
+  //;
   let stmt3 = `select id from state_pin_mapping
   where Pin = ? and status <>'D'`;
 
@@ -1140,7 +1140,7 @@ Master.getNavListByUserId = async (login_id, project_id, result) => {
   //   inner join user_mst_new usm on umm.user_id=usm.id and usm.status = 'Y'
   //   where umm.status='Y' and umm.user_id=${login_id} and mm.project_id=${project_id} 
   //   order by mm.display_order;`;
-debugger;
+//;
   let stmt = `select rmm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,
     mm.icon,mm.icon_url,mm.url,mm.display_order,mm.parent_id  
     from role_menu_mapping rmm 
@@ -1161,7 +1161,7 @@ debugger;
   try {
 
     resp = await pool.query(stmt);
-debugger;
+//;
     arr_nav_list_L1 = resp.filter(x => x.parent_id == null);
     arr_nav_list_L2 = resp.filter(x => x.nav_level == 2);
     arr_nav_list_L3 = resp.filter(x => x.nav_level == 3);
@@ -1227,7 +1227,7 @@ debugger;
 };
 
 StatePIN.updateStatePINMapping = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -1297,7 +1297,7 @@ StatePIN.deleteStatePINMapping = async (id,login_id, result) => {
 //   let final_res;
 //   let resp;
 //   let stmt = `select id, \`key\`,value from master_config where \`key\` = 'ChargingProfileKind' and status="Y";`;
-// debugger;
+// //;
 //   try {
 //     resp = await pool.query(stmt);
 
@@ -1416,7 +1416,7 @@ Master_Config.getActiveMasterConfigData = async (key,result) => {
 
   let stmt = `select id, \`key\`,value,description 
   from master_config where \`key\` = '${key}' and status="Y";`;
-debugger;
+//;
   try {
     resp = await pool.query(stmt);
 
@@ -1459,7 +1459,7 @@ Master_Config.getProjects =  result => {
 };
 
 Master.navListByUserId = async( login_id,project_id ,result) => {
-debugger;
+//;
   let respNavList = await Master.getNavListByUserId(login_id,project_id);
     result(null, respNavList);
  
@@ -1566,7 +1566,7 @@ NotificationEngine.createNotificationEngine = async(data,result)=>{
 };
 
 NotificationEngine.updateNotificationEngine = async(data,result)=>{
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
@@ -1599,7 +1599,7 @@ NotificationEngine.updateNotificationEngine = async(data,result)=>{
 };
 
 NotificationEngine.deleteNotificationEngine = async(id,modify_by,result)=>{
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_res;
@@ -1631,7 +1631,7 @@ NotificationEngine.deleteNotificationEngine = async(id,modify_by,result)=>{
 
 
 NotificationEngine.testSms = async (result)=>{
-  debugger;
+  //;
   let datetime = _utility.convertDatetimeToStringYYYYMMDDHHMMSS();
 
   let resp;
@@ -1656,7 +1656,7 @@ NotificationEngine.testSms = async (result)=>{
       for(let i=0; i<resp.length; i++) {
         id = resp[i].id;
         response_send_otp = await _utility.sendSMSDynamic('send', resp[i].notification_message, resp[i].mobile,countryCode);
-        debugger;
+        //;
         //object  =  Object.assign({ id: id }, response_send_otp);
         //responseArray.push(object);
 
@@ -1672,7 +1672,7 @@ NotificationEngine.testSms = async (result)=>{
       //   WHERE id = ${item.id};`
       // });
 
-      debugger;
+      //;
       queryResp = await pool.query(queries);
       
       final_res = {
@@ -1734,7 +1734,7 @@ NotificationEngine.testSms = async (result)=>{
 
 };
 NotificationEngine.schedulerSms = async(event_code,user_id,datalist,result)=>{
-  debugger;
+  //;
   let datetime = _utility.convertDatetimeToStringYYYYMMDDHHMMSS();
   let resp;
   let final_res;

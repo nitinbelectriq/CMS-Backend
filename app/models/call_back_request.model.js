@@ -24,7 +24,7 @@ CBR.getCallHistory = async (params, result) => {
   let resp;
   let whereClause =``;
 
-  debugger;
+  //;
   if (!!params.user_id) {
     whereClause = ` and cbrl.user_id = ${params.user_id} `;
   } 

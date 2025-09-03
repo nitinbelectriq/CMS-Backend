@@ -148,7 +148,7 @@ ClientMenu.clientMenuMapping = async (params, result) => {
 
 
 RoleMenu.roleMenuMapping = async (params, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let respSelect;
@@ -275,7 +275,7 @@ ClientMenu.getMenusWithAlreadyMappedToClient = async (project_id, client_id, res
     from menu_mst mm left join client_menu_mapping cmm on mm.id = cmm.menu_id and cmm.status='Y'  and cmm.client_id = ${client_id} 
     where mm.status = 'Y' and mm.project_id= ${project_id}
     order by mm.display_order ;`;
-debugger;
+//;
   try {
 
     resp = await pool.query(stmt);
@@ -563,7 +563,7 @@ ClientMenu.getMenusByClientIdWithAlreadyMappedToRole = async (project_id, client
 
 
 Menu.getNavLevel = async (result) => {
-  debugger;
+  //;
   let final_res;
   let resp;
   let resp1;
@@ -657,7 +657,7 @@ Menu.getMenuIcon = async (result) => {
 
 };
 Menu.getParentByNavLevel = async (nav_level, result) => {
-  debugger;
+  //;
   let stmt = `select  id, title from Menu_mst where status="Y"  and nav_level=${nav_level}-1;`;
   try {
     resp = await pool.query(stmt);
@@ -801,7 +801,7 @@ Menu.deleteMenu = async (id, modify_by, result) => {
 
 };
 Menu_Spin.getAllMenuListBLE = async (result) => {
-  debugger;
+  //;
   let stmt = `select id,code,title,icon,icon_url,sub_id,sub_title,sub_icon,sub_icon_url,menu_type,
   country_id,status,created_date,modify_date from menu_spin_mst where status <>'D';`;
   try {

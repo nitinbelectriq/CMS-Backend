@@ -196,7 +196,7 @@ Brand.getAll = (callback) => {
   };
   
   Brand.moderate= async (data, result) => {
-    debugger;
+    //;
     var datetime = new Date();
     let stmt = `Update vehicle_brand_mst 
         set status = ? , modify_date = ? , modify_by = ?

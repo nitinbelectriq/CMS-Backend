@@ -5,7 +5,7 @@ const ClientModuleMapping = myModule.ClientModuleMapping;
 
 exports.create = (req, res) => {
   
-debugger;
+//;
   // Validate request
   if (!req.body) {
     res.status(400).send({
@@ -58,7 +58,7 @@ exports.update = (req, res) => {
       message: "Content cannot be empty!"
     });
   }
-debugger;
+//;
   const client = new Client({
     id: req.body.id,
     name: req.body.name,

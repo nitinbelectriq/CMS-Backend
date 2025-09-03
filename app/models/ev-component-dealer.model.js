@@ -23,7 +23,7 @@ const EvComponent = function (component) {
   };
   EvComponent.create = async (newComponent, result) => {
     var datetime = new Date();
-    debugger;
+    //;
     let stmt = `INSERT INTO ev_component_dealer_mst (company_name,ev_components, website,email,cp_name,mobile,address1,address2,PIN,landmark,city_id,state_id,country_id,remarks,status,createdby,created_date)
     Values ('${newComponent.company_name}','${newComponent.ev_components}','${newComponent.website}',
     '${newComponent.email}','${newComponent.cp_name}',${newComponent.mobile},'${newComponent.address1}',
@@ -123,7 +123,7 @@ const EvComponent = function (component) {
     var datetime = new Date();
     let final_res;
     let resp;
-   debugger;
+   //;
     let stmt = `update ev_component_dealer_mst set company_name = '${newComponent.company_name}', ev_components ='${newComponent.ev_components}',
           website ='${newComponent.website}',email ='${newComponent.email}',cp_name ='${newComponent.cp_name}',
           mobile ='${newComponent.mobile}',address1 ='${newComponent.address1}',address2 ='${newComponent.address2}',
@@ -163,7 +163,7 @@ const EvComponent = function (component) {
     var datetime = new Date();
     let final_res;
     let resp;
-   debugger;
+   //;
     let stmt = `update ev_component_dealer_mst set  status = '${newComponent.status}',
           modifyby = ${newComponent.modifyby},modify_date = ? 
           where id =  ${newComponent.id}`;
@@ -229,11 +229,11 @@ const EvComponent = function (component) {
   };
  
   EvComponent.moderateComponentDealer = async (data,result) => {
-    debugger;
+    //;
     var datetime = new Date();
     let final_res;
     let resp;
-   debugger;
+   //;
     let stmt = `update ev_component_dealer_mst set  status = ?,
           modifyby = ?,modify_date = ? 
           where id = ? `;

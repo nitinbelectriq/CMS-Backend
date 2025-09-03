@@ -51,7 +51,7 @@ VehicleModel.create = async (data, result) => {
 };
 
 VehicleModel.getAllVehicleModel = async(result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let resp;
   let final_res;
@@ -86,7 +86,7 @@ VehicleModel.getAllVehicleModel = async(result) => {
 };
 
 VehicleModel.getVehicleManufacturesByVehicleType = async (vehicle_type, result) => {
-  debugger;
+  //;
   // let whereClause = ``;
   // if (id > 0) {
   //   whereClause = ` where ucl.user_id =${id}  `
@@ -268,7 +268,7 @@ VehicleModel.deleteVehicleModel = async (id, modify_by, result) => {
 };
 
 VehicleModel.moderateVehicleModel = async (data, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let stmt = `Update vehicle_model_mst
       set status = ? , modify_date = ? , modify_by = ?

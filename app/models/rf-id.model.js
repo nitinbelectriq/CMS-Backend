@@ -20,7 +20,7 @@ const RFid = function (rfid) {
 
 RFid.create = (newRfid, result) => {
   const datetime = new Date();
-debugger;
+//;
   // SQL statement should match columns and values count
   const stmt = `
     INSERT INTO charger_rfid 
@@ -234,13 +234,13 @@ RFid.getRFids = (result) => {
 
 
 RFid.getCpoRFidMappingCW = async (login_id,result) => {
-  debugger;
+  //;
   let stmt='';
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
   let client_id = clientAndRoleDetails.data[0].client_id;
   // let role_code = clientAndRoleDetails.data[0].role_code;
   let isSA =  ( clientAndRoleDetails.data.filter(x=>x.role_code=='SA').length > 0) ? true : false;
-  debugger;
+  //;
   if(isSA){
   stmt = `select crm.id as map_id,  cr.name as rfid_name ,cr.description,cr.rf_id_no,cr.expiry_date,
     crm.CLIENT_ID, cm.name as cpo_name, clm.name as client_name,crm.cpo_id,
@@ -345,7 +345,7 @@ RFid.getCpoRFidMappingCCS = async (params,result) => {
     }  
 
     try {
-debugger;
+//;
       resp = await pool.query(stmt);
   
       final_res = {

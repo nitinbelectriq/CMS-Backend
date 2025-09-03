@@ -188,7 +188,7 @@ Booking.getAvailableTimeInterval = async (params, result) => {
   // left join booking_log bl on csm.id = bl.station_id and bl.status in ('P','A') and bl.booking_date = '${params.date}' and charger_id = ${params.charger_id} and connector_no=${params.connector_no} and cast(concat(booking_date, ' ', end_time_with_buffer) as datetime) > now()
   // where csm.id=${params.station_id} and csm.status ='Y' 
   // order by start_time ; `;
-  debugger
+  //
 
   try {
 
@@ -584,7 +584,7 @@ Booking.getAvailableTimeInterval = async (params, result) => {
 //   // left join booking_log bl on csm.id = bl.station_id and bl.status in ('P','A') and bl.booking_date = '${params.date}' and charger_id = ${params.charger_id} and connector_no=${params.connector_no} and cast(concat(booking_date, ' ', end_time_with_buffer) as datetime) > now()
 //   // where csm.id=${params.station_id} and csm.status ='Y' 
 //   // order by start_time ; `;
-// debugger
+// //
 
 //   try {
 
@@ -1115,7 +1115,7 @@ Booking.getBookingHistory = async (params, result) => {
   inner join booking_config bc on bl.station_id = bc.station_id and bc.status='Y'
   ${whereClause}
   order by bl.id desc; `;
-debugger
+//
   try {
 
     resp = await pool.query(stmt);
@@ -1218,9 +1218,9 @@ Booking.UpdateBookingStatus = (params, result) => {
   //let stmt = `Update vehicle_mst set status = 'D', modify_date= ? ,modify_by=? WHERE id = ?`;
 
   let stmt = `UPDATE booking_log SET status = ?, modified_by = ?, modified_date = now() WHERE ID IN(?)`;
-  debugger;
+  //;
   sql.query(stmt, [params.action, params.modified_by, bookings], (err, res) => {
-    debugger
+    //
     if (err) {
       result(null, err);
       return;
@@ -1387,7 +1387,7 @@ Booking.allBookingsCW = async (params, result) => {
   inner join booking_config bc on bl.station_id = bc.station_id and bc.status='Y'
   ${whereClause}
   order by bl.id desc; `;
-debugger
+//
   try {
 
     resp = await pool.query(stmt);
@@ -1449,7 +1449,7 @@ debugger
 //   inner join connector_type_mst ctm on bl.connector_type_id = ctm.id and ctm.status = 'Y'
 //   ${whereClause}
 //   order by bl.id desc; `;
-// debugger;
+// //;
 //   try {
 
 //     resp = await pool.query(stmt);

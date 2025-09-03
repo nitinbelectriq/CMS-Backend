@@ -227,7 +227,7 @@ exports.getStates = (req, res) => {
   });
 };
 exports.getStateByCountry = (req, res) => {
-debugger;
+//;
   State.getStateByCountry(req.params.id, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {

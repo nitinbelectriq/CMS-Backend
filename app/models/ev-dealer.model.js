@@ -26,7 +26,7 @@ Dealer.create = async (data, result) => {
   var datetime = new Date();
   let final_res ;
   let resp;
-debugger;
+//;
   let stmt = `insert into ev_dealer_mst (company_name,deal_type_id, website,email,
               cp_name,mobile,address1,address2,PIN,landmark,city_id,state_id,country_id,
               remarks,status,createdby,created_date) Values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
@@ -261,7 +261,7 @@ Dealer.updateEvDealer = async (newEvDealer, result) => {
 
 };
 Dealer.publishEvDealer = async (newEvDealer, result) => {
-  debugger;
+  //;
   var datetime = new Date();
   let final_res;
   let resp;
