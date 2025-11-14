@@ -218,9 +218,14 @@ RFid.getRFids = (result) => {
     if (res.length) {
       // Format expiry_date as ISO string for each record (if expiry_date exists)
     const formattedData = res.map(row => ({
-  ...row,
-  expiry_date: row.expiry_date ? new Date(row.expiry_date).toISOString().split('T')[0] : null
-}));
+        ...row,
+        // ✅ Keep expiry_date as string (no UTC conversion)
+        expiry_date: row.expiry_date
+          ? typeof row.expiry_date === 'string'
+            ? row.expiry_date
+            : new Date(row.expiry_date).toLocaleDateString('en-CA') // 'YYYY-MM-DD'
+          : null,
+      }));
 
 
       result(null, formattedData);

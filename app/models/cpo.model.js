@@ -190,27 +190,38 @@ Cpo.update = async (newCpo, result) => {
 
   if(isSA){
 
-    stmt = `select cpom.id, client_id,cm.name as client_name, cpom.name,cpom.description,
+    stmt = `select cpom.id, cpom.client_id,cm.name as client_name, cpom.name,cpom.description,
       cpom.address1  ,cpom.address2  ,cpom.PIN  ,cpom.landmark  ,
       cpom.city_id , city.name as city_name, cpom.state_id, sm.name as state_name, cpom.country_id, country.name as country_name,
       cpom.logoPath, cpom.mobile,cpom.email,cpom.cp_name,cpom.gst_no,cpom.tin_no,
-      cpom.status,cpom.created_date,cpom.createdby,cpom.modifyby,cpom.modify_date
+      cpom.status,
+       cpom.created_date,
+  created_user.username AS createdby,
+  cpom.modify_date,
+  modified_user.username AS modifyby
       from cpo_mst cpom inner join client_mst cm on cpom.client_id = cm.id
       inner join city_mst city on cpom.city_id = city.id
       inner join state_mst sm on cpom.state_id = sm.id
       inner join country_mst country on cpom.country_id = country.id
+      LEFT JOIN user_mst_new created_user ON cpom.createdby = created_user.id
+      LEFT JOIN user_mst_new modified_user ON cpom.modifyby = modified_user.id
       where cpom.status <> 'D'
       order by cpom.id desc`;
   }else{
-    stmt = `select cpom.id, client_id,cm.name as client_name, cpom.name,cpom.description,
+    stmt = `select cpom.id, cpom.client_id,cm.name as client_name, cpom.name,cpom.description,
     cpom.address1  ,cpom.address2  ,cpom.PIN  ,cpom.landmark  ,
     cpom.city_id , city.name as city_name, cpom.state_id, sm.name as state_name, cpom.country_id, country.name as country_name,
     cpom.logoPath, cpom.mobile,cpom.email,cpom.cp_name,cpom.gst_no,cpom.tin_no,
-    cpom.status,cpom.created_date,cpom.createdby,cpom.modifyby,cpom.modify_date
+    cpom.status,cpom.created_date,
+  created_user.username AS createdby,
+  cpom.modify_date,
+  modified_user.username AS modifyby
     from cpo_mst cpom inner join client_mst cm on cpom.client_id = cm.id
     inner join city_mst city on cpom.city_id = city.id
     inner join state_mst sm on cpom.state_id = sm.id
     inner join country_mst country on cpom.country_id = country.id
+    LEFT JOIN user_mst_new created_user ON cpom.createdby = created_user.id
+      LEFT JOIN user_mst_new modified_user ON cpom.modifyby = modified_user.id
     where cpom.status <> 'D' and cpom.client_id = ${client_id}
     order by cpom.id desc`;
   }
@@ -231,7 +242,7 @@ Cpo.update = async (newCpo, result) => {
         });
   };
  Cpo.getActiveCposCW = async (login_id,result) => {
-
+debugger;
     // let stmt = `select cpom.id, client_id,cm.name as client_name, cpom.name,cpom.description,
     // cpom.address1  ,cpom.address2  ,cpom.PIN  ,cpom.landmark  ,
     // cpom.city_id , city.name as city_name, cpom.state_id, sm.name as state_name, cpom.country_id, country.name as country_name,

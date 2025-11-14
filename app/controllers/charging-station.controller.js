@@ -9,7 +9,7 @@ exports.create = (req, res) => {
       message: "Content can not be empty!"
     });
   }
-
+debugger;
   // Construct charging station object
 const chargingStation = new ChargingStation({
   id: req.body.id,

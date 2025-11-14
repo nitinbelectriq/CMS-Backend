@@ -151,6 +151,7 @@ ChargingStation.create = async (newCs, result) => {
 
 ChargingStation.update = async (newCs, result) => {
   //;
+  debugger;
   const datetime = new Date();
   let final_res;
 
@@ -197,7 +198,7 @@ ChargingStation.update = async (newCs, result) => {
         try {
           await pool.query(`
             INSERT INTO station_amenity_mapping (station_id, amenity_id, status, created_date, createdby)
-            VALUES (?, ?, 'A', ?, ?)
+            VALUES (?, ?, ?, ?, ?)
           `, [newCs.id, amenity_id,newCs.status, datetime.toISOString().slice(0, 10), newCs.modify_by]);
 
           console.log(`Amenity inserted: station ${newCs.id}, amenity ${amenity_id}`);
@@ -259,17 +260,78 @@ ChargingStation.getChargingStationsByUserRoleAndLatLongUW1 = async (user_id, par
 
 ChargingStation.getChargingStationById = (id, result) => {
 
-  let stmt = `SELECT csm.id, csm.cpo_id, cpom.name as cpo_name , csm.name, csm.code, csm.description,
-    csm.address1,  csm.address2,  csm.PIN , csm.landmark , 
-    csm.city_id , city.name as city_name, csm.state_id, sm.name as state_name, csm.country_id, country.name as country_name,
-    csm.lat, csm.lng,csm.location_type_id,csm.cp_name,csm.mobile,csm.email,
-    csm.commissioned_dt,csm.register_as,csm.electricity_line_id,csm.o_time,csm.c_time,
-    csm.status,csm.created_date,csm.createdby,csm.modify_date,csm.modifyby
-    FROM charging_station_mst csm inner join cpo_mst cpom on csm.cpo_id = cpom.id 
-    inner join city_mst city on csm.city_id = city.id
-    inner join state_mst sm on csm.state_id = sm.id
-    inner join country_mst country on csm.country_id = country.id
-    where csm.id = ? `;
+  // let stmt = `SELECT csm.id, csm.cpo_id, cpom.name as cpo_name , csm.name, csm.code, csm.description,
+  //   csm.address1,  csm.address2,  csm.PIN , csm.landmark , 
+  //   csm.city_id , city.name as city_name, csm.state_id, sm.name as state_name, csm.country_id, country.name as country_name,
+  //   csm.lat, csm.lng,csm.location_type_id,csm.cp_name,csm.mobile,csm.email,
+  //   csm.commissioned_dt,csm.register_as,csm.electricity_line_id,csm.o_time,csm.c_time,
+  //   csm.status,csm.created_date,csm.createdby,csm.modify_date,csm.modifyby
+  //   FROM charging_station_mst csm inner join cpo_mst cpom on csm.cpo_id = cpom.id 
+  //   inner join city_mst city on csm.city_id = city.id
+  //   inner join state_mst sm on csm.state_id = sm.id
+  //   inner join country_mst country on csm.country_id = country.id
+  //   where csm.id = ? `;
+
+
+  let stmt = `SELECT 
+    csm.id, 
+    csm.cpo_id, 
+    cpom.name AS cpo_name, 
+    csm.name, 
+    csm.code, 
+    csm.description,
+    csm.address1,  
+    csm.address2,  
+    csm.PIN, 
+    csm.landmark, 
+    csm.city_id, 
+    city.name AS city_name, 
+    csm.state_id, 
+    sm.name AS state_name, 
+    csm.country_id, 
+    country.name AS country_name,
+    csm.lat, 
+    csm.lng,
+    csm.location_type_id,
+    ltm.name AS location_type,          -- ✅ Added location type name
+    csm.cp_name,
+    csm.mobile,
+    csm.email,
+    csm.commissioned_dt,
+    csm.register_as AS register_as_id,
+    crtm.name AS register_as,           
+    csm.electricity_line_id,
+    csm.o_time,
+    csm.c_time,
+    csm.status,
+    csm.created_date,
+    csm.createdby,
+    csm.modify_date,
+    csm.modifyby,
+    GROUP_CONCAT(DISTINCT am.name ORDER BY am.name SEPARATOR ', ') AS amenities
+
+FROM charging_station_mst csm
+INNER JOIN cpo_mst cpom ON csm.cpo_id = cpom.id 
+INNER JOIN city_mst city ON csm.city_id = city.id
+INNER JOIN state_mst sm ON csm.state_id = sm.id
+INNER JOIN country_mst country ON csm.country_id = country.id
+INNER JOIN charger_registration_type_mst crtm ON csm.register_as = crtm.id
+INNER JOIN location_type_mst ltm ON csm.location_type_id = ltm.id  -- ✅ Added join for location type
+LEFT JOIN station_amenity_mapping sam ON sam.station_id = csm.id
+LEFT JOIN amenity_mst am ON sam.amenity_id = am.id
+
+WHERE csm.id = ?
+  AND csm.status <> 'D'
+GROUP BY 
+    csm.id, csm.cpo_id, cpom.name, csm.name, csm.code, csm.description,
+    csm.address1, csm.address2, csm.PIN, csm.landmark,
+    csm.city_id, city.name, csm.state_id, sm.name, csm.country_id, country.name,
+    csm.lat, csm.lng, csm.location_type_id, ltm.name,
+    csm.cp_name, csm.mobile, csm.email, csm.commissioned_dt,
+    csm.register_as, crtm.name, csm.electricity_line_id,
+    csm.o_time, csm.c_time, csm.status, csm.created_date,
+    csm.createdby, csm.modify_date, csm.modifyby;`;
+
   sql.query(stmt, id, (err, res) => {
     if (err) {
       result(null, err);
@@ -755,9 +817,9 @@ async function func_allChargingStationsWithChargersAndConnectorsUW1(user_id) {
   }
 
 }
-async function func_allChargingStationsWithChargersAndConnectorsCW(user_id) {
+async function    func_allChargingStationsWithChargersAndConnectorsCW(user_id) {
   try {
-    //;
+   debugger;
     const clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(user_id);
     const userRoles = clientAndRoleDetails.data;
     const client_id = userRoles[0]?.client_id;

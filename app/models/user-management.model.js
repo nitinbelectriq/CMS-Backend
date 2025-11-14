@@ -143,6 +143,7 @@ const BLE_Session = function (ble_session) {
 
 User.create = async (newUser, result) => {
   //;
+  debugger;
   var datetime = new Date();
   let final_res;
   let resp;

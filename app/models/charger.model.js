@@ -227,6 +227,7 @@ const _TABLE = 'charger_serial_mst';
 
 Charger.create = async (newCharger, result) => {
   //;
+  debugger;
   var datetime = new Date();
   let query = `select * from charging_model_connector_map where model_id =?`;
   let stmt = `insert into ${_TABLE} (serial_no,name,model_id,station_id,

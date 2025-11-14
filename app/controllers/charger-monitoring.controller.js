@@ -4,14 +4,17 @@ const ChargerMonitoring = myModule.ChargerMonitoring;
 
 
 exports.getMenus = (req, res) => {
-  ChargerMonitoring.getMenus( (err, data) => {
+  ChargerMonitoring.getMenus((err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(200).send({
-          message: `NOT_FOUND`
+        return res.status(200).send({ message: "NOT_FOUND" });
+      } else {
+        return res.status(500).send({
+          message: err.message || "Some error occurred while retrieving menus."
         });
-      } 
-    } else res.send(data);
+      }
+    }
+    return res.status(200).send(data);
   });
 };
 

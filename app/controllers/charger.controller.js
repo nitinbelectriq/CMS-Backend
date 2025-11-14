@@ -44,7 +44,7 @@ exports.create = (req, res) => {
     Periodic_Check_Ref_Time: !!req.body.Periodic_Check_Ref_Time ? req.body.Periodic_Check_Ref_Time : '2000-01-01 00:00:00',
     Periodicity_in_hours: !!req.body.Periodicity_in_hours ? req.body.Periodicity_in_hours : 12,
     When_to_Upgrade: !!req.body.When_to_Upgrade ? req.body.When_to_Upgrade : 'IMMEDIATE',
-    Upgrade_Specific_Time: !!req.body.Upgrade_Specific_Time ? req.body.Upgrade_Specific_Time : '00:00:00',
+    Upgrade_Specific_Time: !!req.body.Upgrade_Specific_Time ? req.body.Upgrade_Specific_Time : '2000-01-01 00:00:00',
     is_available: req.body.is_available,
     status: req.body.status,
     created_date: req.body.created_date,

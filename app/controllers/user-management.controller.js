@@ -15,6 +15,7 @@ exports.create = (req, res) => {
       message: "Content can not be empty!"
     });
   }
+  debugger;
   const user = new User({
     id: req.body.id,
     code: !!req.body.code ? req.body.code : '',
@@ -45,7 +46,7 @@ exports.create = (req, res) => {
     user_type: req.body.user_type,
     client_id: !!req.body.client_id ? req.body.client_id : 0,
     station_id: !!req.body.station_id ? req.body.station_id : 0,
-    can_expire: req.body.can_expire,
+    can_expire: req.body.can_expire || 'Y',
     hint_question: !!req.body.hint_question ? req.body.hint_question : 0,
     hint_answer: !!req.body.hint_answer ? req.body.hint_answer : '',
     last_pass_change: !!req.body.last_pass_change ? req.body.last_pass_change : '',
@@ -53,7 +54,7 @@ exports.create = (req, res) => {
     employee_code: !!req.body.employee_code ? req.body.employee_code : '',
     is_verified: !!req.body.is_verified ? req.body.is_verified : 'N',
     otp: !!req.body.otp ? req.body.otp : '',
-    registration_origin: req.body.registration_origin,
+    registration_origin: req.body.registration_origin || 'WEB',
     status: req.body.status,
     created_date: req.body.created_date,
     created_by: !!req.body.created_by ? req.body.created_by : 0,

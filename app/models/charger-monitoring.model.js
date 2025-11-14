@@ -17,27 +17,26 @@ const ChargerMonitoring = function(cpo) {
   this.modify_by = cpo.modify_by
 };
 
-ChargerMonitoring.getMenus = result => {
+ChargerMonitoring.getMenus = (result) => {
+  const stmt = `
+    select id, name, description, status, created_date, createdby
+    from charger_monitoring_menu_mst
+    where status <> 'D'
+    order by display_order`;
 
-    let stmt = `select id, name, description , status,created_date, createdby
-      from charger_monitoring_menu_mst 
-      where status <> 'D'
-      order by display_order`;
+  sql.query(stmt, (err, res) => {
+    if (err) {
+      return result(err, null);
+    }
 
-      sql.query(stmt, (err, res) => {
-          if (err) {
-            result(err, null);
-            return;
-          }
+    if (res.length > 0) {
+      return result(null, res);
+    }
 
-          if (res.length) {
-            result(null, res);
-            return;
-          }
+    return result({ kind: "not_found" }, null);
+  });
+};
 
-          result({ kind: "not_found" }, null);
-        });
-  };
 
 ChargerMonitoring.getAvailabilityType = result => {
       let res =[{
