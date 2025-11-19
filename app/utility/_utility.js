@@ -408,7 +408,7 @@ async function getClientIdAndRoleByUserId(user_id) {
 
   let final_res;
   let resp;
-
+debugger;
   //added default role flag as if user's default role is SA only then it will be considered as SA
   let stmt = ` select umn.client_id, cm.name , urm.role_id as role_id , rm.code as role_code,
     rm.name as role_name

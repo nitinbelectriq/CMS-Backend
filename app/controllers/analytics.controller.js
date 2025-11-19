@@ -263,10 +263,18 @@ exports.getChargerModelSummaryCountCCS = (req, res) => {
 };
 exports.getDailyBasisTotalActiveChargerCountCW = (req, res) => {
   let login_id = req.params.login_id;
-  TransactionList.getDailyBasisTotalActiveChargerCountCW(login_id, req.body, (err, data) => {
+
+  const today = new Date().toISOString().split("T")[0];
+  const fdate = req.body.fdate || today;
+  const tdate = req.body.tdate || today;
+
+  const payload = { fdate, tdate };
+
+  TransactionList.getDailyBasisTotalActiveChargerCountCW(login_id, payload, (err, data) => {
     res.send(data);
   });
 };
+
 
 
 exports.getDailyBasisTotalActiveChargerCountCCS = (req, res) => {
@@ -604,19 +612,31 @@ exports.GetRecentTransaction =  (req, res) => {
   });
 };
 
-exports.GetPaymentDailySummmaryCW =  (req, res) => {
-  let login_id = req.params.login_id;
+exports.GetPaymentDailySummmaryCW = (req, res) => {
+  const login_id = req.params.login_id;
+
   if (!login_id) {
-    res.status(400).send({
-      message: "User Id Missing!"
+    return res.status(400).send({
+      status: false,
+      message: "User Id Missing!",
+      data: []
     });
   }
 
-  TransactionList.getPaymentSummaryCW(login_id,req.body,  (err, data) => {
-    //console.lo
-    res.send(data)
+  TransactionList.getPaymentSummaryCW(login_id, req.body, (err, data) => {
+
+    if (err) {
+      return res.status(500).send({
+        status: false,
+        message: "Internal Server Error",
+        data: []
+      });
+    }
+
+    return res.status(200).send(data);
   });
 };
+
 
 
 exports.getCustomerVisitingSummaryCW =  (req, res) => {

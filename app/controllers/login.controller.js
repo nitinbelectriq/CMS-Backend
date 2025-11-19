@@ -29,7 +29,7 @@ exports.authorize = (req, res) => {
 
   LoginUser.findByUsername(user_name, async (err, data) => {
     //;
-
+debugger;
     if (err) {
       if (err.kind === "not_found") {
         return res.status(404).send({

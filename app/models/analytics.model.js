@@ -2225,7 +2225,7 @@ TransactionList.getChargerModelSummaryCountCCS = async (params, result) => {
 
 
 TransactionList.getDailyBasisTotalActiveChargerCountCW = async (login_id, params, result) => {
-
+debugger;
   let stmt = '';
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
   let client_id = clientAndRoleDetails.data[0].client_id;
@@ -2233,16 +2233,16 @@ TransactionList.getDailyBasisTotalActiveChargerCountCW = async (login_id, params
 
   if (isSA) {
     stmt = ` select  to_char("request_date", 'DD/MM/YYYY') as server_date , count( distinct charger_id)
-    from chargerrequest_log
+    from charger_log
     where action='Heartbeat' 
-    and request_date::timestamp::date between '${params.fdate}' and  '${params.todate}'
+    and request_date::timestamp::date between '${params.fdate}' and  '${params.tdate}'
     group by  server_date
     order by server_date asc;`
   } else {
     stmt = ` select  to_char("request_date", 'DD/MM/YYYY') as server_date , count( distinct charger_id)
-    from chargerrequest_log
+    from charger_log
     where action='Heartbeat' and client_id = '${client_id}'
-    and request_date::timestamp::date between '${params.fdate}' and  '${params.todate}'
+    and request_date::timestamp::date between '${params.fdate}' and  '${params.tdate}'
     group by  server_date
     order by server_date asc;`
 

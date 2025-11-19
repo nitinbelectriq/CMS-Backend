@@ -1117,7 +1117,7 @@ Master.getProjectsByCode = async (project_code, result) => {
 };
 
 Master.getNavListByUserId = async (login_id, project_id, result) => {
-
+debugger;
   let final_res;
   let resp;
   let arr_final_nav_list;

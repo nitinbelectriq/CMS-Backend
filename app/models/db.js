@@ -1,82 +1,58 @@
+// db.connection.js
 const mysql = require('mysql2');
 const util = require('util');
-const dbConfig = require("../config/db.config.js");
-const Pool = require('pg').Pool;
+const { Pool } = require('pg');
+const dbConfig = require('../config/db.config.js');
 
-
-
+// -------------------- MySQL Single Connection --------------------
 const connection = mysql.createConnection({
-  host: dbConfig.msMain.HOST,
-  user: dbConfig.msMain.USER,
-  password: dbConfig.msMain.PASSWORD,
-  database: dbConfig.msMain.DB,
-  port : dbConfig.msMain.PORT,
-  multipleStatements : true
+  host: dbConfig.mysqlMain.host,
+  user: dbConfig.mysqlMain.user,
+  password: dbConfig.mysqlMain.password,
+  database: dbConfig.mysqlMain.database,
+  port: dbConfig.mysqlMain.port,
+  multipleStatements: true
 });
-
-
-const pool = mysql.createPool({
-  connectionLimit : 100, //important
-  host: dbConfig.msMain.HOST,
-  user: dbConfig.msMain.USER,
-  password: dbConfig.msMain.PASSWORD,
-  database: dbConfig.msMain.DB,
-  port : dbConfig.msMain.PORT,
-  multipleStatements : true
-});
-
-// const poolMG = mysql.createPool({
-//   connectionLimit : 100, //important
-//   host: dbConfig.msMGBLE.HOST,
-//   user: dbConfig.msMGBLE.USER,
-//   password: dbConfig.msMGBLE.PASSWORD,
-//   database: dbConfig.msMGBLE.DB,
-//   port : dbConfig.msMGBLE.PORT,
-//   multipleStatements : true
-// });
-
-
-const poolPG = new Pool({
-  user: dbConfig.pgPool.USER,
-  host: dbConfig.pgPool.HOST,
-  database: dbConfig.pgPool.DB,
-  password: dbConfig.pgPool.PASSWORD,
-  port: dbConfig.pgPool.PORT,
-  multipleStatements : true
-})
-
 
 connection.connect((err) => {
-  if (err) throw err;
+  if (err) {
+    console.error('MySQL connection error:', err);
+    return;
+  }
   console.log('Connected to MySQL Server!');
 });
- 
 
+// -------------------- MySQL Pool --------------------
+const pool = mysql.createPool({
+  connectionLimit: 100,
+  host: dbConfig.mysqlMain.host,
+  user: dbConfig.mysqlMain.user,
+  password: dbConfig.mysqlMain.password,
+  database: dbConfig.mysqlMain.database,
+  port: dbConfig.mysqlMain.port,
+  multipleStatements: true
+});
+
+// Promisify pool queries for async/await
 pool.query = util.promisify(pool.query);
-//poolMG.query = util.promisify(poolMG.query);
 
+// -------------------- PostgreSQL Pool --------------------
+const poolPG = new Pool({
+  user: String(dbConfig.postgresLogs.user),       // ensure string
+  host: dbConfig.postgresLogs.host,
+  database: dbConfig.postgresLogs.database,
+  password: String(dbConfig.postgresLogs.password), // ensure string
+  port: dbConfig.postgresLogs.port,
+  ssl:  false
+});
 
-//for future use
-// pool.getConnection((err, connection) => {
-//   console.log('sql connection');
-//   if (err) {
-//       console.log(err);
-//       if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-//           console.error('Database connection was closed.');
-//       }
-//       if (err.code === 'ER_CON_COUNT_ERROR') {
-//           console.error('Database has too many connections.');
-//       }
-//       if (err.code === 'ECONNREFUSED') {
-//           console.error('Database connection was refused.');
-//       }
-//   }
+poolPG.connect()
+  .then(() => console.log('Connected to PostgreSQL Server!'))
+  .catch((err) => console.error('PostgreSQL connection error:', err));
 
-//   if (connection) connection.release();
-
-//   return
-// })
-
-
-module.exports = {sql : connection,pool,poolPG};
-
+// -------------------- Export --------------------
+module.exports = {
+  sql: connection,   // MySQL single connection
+  pool,             // MySQL pool
+  poolPG            // PostgreSQL pool
+};

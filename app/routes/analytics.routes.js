@@ -62,7 +62,7 @@ module.exports = app => {
 
     // Payments 
     app.post('/analytics/getrecenttansactionCW/:login_id',checkToken,analytics.GetRecentTransaction)
-    app.post('/analytics/getpaymentsummmaryCW/:login_id',checkToken,analytics.GetPaymentDailySummmaryCW)
+    app.get('/analytics/getpaymentsummmaryCW/:login_id',checkToken,analytics.GetPaymentDailySummmaryCW)
     app.post('/analytics/getCustomerVisitingSummaryCW/:login_id',checkToken,analytics.getCustomerVisitingSummaryCW)
 
     app.post('/analytics/ChargerTransactionSlabCW/:login_id',checkToken,analytics.getChargerTransactionSlab)
