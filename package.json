@@ -31,10 +31,12 @@
     "nodemailer": "^6.4.10",
     "otp-generator": "^2.0.0",
     "path": "^0.12.7",
+    "pdfkit": "^0.17.2",
     "pg": "^8.3.0",
     "puppeteer": "^11.0.0",
     "request": "^2.88.2",
     "serverless-http": "^2.7.0",
+    "sharp": "^0.34.5",
     "swagger-jsdoc": "^5.0.1",
     "swagger-ui-express": "^4.1.4",
     "util": "^0.12.3"

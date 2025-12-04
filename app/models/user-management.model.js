@@ -1671,7 +1671,7 @@ User.getUserRoleMappingCW = async (login_id, project_id, result) => {
 
 
 User.updateUserRoleMapping = async (newUser, result) => {
-
+debugger;
   var datetime = new Date();
 
   let stmt = `update user_role_mapping set 

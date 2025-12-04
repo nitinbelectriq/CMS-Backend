@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; color: #333; margin: 0; }
+    .header { display: flex; align-items: center; border-bottom: 2px solid #0c5adb; padding: 15px; }
+    .logo img { width: 120px; margin-right: 15px; }
+    .company-info { font-size: 12px; }
+    .invoice-title { text-align: center; margin: 15px 0; font-size: 18px; color: #0c5adb; font-weight: bold; }
+    .details, .totals, .bank-info { margin: 20px 30px; font-size: 12px; }
+    .table { width: 90%; margin: 20px auto; border-collapse: collapse; font-size: 12px; }
+    .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+    .table th:first-child, .table td:first-child { text-align: left; }
+    .footer { text-align: center; font-size: 11px; color: #666; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo"><img src="{{logo}}" alt="{{client_name}} Logo" /></div>
+    <div class="company-info">
+      <strong>{{client_name}}</strong><br />
+      {{client_address}}<br />
+      GSTIN: {{gst_no}}<br />
+      Email: {{contact_email}} | Phone: {{contact_phone}}
+    </div>
+  </div>
+
+  <div class="invoice-title">TAX INVOICE (GST)</div>
+
+  <div class="details">
+    <strong>Invoice No:</strong> {{bill_id}}<br />
+    <strong>Date:</strong> {{billing_date}}<br />
+    <strong>Station ID:</strong> {{station_id}}<br />
+    <strong>Tariff Plan:</strong> {{tariff_name}} ({{tariff_type}})<br />
+    <strong>State:</strong> {{state_name}}
+  </div>
+
+  <table class="table">
+    <thead><tr><th>Description</th><th>Units</th><th>Rate (₹)</th><th>Amount (₹)</th></tr></thead>
+    <tbody>
+      <tr><td>{{tariff_name}} Charging</td><td>{{units_consumed}}</td><td>{{rate}}</td><td>{{base_amount}}</td></tr>
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <strong>Subtotal:</strong> ₹{{base_amount}}<br />
+    <strong>GST ({{gst_rate}}%):</strong> ₹{{gst_amount}}<br />
+    <strong>Total:</strong> ₹{{final_amount}}
+  </div>
+
+  <div class="bank-info">
+    <strong>Bank Details:</strong><br />
+    Account Holder: {{account_holder_name}}<br />
+    Bank: {{bank_name}}<br />
+    Account No: {{account_no}}<br />
+    IFSC: {{ifsc}}
+  </div>
+
+  <div class="footer">
+    Thank you for choosing Belectriq for your EV charging needs!<br />
+    This is a system-generated invoice and does not require a signature.<br />
+    <em>Generated on {{generated_on}}</em>
+  </div>
+</body>
+</html>
