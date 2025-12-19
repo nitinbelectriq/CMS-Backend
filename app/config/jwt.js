@@ -1,3 +1,3 @@
 module.exports = {
-  secret: 'belectriqcmssecretkey123344'
+  secret: 'Belectriqcmssecretkey123344'
 };

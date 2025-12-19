@@ -1,24 +1,30 @@
 const { sql, pool } = require("./db.js");
 
 const Vehicle = function (vehicle) {
-  this.id = vehicle.id,
-  this.user_id = vehicle.user_id,
-    this.brand_id = vehicle.brand_id,
-    this.model_id = vehicle.model_id,
-    this.connector_type_id = vehicle.connector_type_id,
-    this.charger_type_id = vehicle.charger_type_id,
-    this.registration_no = vehicle.registration_no,
-    this.year_of_manufacture = vehicle.year_of_manufacture,
-    this.engine_no = vehicle.engine_no,
-    this.chassis_no = vehicle.chassis_no,
-    this.vin_no = vehicle.vin_no,
-    this.is_default = vehicle.is_default,
-    this.status = vehicle.status,
-    this.created_date = vehicle.created_date,
-    this.created_by = vehicle.created_by,
-    this.modify_date = vehicle.modify_date,
-    this.modify_by = vehicle.modify_by
+  this.id = vehicle.id;
+  this.user_id = vehicle.user_id;
+  this.brand_id = vehicle.brand_id;
+  this.model_id = vehicle.model_id;
+  this.vehicle_type_id = vehicle.vehicle_type_id; // ✅ new line
+  this.connector_type_id = vehicle.connector_type_id;
+  this.charger_type_id = vehicle.charger_type_id;
+  this.registration_no = vehicle.registration_no;
+  this.year_of_manufacture = vehicle.year_of_manufacture;
+  this.engine_no = vehicle.engine_no;
+  this.chassis_no = vehicle.chassis_no;
+  this.vin_no = vehicle.vin_no;
+  this.is_default = vehicle.is_default;
+  this.status = vehicle.status;
+  this.created_date = vehicle.created_date;
+  this.created_by = vehicle.created_by;
+  this.modify_date = vehicle.modify_date;
+  this.modify_by = vehicle.modify_by;
+   this.owner_id = vehicle.owner_id;
+     this.mac_id = vehicle.mac_id || '';
+    this.evse_id = vehicle.evse_id || '';
+    this.AutoCharge_Enabled = vehicle.AutoCharge_Enabled || 'N';
 };
+
 
 const VehicleView = function (vehicleView) {
   this.id = vehicleView.id,
@@ -87,6 +93,22 @@ const VModel_CType = function (vModel_CType) {
     this.modify_by = vModel_CType.modify_by
   this.published_date = vModel_CType.published_date,
     this.published_by = vModel_CType.published_by
+};
+
+const VehicleOwner = function (owner) {
+  this.id = owner.id;
+  this.first_name = owner.first_name;
+  this.last_name = owner.last_name;
+  this.mobile_no = owner.mobile_no;
+  this.email = owner.email;
+  this.address = owner.address;
+  this.city = owner.city;
+  this.state = owner.state;
+  this.country = owner.country;
+  this.pincode = owner.pincode;
+  this.status = owner.status || 'Y';
+  this.created_by = owner.created_by;
+  this.modify_by = owner.modify_by;
 };
 
 Vehicle.create = async (newVehicle, result) => {
@@ -337,6 +359,7 @@ VehicleView.getAllVehicles = async (result) => {
   //   result({ kind: "not_found" }, null);
   // });
 };
+
 VehicleView.getVehiclesByUserId = async (id, result) => {
 
   let stmt = `select vm.id,vm.brand_id , vbm.name as brand_name , vm.model_id ,
@@ -626,6 +649,485 @@ VModel_CType.deleteC_Type_V_Model_Mapping = (id, user_id, result) => {
   });
 };
 
+// =========================================
+// ✅ ADD NEW VEHICLE
+// =========================================
+Vehicle.addNewVehicle = async (newVehicle, result) => {
+  const datetime = new Date();
+  try {
+    if (newVehicle.is_default == 1) {
+      await pool.query(`UPDATE vehicle_mst SET is_default = 0 WHERE user_id = ?`, [newVehicle.user_id]);
+    }
+
+    const stmt = `
+      INSERT INTO vehicle_mst (
+        owner_id, user_id, brand_id, model_id, vehicle_type_id,
+        connector_type_id, charger_type_id, registration_no, year_of_manufacture,
+        engine_no, chassis_no, mac_id, evse_id, vin_no,
+        AutoCharge_Enabled, is_default, status, created_by, created_date
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const res = await pool.query(stmt, [
+      newVehicle.owner_id, newVehicle.user_id, newVehicle.brand_id,
+      newVehicle.model_id, newVehicle.vehicle_type_id, // ✅ new field
+      newVehicle.connector_type_id, newVehicle.charger_type_id,
+      newVehicle.registration_no, newVehicle.year_of_manufacture,
+      newVehicle.engine_no, newVehicle.chassis_no,
+      newVehicle.mac_id, newVehicle.evse_id, newVehicle.vin_no,
+      newVehicle.AutoCharge_Enabled, newVehicle.is_default,
+      newVehicle.status, newVehicle.created_by, datetime
+    ]);
+
+    result(null, {
+      status: true,
+      message: "New vehicle added successfully",
+      data: { id: res.insertId }
+    });
+  } catch (e) {
+    result(null, { status: false, message: e.message, data: [] });
+  }
+};
+
+
+// =========================================
+// ✅ UPDATE EXISTING VEHICLE
+// =========================================
+Vehicle.updateExistingVehicle = async (v, result) => {
+  const datetime = new Date();
+  try {
+    debugger;
+    const stmt = `
+      UPDATE vehicle_mst SET
+        owner_id = ?, user_id = ?, brand_id = ?, model_id = ?, vehicle_type_id = ?,
+        connector_type_id = ?, charger_type_id = ?, registration_no = ?,
+        year_of_manufacture = ?, engine_no = ?, chassis_no = ?, mac_id = ?,
+        evse_id = ?, vin_no = ?, AutoCharge_Enabled = ?, is_default = ?,
+        status = ?, modify_by = ?, modify_date = ?
+      WHERE id = ?
+    `;
+
+    const res = await pool.query(stmt, [
+      v.owner_id, v.user_id, v.brand_id, v.model_id, v.vehicle_type_id,
+      v.connector_type_id, v.charger_type_id, v.registration_no,
+      v.year_of_manufacture, v.engine_no, v.chassis_no, v.mac_id,
+      v.evse_id, v.vin_no, v.AutoCharge_Enabled, v.is_default || 0,
+      v.status, v.modify_by, datetime, v.id
+    ]);
+
+    result(null, {
+      status: res.affectedRows > 0,
+      message: res.affectedRows > 0 ? "Vehicle updated successfully" : "Vehicle not found",
+      count: res.affectedRows
+    });
+  } catch (e) {
+    result(null, { status: false, message: e.message, count: 0 });
+  }
+};
+
+
+
+// =========================================
+// ✅ TOGGLE AUTOCHARGE ENABLE / DISABLE
+// =========================================
+Vehicle.toggleAutoCharge = async (id, AutoCharge_Enabled, modify_by) => {
+  const datetime = new Date();
+  try {
+    const res = await pool.query(
+      `UPDATE vehicle_mst SET AutoCharge_Enabled = ?, modify_by = ?, modify_date = ? WHERE id = ?`,
+      [AutoCharge_Enabled, modify_by, datetime, id]
+    );
+
+    if (res.affectedRows > 0) {
+      return {
+        status: true,
+        message: `AutoCharge ${AutoCharge_Enabled === 'Y' ? 'Enabled' : 'Disabled'} successfully`,
+        count: res.affectedRows
+      };
+    } else {
+      return { status: false, message: "Vehicle not found", count: 0 };
+    }
+  } catch (e) {
+    return { status: false, message: e.message };
+  }
+};
+
+// =========================================
+// ✅ DELETE VEHICLE
+// =========================================
+Vehicle.deleteVehicle = async (id, modify_by, result) => {
+  const datetime = new Date();
+  try {
+    const res = await pool.query(
+      `UPDATE vehicle_mst SET status = 'D', modify_by = ?, modify_date = ? WHERE id = ?`,
+      [modify_by, datetime, id]
+    );
+    result(null, {
+      status: true,
+      message: "Vehicle deleted successfully",
+      count: res.affectedRows
+    });
+  } catch (e) {
+    result(null, { status: false, message: e.message });
+  }
+};
+
+// =============================================
+// VEHICLE OWNER LOGIC (Integrated Section)
+// =============================================
+
+
+// ✅ CREATE NEW OWNER
+VehicleOwner.createOwner = async (newOwner, result) => {
+  const datetime = new Date();
+  try {
+    const query = `
+      INSERT INTO vehicle_owner_mst 
+      (first_name, last_name, mobile_no, email, address, city, state, country, pincode, status, created_by, created_date)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const res = await pool.query(query, [
+      newOwner.first_name,
+      newOwner.last_name,
+      newOwner.mobile_no,
+      newOwner.email,
+      newOwner.address,
+      newOwner.city,
+      newOwner.state,
+      newOwner.country,
+      newOwner.pincode,
+      newOwner.status,
+      newOwner.created_by,
+      datetime
+    ]);
+
+    result(null, {
+      status: true,
+      message: "Vehicle owner added successfully",
+      data: { id: res.insertId }
+    });
+  } catch (err) {
+    result(null, { status: false, message: err.message });
+  }
+};
+
+// ✅ UPDATE OWNER
+VehicleOwner.updateOwner = async (owner, result) => {
+  const datetime = new Date();
+  try {
+    const query = `
+      UPDATE vehicle_owner_mst SET 
+        first_name = ?, last_name = ?, mobile_no = ?, email = ?, address = ?, city = ?, 
+        state = ?, country = ?, pincode = ?, status = ?, modify_by = ?, modify_date = ?
+      WHERE id = ?
+    `;
+    const res = await pool.query(query, [
+      owner.first_name,
+      owner.last_name,
+      owner.mobile_no,
+      owner.email,
+      owner.address,
+      owner.city,
+      owner.state,
+      owner.country,
+      owner.pincode,
+      owner.status,
+      owner.modify_by,
+      datetime,
+      owner.id
+    ]);
+
+    result(null, {
+      status: res.affectedRows > 0,
+      message: res.affectedRows > 0 ? "Owner updated successfully" : "Owner not found"
+    });
+  } catch (err) {
+    result(null, { status: false, message: err.message });
+  }
+};
+
+// ✅ GET ALL OWNERS
+VehicleOwner.getAllOwners = async (result) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT id, first_name, last_name, mobile_no, email, city, state, country, pincode, status, created_date
+      FROM vehicle_owner_mst
+      WHERE status <> 'D'
+      ORDER BY id DESC
+    `);
+    result(null, {
+      status: true,
+      message: rows.length > 0 ? "DATA_FOUND" : "DATA_NOT_FOUND",
+      count: rows.length,
+      data: rows
+    });
+  } catch (err) {
+    result(null, { status: false, message: err.message });
+  }
+};
+
+// ✅ GET OWNER BY ID
+// in vehicle.model.js (or wherever VehicleOwner is defined)
+
+VehicleOwner.getOwnerById = async (vehicleId) => {
+  try {
+   const rows = await pool.query(
+  `
+  SELECT 
+    -- 🔹 Vehicle Info
+    vm.id AS vehicle_id,
+    vm.user_id,
+    vm.owner_id,
+    vm.brand_id,                -- ✅ for Brand dropdown
+    vm.model_id,                -- ✅ for Model dropdown
+    vm.vehicle_type_id,         -- ✅ for Vehicle Type dropdown
+    vm.connector_type_id,       -- ✅ for Connector dropdown
+    vm.charger_type_id,         -- ✅ if you ever show Charger Type
+    vm.registration_no,
+    vm.year_of_manufacture,
+    vm.engine_no,
+    vm.chassis_no,
+    vm.mac_id,
+    vm.evse_id,
+    vm.vin_no,
+    vm.AutoCharge_Enabled,
+    vm.is_default,
+    vm.status AS vehicle_status,
+    vm.created_date,
+    vm.modify_date,
+
+    -- 🔹 Master Names
+    vbm.name AS brand_name,
+    vmm.name AS model_name,
+    vtm.name AS vehicle_type_name,
+    vmm.image_url AS model_image_url,
+    ctm.name AS connector_type_name,
+    ctm2.name AS charger_type_name,
+
+    -- 🔹 Owner Details + Location
+    vom.id AS owner_id,
+    vom.first_name,
+    vom.last_name,
+    CONCAT(COALESCE(vom.first_name, ''), ' ', COALESCE(vom.last_name, '')) AS owner_name,
+    vom.mobile_no AS owner_mobile,
+    vom.email AS owner_email,
+    vom.address AS owner_address,
+    vom.city AS owner_city_id,
+    city.name AS owner_city_name,
+    vom.state AS owner_state_id,
+    state.name AS owner_state_name,
+    vom.country AS owner_country_id,
+    country.name AS owner_country_name,
+    vom.pincode AS owner_pincode
+
+  FROM vehicle_mst vm
+  INNER JOIN vehicle_brand_mst vbm ON vm.brand_id = vbm.id
+  INNER JOIN vehicle_model_mst vmm ON vm.model_id = vmm.id
+  LEFT JOIN vehicle_type_mst vtm ON vm.vehicle_type_id = vtm.id
+  INNER JOIN connector_type_mst ctm ON vm.connector_type_id = ctm.id
+  LEFT JOIN connector_type_mst ctm2 ON vm.charger_type_id = ctm2.id
+  LEFT JOIN vehicle_owner_mst vom ON vm.owner_id = vom.id
+  LEFT JOIN city_mst city ON vom.city = city.id
+  LEFT JOIN state_mst state ON vom.state = state.id
+  LEFT JOIN country_mst country ON vom.country = country.id
+  WHERE vm.status <> 'D' AND vm.id = ?
+  `,
+  [vehicleId]
+);
+
+
+    if (!rows.length) return { status: false, message: "Vehicle not found" };
+    return { status: true, message: "Owner and vehicle data fetched successfully", data: rows[0] };
+  } catch (err) {
+    console.error("❌ VehicleOwner.getOwnerById error:", err);
+    return { status: false, message: err.message };
+  }
+};
+
+
+
+
+
+
+
+
+// ✅ DELETE OWNER (Soft Delete)
+VehicleOwner.deleteOwner = async (id, modify_by, result) => {
+  const datetime = new Date();
+  try {
+    const res = await pool.query(
+      `UPDATE vehicle_owner_mst SET status = 'D', modify_by = ?, modify_date = ? WHERE id = ?`,
+      [modify_by, datetime, id]
+    );
+
+    result(null, {
+      status: res.affectedRows > 0,
+      message: res.affectedRows > 0 ? "Owner deleted successfully" : "Owner not found"
+    });
+  } catch (err) {
+    result(null, { status: false, message: err.message });
+  }
+};
+
+// ======================================================
+// ✅ OPTIONAL: VEHICLE BY CLIENT ID (for future use)
+// ======================================================
+VehicleView.getVehiclesByClientId = async (client_id) => {
+  const stmt = `
+    SELECT vm.id, vm.brand_id, vbm.name AS brand_name, vm.model_id,
+           vmm.name AS model_name, vm.connector_type_id, ctm.name AS connector_type_name,
+           vm.registration_no, vm.year_of_manufacture, vm.engine_no,
+           vm.chassis_no, vm.vin_no, vm.status, vm.created_date, vm.created_by
+    FROM vehicle_mst vm
+    INNER JOIN vehicle_brand_mst vbm ON vm.brand_id = vbm.id
+    INNER JOIN vehicle_model_mst vmm ON vm.model_id = vmm.id
+    INNER JOIN connector_type_mst ctm ON vm.connector_type_id = ctm.id
+    INNER JOIN user_mst um ON vm.user_id = um.id
+    WHERE vm.status <> 'D' AND um.client_id = ?
+    ORDER BY vm.id DESC;
+  `;
+  try {
+    const res = await pool.query(stmt, [client_id]);
+    return {
+      status: true,
+      message: res.length > 0 ? "DATA_FOUND" : "DATA_NOT_FOUND",
+      count: res.length,
+      data: res
+    };
+  } catch (err) {
+    return { status: false, message: err.message, count: 0, data: [] };
+  }
+};
+
+// =============================================================
+// ✅ NEW: ROLE-BASED VEHICLE VIEWS (without changing old logic)
+// =============================================================
+
+/**
+ * Get all vehicles (role-based)
+ * Includes: brand, model, connector, charger, owner, AutoCharge_Enabled
+ */
+VehicleView.getAllVehicles_RB_New = async () => {
+  const stmt = `
+    SELECT 
+      vm.id,
+      vm.user_id,
+      vm.owner_id,
+      CONCAT(COALESCE(vom.first_name, ''), ' ', COALESCE(vom.last_name, '')) AS owner_name,
+      vom.mobile_no AS owner_mobile,
+      vom.email AS owner_email,
+      vm.brand_id,
+      vbm.name AS brand_name,
+      vm.model_id,
+      vmm.name AS model_name,
+      vm.connector_type_id,
+      ctm.name AS connector_type_name,
+      vm.charger_type_id,
+      ctm2.name AS charger_type_name,
+      vm.registration_no,
+      vm.year_of_manufacture,
+      vmm.image_url AS model_image_url,
+      vm.engine_no,
+      vm.chassis_no,
+      vm.mac_id,
+      vm.evse_id,
+      vm.vin_no,
+      vm.AutoCharge_Enabled,
+      vm.is_default,
+      vm.status,
+      vm.created_date,
+      vm.modify_date
+    FROM vehicle_mst vm
+    INNER JOIN vehicle_brand_mst vbm ON vm.brand_id = vbm.id
+    INNER JOIN vehicle_model_mst vmm ON vm.model_id = vmm.id
+    INNER JOIN connector_type_mst ctm ON vm.connector_type_id = ctm.id
+    LEFT JOIN connector_type_mst ctm2 ON vm.charger_type_id = ctm2.id
+    LEFT JOIN vehicle_owner_mst vom ON vm.owner_id = vom.id
+    WHERE vm.status <> 'D'
+    ORDER BY vm.id DESC
+  `;
+
+  try {
+    const res = await pool.query(stmt);
+    return {
+      status: true,
+      message: res.length > 0 ? 'DATA_FOUND' : 'DATA_NOT_FOUND',
+      count: res.length,
+      data: res
+    };
+  } catch (e) {
+    return {
+      status: false,
+      message: `ERROR: ${e.message}`,
+      count: 0,
+      data: []
+    };
+  }
+};
+
+/**
+ * Get all vehicles for a specific user (role-based)
+ * Includes: owner, AutoCharge, brand, model, connector, charger
+ */
+VehicleView.getVehiclesByUserId_RB_New = async (user_id) => {
+  const stmt = `
+    SELECT 
+      vm.id,
+      vm.user_id,
+      vm.owner_id,
+      CONCAT(COALESCE(vom.first_name, ''), ' ', COALESCE(vom.last_name, '')) AS owner_name,
+      vom.mobile_no AS owner_mobile,
+      vom.email AS owner_email,
+      vm.brand_id,
+      vbm.name AS brand_name,
+      vm.model_id,
+      vmm.name AS model_name,
+      vm.connector_type_id,
+      ctm.name AS connector_type_name,
+      vm.charger_type_id,
+      ctm2.name AS charger_type_name,
+      vm.registration_no,
+      vm.year_of_manufacture,
+      vmm.image_url AS model_image_url,
+      vm.engine_no,
+      vm.chassis_no,
+      vm.mac_id,
+      vm.evse_id,
+      vm.vin_no,
+      vm.AutoCharge_Enabled,
+      vm.is_default,
+      vm.status,
+      vm.created_date,
+      vm.modify_date
+    FROM vehicle_mst vm
+    INNER JOIN vehicle_brand_mst vbm ON vm.brand_id = vbm.id
+    INNER JOIN vehicle_model_mst vmm ON vm.model_id = vmm.id
+    INNER JOIN connector_type_mst ctm ON vm.connector_type_id = ctm.id
+    LEFT JOIN connector_type_mst ctm2 ON vm.charger_type_id = ctm2.id
+    LEFT JOIN vehicle_owner_mst vom ON vm.owner_id = vom.id
+    WHERE vm.status <> 'D' AND vm.user_id = ?
+    ORDER BY vm.id DESC
+  `;
+
+  try {
+    const res = await pool.query(stmt, [user_id]);
+    return {
+      status: true,
+      message: res.length > 0 ? 'DATA_FOUND' : 'DATA_NOT_FOUND',
+      count: res.length,
+      data: res
+    };
+  } catch (e) {
+    return {
+      status: false,
+      message: `ERROR: ${e.message}`,
+      count: 0,
+      data: []
+    };
+  }
+};
+
+
 //------------21-03-2022-------------------//
 // VehicleType.getAllVehicleBrand = result => {
 //   sql.query("SELECT id,name,description FROM vehicle_type_mst where status = 'Y'", (err, res) => {
@@ -745,5 +1247,6 @@ module.exports = {
   VehicleModel: VehicleModel,
   VehicleView: VehicleView,
   VehicleType: VehicleType,
-  VModel_CType: VModel_CType
+  VModel_CType: VModel_CType,
+   VehicleOwner: VehicleOwner 
 };

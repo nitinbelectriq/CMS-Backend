@@ -1,11 +1,11 @@
 const myModule = require("../models/vehicle.model.js");
-
+const _utility = require("../utility/_utility.js");
 const Vehicle = myModule.Vehicle;
 const VehicleModel = myModule.VehicleModel;
 const VehicleView = myModule.VehicleView;
 const VehicleType = myModule.VehicleType;
 const VModel_CType = myModule.VModel_CType;
-
+const VehicleOwner = myModule.VehicleOwner;
   
 
 exports.create = (req, res) => {
@@ -441,3 +441,313 @@ exports.deleteC_Type_V_Model_Mapping = (req, res) => {
 //     } else res.send({ message: `Brand was deleted successfully!` });
 //   });
 // };
+
+// =========================================
+// ✅ ADD NEW VEHICLE
+// =========================================
+exports.addNewVehicle = async (req, res) => {
+  try {
+    if (!req.body) {
+      return res.status(400).send({ status: false, message: "Request body cannot be empty!" });
+    }
+
+    const {
+      owner_id,
+      user_id,
+      brand_id,
+      model_id,
+       vehicle_type_id,
+      connector_type_id,
+      charger_type_id,
+      registration_no,
+      year_of_manufacture,
+      engine_no,
+      chassis_no,
+      mac_id,
+      evse_id,
+      vin_no,
+      AutoCharge_Enabled,
+      is_default,
+      status,
+      created_by,
+      modify_by,
+    } = req.body;
+
+    const vehicle = {
+      owner_id: Number(owner_id) || null,
+      user_id: Number(user_id),
+      brand_id,
+      model_id,
+      connector_type_id,
+      charger_type_id: charger_type_id || null,
+      registration_no,
+      year_of_manufacture: year_of_manufacture || null,
+      engine_no: engine_no || "",
+      chassis_no: chassis_no || "",
+      mac_id: mac_id || "",
+      evse_id: evse_id || "",
+      vin_no: vin_no || "",
+      AutoCharge_Enabled: AutoCharge_Enabled === "Y" ? "Y" : "N",
+      is_default: is_default || 0,
+      status: status === "Y" ? "Y" : "N",
+      created_by: created_by || user_id,
+      modify_by: modify_by || user_id,
+    };
+
+    console.log("🚗 Final Vehicle Insert Payload:", vehicle);
+
+    Vehicle.addNewVehicle(vehicle, (err, data) => {
+      if (err) return res.status(500).send({ status: false, message: err.message });
+      return res.status(200).send(data);
+    });
+  } catch (e) {
+    res.status(500).send({ status: false, message: e.message });
+  }
+};
+
+// =========================================
+// ✅ UPDATE EXISTING VEHICLE
+// =========================================
+exports.updateExistingVehicle = (req, res) => {
+  debugger;
+  if (!req.body || !req.body.id) {
+    return res.status(400).send({ status: false, message: "Vehicle ID is required!" });
+  }
+
+  const vehicle = new Vehicle({
+    id: req.body.id,
+    owner_id: req.body.owner_id,
+    user_id: req.body.user_id,
+    brand_id: req.body.brand_id,
+    model_id: req.body.model_id,
+    vehicle_type_id: req.body.vehicle_type_id,
+    connector_type_id: req.body.connector_type_id,
+    charger_type_id: req.body.charger_type_id,
+    registration_no: req.body.registration_no,
+    year_of_manufacture: req.body.year_of_manufacture || null,
+    engine_no: req.body.engine_no || '',
+    chassis_no: req.body.chassis_no || '',
+    mac_id: req.body.mac_id || '',
+    evse_id: req.body.evse_id || '',
+    vin_no: req.body.vin_no || '',
+    AutoCharge_Enabled: req.body.AutoCharge_Enabled || 'N',
+    is_default: req.body.is_default || 0,
+    status: req.body.status || 'Y',
+    modify_by: req.body.modify_by
+  });
+
+  Vehicle.updateExistingVehicle(vehicle, (err, data) => {
+    if (err) res.status(500).send({ status: false, message: err.message });
+    else res.send(data);
+  });
+};
+
+// =========================================
+// ✅ TOGGLE AUTOCHARGE ENABLE / DISABLE
+// =========================================
+exports.toggleAutoCharge = async (req, res) => {
+  const { id, AutoCharge_Enabled, modify_by } = req.body;
+  if (!id || !AutoCharge_Enabled) {
+    return res.status(400).send({ status: false, message: "Vehicle ID and AutoCharge_Enabled are required!" });
+  }
+
+  try {
+    const result = await Vehicle.toggleAutoCharge(id, AutoCharge_Enabled, modify_by);
+    res.send(result);
+  } catch (e) {
+    res.status(500).send({ status: false, message: e.message });
+  }
+};
+
+// =========================================
+// ✅ DELETE VEHICLE
+// =========================================
+exports.deleteVehicle = (req, res) => {
+  Vehicle.deleteVehicle(req.params.id, req.params.modify_by, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(404).send({ status: false, message: "Vehicle not found." });
+      } else {
+        res.status(500).send({ status: false, message: "Error deleting vehicle." });
+      }
+    } else res.send(data);
+  });
+};
+
+
+// =============================================
+// VEHICLE OWNER APIS (Integrated Section)
+// =============================================
+
+// ✅ CREATE OWNER
+exports.createVehicleOwner = async (req, res) => {
+  try {
+    if (!req.body.first_name) {
+      return res.status(400).send({ status: false, message: "First name is required" });
+    }
+
+    const owner = {
+      ...req.body,
+      created_by: req.body.created_by || req.body.user_id || 0,
+      modify_by: req.body.modify_by || req.body.user_id || 0,
+      status: req.body.status || "Y",
+    };
+
+    console.log("👤 Owner insert payload:", owner);
+
+    VehicleOwner.createOwner(owner, (err, data) => {
+      if (err) return res.status(500).send(err);
+      res.status(200).send(data);
+    });
+  } catch (e) {
+    res.status(500).send({ status: false, message: e.message });
+  }
+};
+
+// ✅ UPDATE OWNER
+exports.updateVehicleOwner = (req, res) => {
+  if (!req.body.id) {
+    return res.status(400).send({ status: false, message: "Owner ID is required" });
+  }
+
+  const owner = new VehicleOwner(req.body);
+  VehicleOwner.updateOwner(owner, (err, data) => {
+    if (err) return res.status(500).send(err);
+    res.send(data);
+  });
+};
+
+// ✅ GET ALL OWNERS
+exports.getAllVehicleOwners = (req, res) => {
+  VehicleOwner.getAllOwners((err, data) => {
+    if (err) return res.status(500).send(err);
+    res.send(data);
+  });
+};
+
+// ✅ GET OWNER BY ID
+
+
+// ✅ DELETE OWNER
+exports.deleteVehicleOwner = (req, res) => {
+  VehicleOwner.deleteOwner(req.params.id, req.params.modify_by, (err, data) => {
+    if (err) return res.status(500).send(err);
+    res.send(data);
+  });
+};
+
+// ======================================================
+// ✅ NEW: GET ALL VEHICLES (ROLE-BASED)
+// ======================================================
+exports.getAllVehicles_RB = async (req, res) => {
+  try {
+    debugger;
+    const user_id = login_id = req.params.login_id;
+
+    // Get user’s client and role details
+    const clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(user_id);
+    const client_id = clientAndRoleDetails.data[0].client_id;
+    const isSA = clientAndRoleDetails.data.some(x => x.role_code === "SA");
+
+    let response;
+    if (isSA) {
+      // Super Admin: get all vehicles
+      response = await VehicleView.getAllVehicles_RB_New();
+    } else {
+      // Regular user: get vehicles only created by them
+      response = await VehicleView.getVehiclesByUserId_RB_New(login_id);
+    }
+
+    res.send({
+      status: true,
+      message: response.message,
+      count: response.count,
+      data: response.data,
+      client_id,
+      isSuperAdmin: isSA
+    });
+  } catch (err) {
+    res.status(500).send({ status: false, message: err.message });
+  }
+};
+
+// ======================================================
+// ✅ NEW: GET VEHICLES BY USER ID (ROLE-BASED)
+// ======================================================
+exports.getVehiclesByUserId_RB = async (req, res) => {
+  try {
+    const login_id = req.user.id;
+    const clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
+    const isSA = clientAndRoleDetails.data.some(x => x.role_code === "SA");
+
+    // Allow only logged-in user's data unless SA
+    const userId = isSA && req.params.userId ? req.params.userId : login_id;
+    const response = await VehicleView.getVehiclesByUserId(userId);
+
+    res.send({
+      status: true,
+      message: response.message,
+      count: response.count,
+      data: response.data,
+      isSuperAdmin: isSA
+    });
+  } catch (err) {
+    res.status(500).send({ status: false, message: err.message });
+  }
+};
+
+// ======================================================
+// ✅ NEW: GET ALL VEHICLE OWNERS (ROLE-BASED)
+// ======================================================
+exports.getAllVehicleOwners_RB = async (req, res) => {
+  try {
+    const login_id = req.user.id;
+    const clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
+    const isSA = clientAndRoleDetails.data.some(x => x.role_code === "SA");
+
+    if (!isSA) {
+      return res.status(403).send({
+        status: false,
+        message: "Access denied: Only Super Admin can view all owners."
+      });
+    }
+
+    VehicleOwner.getAllOwners((err, data) => {
+      if (err) return res.status(500).send(err);
+      res.send(data);
+    });
+  } catch (err) {
+    res.status(500).send({ status: false, message: err.message });
+  }
+};
+
+// ======================================================
+// ✅ NEW: GET VEHICLE OWNER BY ID (ROLE-BASED)
+// ======================================================
+exports.getVehicleOwnerById_RB = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    if (!id) {
+      return res.status(400).send({ status: false, message: "Missing ID parameter" });
+    }
+
+    const result = await VehicleOwner.getOwnerById(id);
+
+    if (!result.status) {
+      return res.status(404).send({
+        status: false,
+        message: result.message || "Owner or vehicle not found"
+      });
+    }
+
+    res.status(200).send(result);
+
+  } catch (err) {
+    console.error("❌ getVehicleOwnerById_RB Error:", err);
+    res.status(500).send({ status: false, message: err.message });
+  }
+};
+
+
+
