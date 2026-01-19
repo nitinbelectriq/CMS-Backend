@@ -298,4 +298,20 @@ const Billing = {
   }
 };
 
+
+// ------------------------------------------------------
+// SAVE Paytm ORDER ID INTO billing_txn
+// ------------------------------------------------------
+Billing.updateBillPaymentOrder = async (bill_id, orderId, mode) => {
+  await pool.query(
+    `
+      UPDATE billing_txn
+      SET payment_order_id = ?, payment_mode = ?
+      WHERE bill_id = ?
+    `,
+    [orderId, mode, bill_id]
+  );
+};
+
+
 module.exports = Billing;

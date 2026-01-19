@@ -22,4 +22,8 @@ module.exports = (app) => {
 
   // GST update
   app.put('/gst/update', checkToken, billingController.updateGST);
+
+  // Pay Bill (Initiate Paytm Order)
+app.post('/billing/pay', checkToken, billingController.payBill);
+
 };

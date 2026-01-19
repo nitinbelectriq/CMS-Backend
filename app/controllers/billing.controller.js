@@ -4,6 +4,9 @@ const fs = require('fs');
 const Billing = require('../models/billing.model.js');
 const { generateInvoicePDF } = require('../utility/pdf.utility.js');
 const { sendEmail } = require('../utility/email.utility.js');
+const axios = require("axios");
+const BASE_API =  "http://116.203.172.166:4100";
+
 
 // ✅ Generate Bill (create + PDF + optional email)
 exports.generateBill = async (req, res) => {
@@ -270,3 +273,71 @@ exports.updateBill = async (req, res) => {
     res.status(500).json({ status: false, message: 'Server error' });
   }
 };
+
+exports.payBill = async (req, res) => {
+  try {
+    const { bill_id, amount } = req.body;
+    const user_id = req.body.userid;   // 🔥 FIXED
+
+    if (!bill_id || !user_id || !amount) {
+      return res.status(400).json({
+        status: false,
+        message: "Missing required fields (bill_id, userid, amount)"
+      });
+    }
+
+    const rawToken = req.headers["authorization"];
+
+    if (!rawToken) {
+      return res.status(403).json({
+        status: false,
+        message: "Auth token missing"
+      });
+    }
+
+    const safeToken = rawToken.startsWith("Bearer ")
+      ? rawToken
+      : `Bearer ${rawToken}`;
+
+    const paymentRes = await axios.post(
+      `${BASE_API}/payment/initiatetransaction`,
+      {
+        userid: user_id,
+        amount: amount,
+        bill_id: bill_id,
+        type: req.body.type ?? "CURRENT",
+        source: req.body.source ?? "WEB_PORTAL",
+        serial_no: req.body.serial_no ?? "cms"
+      },
+      {
+        headers: {
+          Authorization: safeToken
+        }
+      }
+    );
+
+    if (!paymentRes.data.status) {
+      return res.status(400).json(paymentRes.data);
+    }
+
+    const paytmData = paymentRes.data.data;
+
+    await Billing.updateBillPaymentOrder(bill_id, paytmData.orderid, "paytm");
+
+    return res.status(200).json({
+      status: true,
+      message: "Payment Initiated",
+      data: paytmData
+    });
+
+  } catch (error) {
+    console.error("❌ payBill Error:", error?.response?.data || error);
+
+    return res.status(500).json({
+      status: false,
+      message: "Server error"
+    });
+  }
+};
+
+
