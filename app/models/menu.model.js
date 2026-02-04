@@ -147,57 +147,125 @@ ClientMenu.clientMenuMapping = async (params, result) => {
 };
 
 
+// RoleMenu.roleMenuMapping = async (params, result) => {
+//   debugger;
+//   var datetime = new Date();
+//   let final_res;
+//   let respSelect;
+//   let respSelectActive;
+//   let id_to_keep_status_active = [];
+
+//   let stmtSelect = `Select map_id,status from role_menu_mapping where role_id = ? and menu_id = ? `;
+//   let stmtSelectActive = `Select map_id from role_menu_mapping where role_id = ? and status ='Y' and map_id not in (?)  `;
+//   let stmtInsert = `insert into role_menu_mapping (role_id,menu_id,status,created_date,createdby) VALUES ? `;
+//   let stmtUpdate = `update role_menu_mapping set role_id = ? ,menu_id = ?,status = ?,modify_date = ? ,modifyby =  ?
+//     where map_id = ? ; `;
+//   let stmtUpdateDelete = `update role_menu_mapping set status = 'D',modify_date = ? ,modifyby =  ?
+//     where role_id = ? and map_id not in (?)  ; `;
+
+//   let values = [];
+//   try {
+//     for (let i = 0; i < params.menus.length; i++) {
+//       respSelect = await pool.query(stmtSelect, [params.role_id, params.menus[i].menu_id]);
+
+//       if (respSelect.length == 0) {
+//         values.push([params.role_id, params.menus[i].menu_id, params.status, datetime, params.created_by]);
+//       } else {
+//         id_to_keep_status_active.push(respSelect[0].map_id);
+
+//         // update only if current status is not 'Y'
+//         if (respSelect[0].status != 'Y') {
+//           await pool.query(stmtUpdate, [params.role_id, params.menus[i].menu_id,
+//             params.status, datetime, params.created_by, respSelect[0].map_id]);
+//         }
+//       }
+//     }
+
+//     if (id_to_keep_status_active.length > 0) {
+//       respSelectActive = await pool.query(stmtSelectActive, [params.role_id, id_to_keep_status_active]);
+
+//       if (respSelectActive.length > 0) {
+//         await pool.query(stmtUpdateDelete, [datetime, params.created_by, params.role_id, id_to_keep_status_active]);
+//       }
+//     }
+
+//     if (values.length > 0) {
+//       await pool.query(stmtInsert, [values]);
+//     }
+
+//     final_res = {
+//       status: true,
+//       err_code: `ERROR : 0`,
+//       message: 'SUCCESS',
+//       count: 0,
+//       data: []
+//     };
+
+//   } catch (e) {
+//     final_res = {
+//       status: false,
+//       err_code: `ERROR : ${e.code}`,
+//       message: `ERROR : ${e.message}`,
+//       count: 0,
+//       data: []
+//     };
+//   } finally {
+//     result(null, final_res);
+//   }
+// };
+
 RoleMenu.roleMenuMapping = async (params, result) => {
-  debugger;
-  var datetime = new Date();
+  const datetime = new Date();
   let final_res;
-  let respSelect;
-  let respSelectActive;
-  let id_to_keep_status_active = [];
 
-  let stmtSelect = `Select map_id,status from role_menu_mapping where role_id = ? and menu_id = ? `;
-  let stmtSelectActive = `Select map_id from role_menu_mapping where role_id = ? and status ='Y' and map_id not in (?)  `;
-  let stmtInsert = `insert into role_menu_mapping (role_id,menu_id,status,created_date,createdby) VALUES ? `;
-  let stmtUpdate = `update role_menu_mapping set role_id = ? ,menu_id = ?,status = ?,modify_date = ? ,modifyby =  ?
-    where map_id = ? ; `;
-  let stmtUpdateDelete = `update role_menu_mapping set status = 'D',modify_date = ? ,modifyby =  ?
-    where role_id = ? and map_id not in (?)  ; `;
-
-  let values = [];
   try {
-    for (let i = 0; i < params.menus.length; i++) {
-      respSelect = await pool.query(stmtSelect, [params.role_id, params.menus[i].menu_id]);
+    // 1️⃣ Soft delete old mappings
+    await pool.query(
+      `UPDATE role_menu_mapping
+       SET status = 'D', modify_date = ?, modifyby = ?
+       WHERE role_id = ?`,
+      [datetime, params.created_by, params.role_id]
+    );
 
-      if (respSelect.length == 0) {
-        values.push([params.role_id, params.menus[i].menu_id, params.status, datetime, params.created_by]);
-      } else {
-        id_to_keep_status_active.push(respSelect[0].map_id);
+    // 2️⃣ Collect selected menu IDs
+    const selectedMenuIds = params.menus.map(m => m.menu_id);
 
-        // update only if current status is not 'Y'
-        if (respSelect[0].status != 'Y') {
-          await pool.query(stmtUpdate, [params.role_id, params.menus[i].menu_id,
-            params.status, datetime, params.created_by, respSelect[0].map_id]);
-        }
-      }
-    }
+    // 3️⃣ Auto-fetch ALL parents recursively
+    const parents = await pool.query(`
+      SELECT DISTINCT parent_id
+      FROM menu_mst
+      WHERE id IN (?)
+      AND parent_id IS NOT NULL
+    `, [selectedMenuIds]);
 
-    if (id_to_keep_status_active.length > 0) {
-      respSelectActive = await pool.query(stmtSelectActive, [params.role_id, id_to_keep_status_active]);
+    const parentIds = parents.map(p => p.parent_id);
 
-      if (respSelectActive.length > 0) {
-        await pool.query(stmtUpdateDelete, [datetime, params.created_by, params.role_id, id_to_keep_status_active]);
-      }
-    }
+    // 4️⃣ Merge children + parents
+    const finalMenuIds = [...new Set([...selectedMenuIds, ...parentIds])];
+
+    // 5️⃣ Insert final menu list
+    const values = finalMenuIds.map(menu_id => ([
+      params.role_id,
+      menu_id,
+      'Y',
+      datetime,
+      params.created_by
+    ]));
 
     if (values.length > 0) {
-      await pool.query(stmtInsert, [values]);
+      await pool.query(
+        `INSERT INTO role_menu_mapping
+         (role_id, menu_id, status, created_date, createdby)
+         VALUES ?`,
+        [values]
+      );
     }
 
     final_res = {
       status: true,
-      err_code: `ERROR : 0`,
+      err_code: 'ERROR : 0',
       message: 'SUCCESS',
-      count: 0,
+      count: values.length,
       data: []
     };
 
@@ -213,6 +281,7 @@ RoleMenu.roleMenuMapping = async (params, result) => {
     result(null, final_res);
   }
 };
+
 
 
 Menu.update = async (newClient, result) => {

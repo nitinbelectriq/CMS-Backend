@@ -1116,10 +1116,122 @@ Master.getProjectsByCode = async (project_code, result) => {
   }
 };
 
+// Master.getNavListByUserId = async (login_id, project_id, result) => {
+// debugger;
+//   let final_res;
+//   let resp;
+//   let arr_final_nav_list;
+//   let arr_nav_list_L1;
+//   let arr_nav_list_L2;
+//   let arr_nav_list_L3;
+//   let arr_nav_list_L4;
+//   let arr_nav_list_L5;
+
+//   //role based for fututre
+//   // let stmt =`SELECT mm.id as table_id,mm.nav_level , mm.nav_id as id , mm.title, mm.type,
+//   //   mm.icon,mm.url,mm.icon_url,mm.parent_id
+//   //   FROM menu_mst mm where mm.status = 'Y' and mm.project_id=${project_id} 
+//   //   order by mm.display_order;`;
+//   // let stmt =`select umm.map_id,umm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,mm.icon,
+//   //   mm.icon_url,mm.url,mm.display_order,mm.parent_id  ,umm.user_id, usm.f_Name,usm.l_Name ,
+//   //   umm.status as umm_status, umm.created_date,umm.createdby,umm.modify_date,umm.modifyby 
+//   //   from user_menu_mapping umm 
+//   //   inner join menu_mst mm on umm.menu_id = mm.id and mm.status='Y'
+//   //   inner join user_mst_new usm on umm.user_id=usm.id and usm.status = 'Y'
+//   //   where umm.status='Y' and umm.user_id=${login_id} and mm.project_id=${project_id} 
+//   //   order by mm.display_order;`;
+// //;
+//   let stmt = `select rmm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,
+//     mm.icon,mm.icon_url,mm.url,mm.display_order,mm.parent_id  
+//     from role_menu_mapping rmm 
+//     inner join menu_mst mm on rmm.menu_id = mm.id and mm.status='Y'
+//     inner join role_mst rm on rmm.role_id=rm.id and rm.status = 'Y'
+//     where rmm.status='Y' 
+//     and rmm.role_id in (select role_id from user_role_mapping where user_id = ${login_id} and status='Y') 
+//     and mm.project_id=${project_id} 
+//     UNION
+//     select umm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,mm.icon,
+//     mm.icon_url,mm.url,mm.display_order,mm.parent_id  
+//     from user_menu_mapping umm 
+//     inner join menu_mst mm on umm.menu_id = mm.id and mm.status='Y'
+//     inner join user_mst_new usm on umm.user_id=usm.id and usm.status = 'Y'
+//     where umm.status='Y' and umm.user_id=${login_id}  and mm.project_id=${project_id} 
+//     order by display_order ;`;
+
+//   try {
+
+//     resp = await pool.query(stmt);
+// //;
+//     arr_nav_list_L1 = resp.filter(x => x.parent_id == null);
+//     arr_nav_list_L2 = resp.filter(x => x.nav_level == 2);
+//     arr_nav_list_L3 = resp.filter(x => x.nav_level == 3);
+//     arr_nav_list_L4 = resp.filter(x => x.nav_level == 4);
+//     arr_nav_list_L5 = resp.filter(x => x.nav_level == 5);
+
+//     let childL5;
+//     if (arr_nav_list_L5.length > 0) {
+//       for (let iL4 = 0; iL4 < arr_nav_list_L4.length; iL4++) {
+//         childL5 = arr_nav_list_L5.filter(x => x.parent_id == arr_nav_list_L4[iL4].table_id);
+//         if (childL5.length > 0) arr_nav_list_L4[iL4].children = childL5;
+//       }
+//     }
+
+//     let childL4;
+//     if (arr_nav_list_L4.length > 0) {
+//       for (let iL3 = 0; iL3 < arr_nav_list_L3.length; iL3++) {
+//         childL4 = arr_nav_list_L4.filter(x => x.parent_id == arr_nav_list_L3[iL3].table_id);
+//         if (childL4.length > 0) arr_nav_list_L3[iL3].children = childL4;
+
+//       }
+//     }
+
+//     let childL3;
+//     if (arr_nav_list_L3.length > 0) {
+//       for (let iL2 = 0; iL2 < arr_nav_list_L2.length; iL2++) {
+//         childL3 = arr_nav_list_L3.filter(x => x.parent_id == arr_nav_list_L2[iL2].table_id);
+//         if (childL3.length > 0) arr_nav_list_L2[iL2].children = childL3;
+
+//       }
+//     }
+
+//     let childL2;
+//     if (arr_nav_list_L2.length > 0) {
+//       for (let iL1 = 0; iL1 < arr_nav_list_L1.length; iL1++) {
+//         childL2 = arr_nav_list_L2.filter(x => x.parent_id == arr_nav_list_L1[iL1].table_id);
+//         if (childL2.length > 0) arr_nav_list_L1[iL1].children = childL2;
+
+//       }
+//     }
+
+//     arr_final_nav_list = arr_nav_list_L1;
+
+//     final_res = {
+//       status: arr_final_nav_list.length > 0 ? true : false,
+//       err_code: `ERROR : 0`,
+//       message: arr_final_nav_list.length > 0 ? 'SUCCESS' : 'DATA NOT FOUND',
+//       count: arr_final_nav_list.length,
+//       data: arr_final_nav_list
+//     }
+//   } catch (err) {
+
+//     final_res = {
+//       status: false,
+//       err_code: `ERROR : ${err.code}`,
+//       message: `ERROR : ${err.message}`,
+//       count: 0,
+//       data: []
+//     }
+//   } finally {
+//     return final_res;
+//   }
+// };
+
 Master.getNavListByUserId = async (login_id, project_id, result) => {
-debugger;
+  debugger;
+
   let final_res;
-  let resp;
+  let resp = [];
+
   let arr_final_nav_list;
   let arr_nav_list_L1;
   let arr_nav_list_L2;
@@ -1127,104 +1239,133 @@ debugger;
   let arr_nav_list_L4;
   let arr_nav_list_L5;
 
-  //role based for fututre
-  // let stmt =`SELECT mm.id as table_id,mm.nav_level , mm.nav_id as id , mm.title, mm.type,
-  //   mm.icon,mm.url,mm.icon_url,mm.parent_id
-  //   FROM menu_mst mm where mm.status = 'Y' and mm.project_id=${project_id} 
-  //   order by mm.display_order;`;
-  // let stmt =`select umm.map_id,umm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,mm.icon,
-  //   mm.icon_url,mm.url,mm.display_order,mm.parent_id  ,umm.user_id, usm.f_Name,usm.l_Name ,
-  //   umm.status as umm_status, umm.created_date,umm.createdby,umm.modify_date,umm.modifyby 
-  //   from user_menu_mapping umm 
-  //   inner join menu_mst mm on umm.menu_id = mm.id and mm.status='Y'
-  //   inner join user_mst_new usm on umm.user_id=usm.id and usm.status = 'Y'
-  //   where umm.status='Y' and umm.user_id=${login_id} and mm.project_id=${project_id} 
-  //   order by mm.display_order;`;
-//;
-  let stmt = `select rmm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,
-    mm.icon,mm.icon_url,mm.url,mm.display_order,mm.parent_id  
-    from role_menu_mapping rmm 
-    inner join menu_mst mm on rmm.menu_id = mm.id and mm.status='Y'
-    inner join role_mst rm on rmm.role_id=rm.id and rm.status = 'Y'
-    where rmm.status='Y' 
-    and rmm.role_id in (select role_id from user_role_mapping where user_id = ${login_id} and status='Y') 
-    and mm.project_id=${project_id} 
-    UNION
-    select umm.menu_id  as table_id, mm.title, mm.nav_level,mm.nav_id as id ,mm.type,mm.icon,
-    mm.icon_url,mm.url,mm.display_order,mm.parent_id  
-    from user_menu_mapping umm 
-    inner join menu_mst mm on umm.menu_id = mm.id and mm.status='Y'
-    inner join user_mst_new usm on umm.user_id=usm.id and usm.status = 'Y'
-    where umm.status='Y' and umm.user_id=${login_id}  and mm.project_id=${project_id} 
-    order by display_order ;`;
-
   try {
+    // 🔑 role check
+    const clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
+    const isSA = clientAndRoleDetails?.data?.some(x => x.role_code === 'SA');
 
+    let stmt;
+
+    // ===============================
+    // ✅ SUPER ADMIN → ALL MENUS
+    // ===============================
+    if (isSA) {
+      stmt = `
+        select 
+          mm.id as table_id,
+          mm.title,
+          mm.nav_level,
+          mm.nav_id as id,
+          mm.type,
+          mm.icon,
+          mm.icon_url,
+          mm.url,
+          mm.display_order,
+          mm.parent_id
+        from menu_mst mm
+        where mm.status = 'Y'
+        and mm.project_id = ${project_id}
+        order by mm.display_order
+      `;
+    }
+
+    // ===============================
+    // ✅ NORMAL USER → ROLE MENUS ONLY
+    // ===============================
+    else {
+      stmt = `
+        select DISTINCT
+          rmm.menu_id as table_id,
+          mm.title,
+          mm.nav_level,
+          mm.nav_id as id,
+          mm.type,
+          mm.icon,
+          mm.icon_url,
+          mm.url,
+          mm.display_order,
+          mm.parent_id
+        from role_menu_mapping rmm
+        inner join menu_mst mm
+          on rmm.menu_id = mm.id
+          and mm.status = 'Y'
+        where rmm.status = 'Y'
+        and rmm.role_id in (
+          select role_id
+          from user_role_mapping
+          where user_id = ${login_id}
+          and status = 'Y'
+        )
+        and mm.project_id = ${project_id}
+        order by mm.display_order
+      `;
+    }
+
+    // 🔥 run query
     resp = await pool.query(stmt);
-//;
+
+    // ===============================
+    // 🧹 REMOVE EMPTY PARENT MENUS
+    // ===============================
+    const activeMenuIds = new Set(resp.map(x => x.table_id));
+
+    resp = resp.filter(menu => {
+      if (!menu.parent_id) {
+        // keep parent only if it has at least one child
+        return resp.some(child => child.parent_id === menu.table_id);
+      }
+      return true;
+    });
+
+    // ===============================
+    // 🌳 BUILD MENU TREE
+    // ===============================
     arr_nav_list_L1 = resp.filter(x => x.parent_id == null);
     arr_nav_list_L2 = resp.filter(x => x.nav_level == 2);
     arr_nav_list_L3 = resp.filter(x => x.nav_level == 3);
     arr_nav_list_L4 = resp.filter(x => x.nav_level == 4);
     arr_nav_list_L5 = resp.filter(x => x.nav_level == 5);
 
-    let childL5;
-    if (arr_nav_list_L5.length > 0) {
-      for (let iL4 = 0; iL4 < arr_nav_list_L4.length; iL4++) {
-        childL5 = arr_nav_list_L5.filter(x => x.parent_id == arr_nav_list_L4[iL4].table_id);
-        if (childL5.length > 0) arr_nav_list_L4[iL4].children = childL5;
-      }
+    for (const l4 of arr_nav_list_L4) {
+      l4.children = arr_nav_list_L5.filter(x => x.parent_id === l4.table_id);
     }
 
-    let childL4;
-    if (arr_nav_list_L4.length > 0) {
-      for (let iL3 = 0; iL3 < arr_nav_list_L3.length; iL3++) {
-        childL4 = arr_nav_list_L4.filter(x => x.parent_id == arr_nav_list_L3[iL3].table_id);
-        if (childL4.length > 0) arr_nav_list_L3[iL3].children = childL4;
-
-      }
+    for (const l3 of arr_nav_list_L3) {
+      l3.children = arr_nav_list_L4.filter(x => x.parent_id === l3.table_id);
     }
 
-    let childL3;
-    if (arr_nav_list_L3.length > 0) {
-      for (let iL2 = 0; iL2 < arr_nav_list_L2.length; iL2++) {
-        childL3 = arr_nav_list_L3.filter(x => x.parent_id == arr_nav_list_L2[iL2].table_id);
-        if (childL3.length > 0) arr_nav_list_L2[iL2].children = childL3;
-
-      }
+    for (const l2 of arr_nav_list_L2) {
+      l2.children = arr_nav_list_L3.filter(x => x.parent_id === l2.table_id);
     }
 
-    let childL2;
-    if (arr_nav_list_L2.length > 0) {
-      for (let iL1 = 0; iL1 < arr_nav_list_L1.length; iL1++) {
-        childL2 = arr_nav_list_L2.filter(x => x.parent_id == arr_nav_list_L1[iL1].table_id);
-        if (childL2.length > 0) arr_nav_list_L1[iL1].children = childL2;
-
-      }
+    for (const l1 of arr_nav_list_L1) {
+      l1.children = arr_nav_list_L2.filter(x => x.parent_id === l1.table_id);
     }
 
     arr_final_nav_list = arr_nav_list_L1;
 
     final_res = {
-      status: arr_final_nav_list.length > 0 ? true : false,
-      err_code: `ERROR : 0`,
+      status: arr_final_nav_list.length > 0,
+      err_code: 'ERROR : 0',
       message: arr_final_nav_list.length > 0 ? 'SUCCESS' : 'DATA NOT FOUND',
       count: arr_final_nav_list.length,
       data: arr_final_nav_list
-    }
-  } catch (err) {
+    };
 
+  } catch (err) {
     final_res = {
       status: false,
       err_code: `ERROR : ${err.code}`,
       message: `ERROR : ${err.message}`,
       count: 0,
       data: []
-    }
+    };
   } finally {
     return final_res;
   }
 };
+
+
 
 StatePIN.updateStatePINMapping = async (data, result) => {
   //;

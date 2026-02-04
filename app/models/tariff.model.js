@@ -130,9 +130,19 @@ getMappingList: async (login_id) => {
 
   const query = isSA
     ? `
-      SELECT stm.id, cs.name AS station_name, t.tariff_name, t.type, t.costing_type,
-             t.charging_fee, t.charging_fee_unit,
-             u.username AS created_by_name, stm.created_date
+      SELECT
+        stm.id,
+        stm.station_id,
+        stm.tariff_id,
+        cs.state_id,
+        cs.name AS station_name,
+        t.tariff_name,
+        t.type,
+        t.costing_type,
+        t.charging_fee,
+        t.charging_fee_unit,
+        u.username AS created_by_name,
+        stm.created_date
       FROM station_tariff_map stm
       LEFT JOIN charging_station_mst cs ON stm.station_id = cs.id
       LEFT JOIN tariff_mst t ON stm.tariff_id = t.tariff_id
@@ -141,19 +151,36 @@ getMappingList: async (login_id) => {
       ORDER BY stm.id DESC
     `
     : `
-      SELECT stm.id, cs.name AS station_name, t.tariff_name, t.type, t.costing_type,
-             t.charging_fee, t.charging_fee_unit,
-             u.username AS created_by_name, stm.created_date
+      SELECT
+        stm.id,
+        stm.station_id,
+        stm.tariff_id,
+        cs.state_id,
+        cs.name AS station_name,
+        t.tariff_name,
+        t.type,
+        t.costing_type,
+        t.charging_fee,
+        t.charging_fee_unit,
+        u.username AS created_by_name,
+        stm.created_date
       FROM station_tariff_map stm
       LEFT JOIN charging_station_mst cs ON stm.station_id = cs.id
       LEFT JOIN tariff_mst t ON stm.tariff_id = t.tariff_id
       LEFT JOIN user_mst_new u ON stm.created_by = u.id
-      WHERE stm.status='Y' AND u.client_id='${client_id}'
+      WHERE stm.status='Y'
+        AND u.client_id='${client_id}'
       ORDER BY stm.id DESC
     `;
 
-  return await pool.query(query);
+  const rows = await pool.query(query);
+
+  return {
+    status: true,
+    data: rows
+  };
 },
+
 
 getMappingById: async (id) => {
   const query = `

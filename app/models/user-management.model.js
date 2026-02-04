@@ -1597,7 +1597,7 @@ User.getRoleListWithRolesAssignedToUserCW = async (client_id, user_id, project_i
 };
 
 User.getUserRoleMappingCW = async (login_id, project_id, result) => {
-
+debugger;
   let final_res;
   let resp;
   let stmt;

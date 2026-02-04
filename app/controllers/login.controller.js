@@ -548,127 +548,181 @@ exports.forgotpassword = (req, res) => {
     }
 };
 
+// exports.Webforgotpassword = (req, res) => {
+
+//     const user = new User({
+//         id: req.body.id,
+//         code: !!req.body.code ? req.body.code : '',
+//         username: req.body.username,
+//         password: req.body.password,
+//         f_Name: !!req.body.f_Name ? req.body.f_Name : '',
+//         m_Name: !!req.body.m_Name ? req.body.m_Name : '',
+//         l_Name: !!req.body.l_Name ? req.body.l_Name : '',
+//         dob: !!req.body.dob ? req.body.dob : '',
+//         mobile: !!req.body.mobile ? req.body.mobile : '',
+//         alt_mobile: !!req.body.alt_mobile ? req.body.alt_mobile : '',
+
+//         email: !!req.body.email ? req.body.email : '',
+//         device_id: !!req.body.device_id ? req.body.device_id : '',
+//         app_version: !!req.body.app_version ? req.body.app_version : '',
+//         os_version: !!req.body.os_version ? req.body.os_version : '',
+
+//         user_type: req.body.user_type,
+//         client_id: !!req.body.client_id ? req.body.client_id : 0,
+//         can_expire: req.body.can_expire,
+//         hint_question: !!req.body.hint_question ? req.body.hint_question : 0,
+//         hint_answer: !!req.body.hint_answer ? req.body.hint_answer : '',
+//         last_pass_change: !!req.body.last_pass_change ? req.body.last_pass_change : '',
+//         last_login_date: !!req.body.last_login_date ? req.body.last_login_date : '',
+//         employee_code: !!req.body.employee_code ? req.body.employee_code : '',
+//         is_verified: !!req.body.is_verified ? req.body.is_verified : 'N',
+//         otp: !!req.body.otp ? req.body.otp : '',
+//         registration_origin: req.body.registration_origin,
+//         status: req.body.status,
+//         created_date: req.body.created_date,
+//         created_by: !!req.body.created_by ? req.body.created_by : 0,
+//         modify_date: req.body.modify_date,
+//         modify_by: req.body.modify_by
+//     });
+
+
+//     // Validate request
+//     if (!req.body.username) {
+//         res.status(400).send({
+//             message: "Invalid Input"
+//         });
+//     }
+//     else {
+
+//         // const { user_name, password } = req.body;
+//         User.Webforgotpassword(user, (err, data) => {
+//             if (err)
+//                 res.status(500).send({
+//                     message:
+//                         err.message || "Some error occurred while generate the user password."
+//                 });
+//             else res.send(data);
+//         });
+
+
+//     }
+// };
+
 exports.Webforgotpassword = (req, res) => {
-
-    const user = new User({
-        id: req.body.id,
-        code: !!req.body.code ? req.body.code : '',
-        username: req.body.username,
-        password: req.body.password,
-        f_Name: !!req.body.f_Name ? req.body.f_Name : '',
-        m_Name: !!req.body.m_Name ? req.body.m_Name : '',
-        l_Name: !!req.body.l_Name ? req.body.l_Name : '',
-        dob: !!req.body.dob ? req.body.dob : '',
-        mobile: !!req.body.mobile ? req.body.mobile : '',
-        alt_mobile: !!req.body.alt_mobile ? req.body.alt_mobile : '',
-
-        email: !!req.body.email ? req.body.email : '',
-        device_id: !!req.body.device_id ? req.body.device_id : '',
-        app_version: !!req.body.app_version ? req.body.app_version : '',
-        os_version: !!req.body.os_version ? req.body.os_version : '',
-
-        user_type: req.body.user_type,
-        client_id: !!req.body.client_id ? req.body.client_id : 0,
-        can_expire: req.body.can_expire,
-        hint_question: !!req.body.hint_question ? req.body.hint_question : 0,
-        hint_answer: !!req.body.hint_answer ? req.body.hint_answer : '',
-        last_pass_change: !!req.body.last_pass_change ? req.body.last_pass_change : '',
-        last_login_date: !!req.body.last_login_date ? req.body.last_login_date : '',
-        employee_code: !!req.body.employee_code ? req.body.employee_code : '',
-        is_verified: !!req.body.is_verified ? req.body.is_verified : 'N',
-        otp: !!req.body.otp ? req.body.otp : '',
-        registration_origin: req.body.registration_origin,
-        status: req.body.status,
-        created_date: req.body.created_date,
-        created_by: !!req.body.created_by ? req.body.created_by : 0,
-        modify_date: req.body.modify_date,
-        modify_by: req.body.modify_by
+  if (!req.body.username || !req.body.email) {
+    return res.status(200).send({
+      status: false,
+      message: "Username and email required"
     });
+  }
 
+  const user = new User({
+    username: req.body.username,
+    email: req.body.email
+  });
 
-    // Validate request
-    if (!req.body.username) {
-        res.status(400).send({
-            message: "Invalid Input"
-        });
+  User.Webforgotpassword(user, (err, data) => {
+    if (err) {
+      res.status(500).send({
+        status: false,
+        message: err.message
+      });
+    } else {
+      res.send(data);
     }
-    else {
-
-        // const { user_name, password } = req.body;
-        User.Webforgotpassword(user, (err, data) => {
-            if (err)
-                res.status(500).send({
-                    message:
-                        err.message || "Some error occurred while generate the user password."
-                });
-            else res.send(data);
-        });
-
-
-    }
+  });
 };
-exports.updatepassword = (req, res) => {
 
-    const user = new User({
-        id: req.body.id,
-        code: !!req.body.code ? req.body.code : '',
-        username: req.body.username,
-        password: req.body.password,
-        f_Name: !!req.body.f_Name ? req.body.f_Name : '',
-        m_Name: !!req.body.m_Name ? req.body.m_Name : '',
-        l_Name: !!req.body.l_Name ? req.body.l_Name : '',
-        dob: !!req.body.dob ? req.body.dob : '',
-        mobile: !!req.body.mobile ? req.body.mobile : '',
-        alt_mobile: !!req.body.alt_mobile ? req.body.alt_mobile : '',
+// exports.updatepassword = (req, res) => {
 
-        email: !!req.body.email ? req.body.email : '',
-        device_id: !!req.body.device_id ? req.body.device_id : '',
-        app_version: !!req.body.app_version ? req.body.app_version : '',
-        os_version: !!req.body.os_version ? req.body.os_version : '',
+//     const user = new User({
+//         id: req.body.id,
+//         code: !!req.body.code ? req.body.code : '',
+//         username: req.body.username,
+//         password: req.body.password,
+//         f_Name: !!req.body.f_Name ? req.body.f_Name : '',
+//         m_Name: !!req.body.m_Name ? req.body.m_Name : '',
+//         l_Name: !!req.body.l_Name ? req.body.l_Name : '',
+//         dob: !!req.body.dob ? req.body.dob : '',
+//         mobile: !!req.body.mobile ? req.body.mobile : '',
+//         alt_mobile: !!req.body.alt_mobile ? req.body.alt_mobile : '',
 
-        user_type: req.body.user_type,
-        client_id: !!req.body.client_id ? req.body.client_id : 0,
-        can_expire: req.body.can_expire,
-        hint_question: !!req.body.hint_question ? req.body.hint_question : 0,
-        hint_answer: !!req.body.hint_answer ? req.body.hint_answer : '',
-        last_pass_change: !!req.body.last_pass_change ? req.body.last_pass_change : '',
-        last_login_date: !!req.body.last_login_date ? req.body.last_login_date : '',
-        employee_code: !!req.body.employee_code ? req.body.employee_code : '',
-        is_verified: !!req.body.is_verified ? req.body.is_verified : 'N',
-        otp: !!req.body.otp ? req.body.otp : '',
-        registration_origin: req.body.registration_origin,
-        status: req.body.status,
-        created_date: req.body.created_date,
-        created_by: !!req.body.created_by ? req.body.created_by : 0,
-        modify_date: req.body.modify_date,
-        modify_by: req.body.modify_by
-    });
+//         email: !!req.body.email ? req.body.email : '',
+//         device_id: !!req.body.device_id ? req.body.device_id : '',
+//         app_version: !!req.body.app_version ? req.body.app_version : '',
+//         os_version: !!req.body.os_version ? req.body.os_version : '',
 
-
-    // Validate request
-    if (!req.body.password) {
-        res.status(200).send({
-            status: false,
-            message: "Invalid Input"
-        });
-    }
-    else {
-
-        // const { user_name, password } = req.body;
-        User.updatepassword(user, (err, data) => {
-          //  User.updatePasswordNewBLE(user, (err, data) => {
-            if (err)
-                res.status(500).send({
-                    status: false,
-                    message: err.message || "Some error occurred while Update the User Password."
-                });
-            else res.send(data);
-        });
+//         user_type: req.body.user_type,
+//         client_id: !!req.body.client_id ? req.body.client_id : 0,
+//         can_expire: req.body.can_expire,
+//         hint_question: !!req.body.hint_question ? req.body.hint_question : 0,
+//         hint_answer: !!req.body.hint_answer ? req.body.hint_answer : '',
+//         last_pass_change: !!req.body.last_pass_change ? req.body.last_pass_change : '',
+//         last_login_date: !!req.body.last_login_date ? req.body.last_login_date : '',
+//         employee_code: !!req.body.employee_code ? req.body.employee_code : '',
+//         is_verified: !!req.body.is_verified ? req.body.is_verified : 'N',
+//         otp: !!req.body.otp ? req.body.otp : '',
+//         registration_origin: req.body.registration_origin,
+//         status: req.body.status,
+//         created_date: req.body.created_date,
+//         created_by: !!req.body.created_by ? req.body.created_by : 0,
+//         modify_date: req.body.modify_date,
+//         modify_by: req.body.modify_by
+//     });
 
 
-    }
-};
+//     // Validate request
+//     if (!req.body.password) {
+//         res.status(200).send({
+//             status: false,
+//             message: "Invalid Input"
+//         });
+//     }
+//     else {
+
+//         // const { user_name, password } = req.body;
+//         User.updatepassword(user, (err, data) => {
+//           //  User.updatePasswordNewBLE(user, (err, data) => {
+//             if (err)
+//                 res.status(500).send({
+//                     status: false,
+//                     message: err.message || "Some error occurred while Update the User Password."
+//                 });
+//             else res.send(data);
+//         });
+
+
+//     }
+// };
 //use for ble and charger 25-03-2022
+
+exports.updatepassword = (req, res) => {
+  if (!req.body.username || !req.body.password || !req.body.otp) {
+    return res.status(200).send({
+      status: false,
+      message: "Invalid input"
+    });
+  }
+
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password,
+    otp: req.body.otp
+  });
+
+  User.updatepassword(user, (err, data) => {
+    if (err) {
+      res.status(500).send({
+        status: false,
+        message: err.message
+      });
+    } else {
+      res.send(data);
+    }
+  });
+};
+
+
 exports.updatePasswordNewBLE = (req, res) => {
         const user = new User({
             id: req.body.id,

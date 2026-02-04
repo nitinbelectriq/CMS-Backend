@@ -4,7 +4,7 @@ const _userModel = require("../models/user-management.model");
 const charger = require("../models/charger.model");
 const bcrypt = require('bcrypt');
 const helper = require('../helper/passwordHelper');
-
+const { sendForgotPasswordOTP } = require('../utility/email.utility');
 const https = require('https')
 const http = require('https')
 const axios = require('axios');
@@ -458,63 +458,173 @@ User.forgotPasswordNew = async (newUser, result) => {
 };
 
 //forgotpassword
+// User.Webforgotpassword = async (newUser, result) => {
+//   let final_result;
+//   var datetime = new Date();
+
+//   let genPass = await _utility.generatePassword();
+
+//   let stmt = `update user_mst_new set 
+//     password = '${genPass}'
+//     where username = '${newUser.username}' and status = 'Y' `;
+
+//   sql.query(stmt, async (err, res) => {
+//     if (err) {
+//       result(err, null);
+//       return;
+//     }
+//     let response_send_otp = await _utility.sendOTP('FORGOT_PASSWORD', otp, newUser.mobile, newUser.email);
+//     if (response_send_otp.message == "SUCCESS") {
+//       final_result = {
+//         status: true,
+//         message: 'User OTP successfully. Please verify user with OTP sent'
+//       }
+//     } else {
+//       final_result = {
+//         status: false,
+//         message: 'Please retry'
+//       }
+//     }
+
+//     result(null, final_result);
+//   });
+// };
+
+
+
 User.Webforgotpassword = async (newUser, result) => {
-  let final_result;
-  var datetime = new Date();
+  try {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otpValidity = new Date(Date.now() + 10 * 60000); // 10 mins
 
-  let genPass = await _utility.generatePassword();
+    const stmt = `
+      UPDATE user_mst_new
+      SET otp = ?,
+          otp_validity = ?,
+          otp_used = 0
+      WHERE username = ?
+        AND email = ?
+        AND status = 'Y'
+    `;
 
-  let stmt = `update user_mst_new set 
-    password = '${genPass}'
-    where username = '${newUser.username}' and status = 'Y' `;
+    sql.query(
+      stmt,
+      [otp, otpValidity, newUser.username, newUser.email],
+      async (err, res) => {
+        if (err) {
+          result(err, null);
+          return;
+        }
 
-  sql.query(stmt, async (err, res) => {
-    if (err) {
-      result(err, null);
-      return;
-    }
-    let response_send_otp = await _utility.sendOTP('FORGOT_PASSWORD', otp, newUser.mobile, newUser.email);
-    if (response_send_otp.message == "SUCCESS") {
-      final_result = {
-        status: true,
-        message: 'User OTP successfully. Please verify user with OTP sent'
+        if (res.affectedRows === 0) {
+          result(null, {
+            status: false,
+            message: 'Invalid username or email'
+          });
+          return;
+        }
+
+        const mailSent = await sendForgotPasswordOTP(
+          newUser.email,
+          otp
+        );
+
+        if (!mailSent) {
+          result(null, {
+            status: false,
+            message: 'OTP sending failed'
+          });
+          return;
+        }
+
+        result(null, {
+          status: true,
+          message: 'OTP sent to registered email'
+        });
       }
-    } else {
-      final_result = {
-        status: false,
-        message: 'Please retry'
-      }
-    }
-
-    result(null, final_result);
-  });
+    );
+  } catch (error) {
+    result(error, null);
+  }
 };
 
-User.updatepassword = (newUser, result) => {
 
-  let final_result;
-  var datetime = new Date();
 
-  let stmt = `update user_mst_new set 
-        password = '${newUser.password}',registration_origin = '${newUser.registration_origin}',     
-        modifyby = ${newUser.modify_by},modify_date = '${datetime.toISOString().slice(0, 10)}' 
-        where id=  ${newUser.id} and status = 'Y'`;
+// User.updatepassword = (newUser, result) => {
 
-  sql.query(stmt, (err, res) => {
-    if (err) {
-      result(err, null);
-      return;
-    }
-    final_result = {
-      status: true,
-      message: 'User password updated successfully.'
-    }
+//   let final_result;
+//   var datetime = new Date();
 
-    result(null, final_result);
-  });
-};
+//   let stmt = `update user_mst_new set 
+//         password = '${newUser.password}',registration_origin = '${newUser.registration_origin}',     
+//         modifyby = ${newUser.modify_by},modify_date = '${datetime.toISOString().slice(0, 10)}' 
+//         where id=  ${newUser.id} and status = 'Y'`;
+
+//   sql.query(stmt, (err, res) => {
+//     if (err) {
+//       result(err, null);
+//       return;
+//     }
+//     final_result = {
+//       status: true,
+//       message: 'User password updated successfully.'
+//     }
+
+//     result(null, final_result);
+//   });
+// };
 
 // use for ble and charger 25-03-2022
+
+User.updatepassword = (newUser, result) => {
+  const datetime = new Date();
+
+  const stmt = `
+    UPDATE user_mst_new
+    SET password = ?,
+        otp_used = 1,
+        otp = NULL,
+        otp_validity = NULL,
+        modify_date = ?
+    WHERE username = ?
+      AND otp = ?
+      AND otp_used = 0
+      AND otp_validity >= NOW()
+      AND status = 'Y'
+  `;
+
+  sql.query(
+    stmt,
+    [
+      newUser.password,
+      datetime,
+      newUser.username,
+      newUser.otp
+    ],
+    (err, res) => {
+      if (err) {
+        result(err, null);
+        return;
+      }
+
+      if (res.affectedRows === 0) {
+        result(null, {
+          status: false,
+          message: 'Invalid or expired OTP'
+        });
+        return;
+      }
+
+      result(null, {
+        status: true,
+        message: 'Password updated successfully'
+      });
+    }
+  );
+};
+
+
+
 User.updatePasswordNewBLE =  async(newUser, result) => {
 
   let final_result;

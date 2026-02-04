@@ -8,49 +8,58 @@ const axios = require("axios");
 const BASE_API =  "http://116.203.172.166:4100";
 
 
-// ✅ Generate Bill (create + PDF + optional email)
+// ✅ Generate Bill 
+// ✅ Generate Bill (FINAL & SAFE)
 exports.generateBill = async (req, res) => {
+  debugger
   try {
     const {
       station_id,
       tariff_id,
       state_id,
       units_consumed,
-      created_by,
-      customer_email
+      created_by
     } = req.body;
 
     if (!station_id || !tariff_id || !state_id || !units_consumed) {
-      return res
-        .status(400)
-        .json({ status: false, message: 'Missing required fields' });
+      return res.status(400).json({
+        status: false,
+        message: 'Missing required fields'
+      });
     }
 
-    // Check station–tariff mapping
-    const isMapped = await Billing.isStationMapped(station_id, tariff_id);
+    // 🔒 VALIDATE STATION–TARIFF MAPPING
+    const isMapped = await Billing.isStationTariffMapped(
+      station_id,
+      tariff_id
+    );
+
     if (!isMapped) {
-      return res
-        .status(400)
-        .json({ status: false, message: 'Station not mapped with tariff' });
+      return res.status(400).json({
+        status: false,
+        message: 'Selected tariff is not mapped to this station'
+      });
     }
 
-    // Get tariff & GST details
+    // ✅ Tariff details
     const tariff = await Billing.getTariffDetails(tariff_id);
     if (!tariff) {
-      return res
-        .status(404)
-        .json({ status: false, message: 'Tariff not found' });
+      return res.status(404).json({
+        status: false,
+        message: 'Tariff not found'
+      });
     }
 
+    // ✅ GST
     const gst_rate = await Billing.getGSTRateByState(state_id);
 
     const units = Number(units_consumed);
     const rate = Number(tariff.charging_fee) || 0;
+
     const base_amount = rate * units;
     const gst_amount = (base_amount * gst_rate) / 100;
     const final_amount = base_amount + gst_amount;
 
-    // Create bill in DB
     const bill_id = await Billing.createBill({
       station_id,
       tariff_id,
@@ -63,53 +72,26 @@ exports.generateBill = async (req, res) => {
       created_by
     });
 
-    // Fetch full bill details for invoice
-    const bill = await Billing.getBillById(bill_id);
-    if (!bill) {
-      return res
-        .status(404)
-        .json({ status: false, message: 'Bill not found after creation' });
-    }
-
-    const invoicePath = path.join(process.cwd(), `Invoice_${bill_id}.pdf`);
-    await generateInvoicePDF(bill, invoicePath);
-
-    // Optional email with invoice
-    if (customer_email) {
-      const html = `
-        <h3>Dear Customer,</h3>
-        <p>Your invoice <strong>#${bill_id}</strong> has been generated.</p>
-        <p>Total Amount: <strong>₹${final_amount.toFixed(2)}</strong></p>
-      `;
-
-      await sendEmail(customer_email, `Invoice #${bill_id}`, html, [
-        {
-          filename: `Invoice_${bill_id}.pdf`,
-          path: invoicePath,
-          contentType: 'application/pdf'
-        }
-      ]);
-    }
-
-    // Response
-    res.status(200).json({
+    return res.status(200).json({
       status: true,
       message: 'Bill generated successfully',
       bill_id,
       base_amount,
       gst_amount,
-      final_amount
+      final_amount,
+      payment_status: 'Pending'
     });
 
-    // Delete temp file after some time
-    setTimeout(() => {
-      if (fs.existsSync(invoicePath)) fs.unlinkSync(invoicePath);
-    }, 10000);
   } catch (error) {
-    console.error('❌ Billing generation error:', error);
-    res.status(500).json({ status: false, message: 'Server error' });
+    console.error('❌ Generate Bill Error:', error);
+    return res.status(500).json({
+      status: false,
+      message: 'Server error'
+    });
   }
 };
+
+
 
 // ✅ Billing list (role-based, like tariff.getAll)
 exports.getBillingList = async (req, res) => {
@@ -277,7 +259,7 @@ exports.updateBill = async (req, res) => {
 exports.payBill = async (req, res) => {
   try {
     const { bill_id, amount } = req.body;
-    const user_id = req.body.userid;   // 🔥 FIXED
+    const user_id = req.body.userid;
 
     if (!bill_id || !user_id || !amount) {
       return res.status(400).json({
@@ -287,7 +269,6 @@ exports.payBill = async (req, res) => {
     }
 
     const rawToken = req.headers["authorization"];
-
     if (!rawToken) {
       return res.status(403).json({
         status: false,
@@ -299,28 +280,61 @@ exports.payBill = async (req, res) => {
       ? rawToken
       : `Bearer ${rawToken}`;
 
-    const paymentRes = await axios.post(
-      `${BASE_API}/payment/initiatetransaction`,
-      {
-        userid: user_id,
-        amount: amount,
-        bill_id: bill_id,
-        type: req.body.type ?? "CURRENT",
-        source: req.body.source ?? "WEB_PORTAL",
-        serial_no: req.body.serial_no ?? "cms"
-      },
-      {
-        headers: {
-          Authorization: safeToken
-        }
-      }
-    );
+   console.log("👉 payBill called, payload:", req.body);
 
-    if (!paymentRes.data.status) {
-      return res.status(400).json(paymentRes.data);
+let paymentRes;
+try {
+  paymentRes = await axios.post(
+    `${BASE_API}/payment/initiatetransaction`,
+    {
+      userid: user_id,
+      amount,
+      bill_id,
+      type: req.body.type ?? "CURRENT",
+      source: req.body.source ?? "WEB_PORTAL",
+      serial_no: req.body.serial_no ?? "cms",
+      mobileno: req.body.mobileno,
+      activity_id: req.body.activity_id,
+      paymentmode: "paytm"
+    },
+    {
+      headers: { Authorization: safeToken },
+      timeout: 15000   // 👈 ADD TIMEOUT
     }
+  );
+
+  console.log("✅ paymentRes received:", paymentRes.data);
+
+} catch (err) {
+  console.error("❌ AXIOS FAILED:", err.message);
+  console.error("❌ AXIOS RESPONSE:", err.response?.data);
+
+  return res.status(200).json({
+    status: false,
+    message: "Payment service not responding",
+    error: err.response?.data || err.message
+  });
+}
+
+
+ if (!paymentRes.data.status) {
+  return res.status(200).json(paymentRes.data);
+}
+
 
     const paytmData = paymentRes.data.data;
+
+    // ✅ HARD VALIDATION
+    if (!paytmData?.token || !paytmData?.orderid || !paytmData?.mid) {
+      return res.status(500).json({
+        status: false,
+        message: "Invalid Paytm transaction data received"
+      });
+    }
+
+    // ✅ FIX CALLBACK URL
+    //paytmData.callbackurl =
+     // `https://penological-ascertainably-laquanda.ngrok-free.dev/payment/callback?ORDER_ID=${paytmData.orderid}`;
 
     await Billing.updateBillPaymentOrder(bill_id, paytmData.orderid, "paytm");
 
@@ -332,12 +346,12 @@ exports.payBill = async (req, res) => {
 
   } catch (error) {
     console.error("❌ payBill Error:", error?.response?.data || error);
-
     return res.status(500).json({
       status: false,
       message: "Server error"
     });
   }
 };
+
 
 
