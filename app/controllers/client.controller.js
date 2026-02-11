@@ -136,7 +136,7 @@ exports.getClientsCW = (req, res) => {
 };
 
 exports.getActiveClientsCW = (req, res) => {
-
+debugger;
   let login_id = req.params.login_id;
   Client.getActiveClientsCW(login_id, (err, data) => {
     if (err) {

@@ -312,7 +312,7 @@ Client.getClientsCW = async (login_id,result) => {
 
 Client.getActiveClientsCW = async (login_id,result) => {
   //;
-
+debugger;
   let stmt='';
   let clientAndRoleDetails = await _utility.getClientIdAndRoleByUserId(login_id);
   let client_id = clientAndRoleDetails.data[0].client_id;

@@ -555,6 +555,279 @@ RFid.unMapRFidCpoID = async (id,user_id, result) => {
   }
 };
 
+
+RFid.createUserRfidMapping = async (data, result) => {
+  try {
+    const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const created_by = data.created_by || data.modify_by;
+
+    if (!created_by) {
+      return result(null, {
+        status: false,
+        message: "created_by missing",
+        data: []
+      });
+    }
+
+    // ✅ CHECK RFID USED BY SOMEONE ELSE
+    for (const rfid of data.rfid_data) {
+
+      // other USER
+      const userCheck = await pool.query(`
+        SELECT user_id 
+        FROM user_rfid_mapping 
+        WHERE rfid_id=? AND status <> 'D'
+      `, [rfid]);
+
+      if (userCheck.length && userCheck[0].user_id !== data.user_id) {
+        return result(null, {
+          status: false,
+          message: `RFID already assigned to another USER`,
+          data: []
+        });
+      }
+
+      // any CPO
+      const cpoCheck = await pool.query(`
+        SELECT cpo_id 
+        FROM cpo_rfid_mapping 
+        WHERE rfid_id=? AND status <> 'D'
+      `, [rfid]);
+
+      if (cpoCheck.length) {
+        return result(null, {
+          status: false,
+          message: `RFID already assigned to a CPO`,
+          data: []
+        });
+      }
+    }
+
+    // ✅ SAFE → NOW DELETE OLD
+    await pool.query(`
+      UPDATE user_rfid_mapping 
+      SET status='D', modify_date=?, modifyby=? 
+      WHERE user_id=? AND status <> 'D'
+    `, [datetime, created_by, data.user_id]);
+
+    // ✅ INSERT
+    const values = data.rfid_data.map(rfid => [
+      data.user_id,
+      rfid,
+      data.status || 'Y',
+      created_by,
+      datetime
+    ]);
+
+    await pool.query(`
+      INSERT INTO user_rfid_mapping
+      (user_id, rfid_id, status, createdby, created_date)
+      VALUES ?
+    `, [values]);
+
+    result(null, { status: true, message: "SUCCESS", data: [] });
+
+  } catch (error) {
+    console.error("createUserRfidMapping:", error);
+    result(null, { status: false, message: error.message, data: [] });
+  }
+};
+
+RFid.updateUserRfidMapping = async (data, result) => {
+  try {
+    const datetime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const modify_by = data.modify_by || data.created_by;
+
+    if (!modify_by) {
+      return result(null, {
+        status: false,
+        message: "modify_by missing",
+        data: []
+      });
+    }
+
+    // ✅ CHECK RFID USED BY SOMEONE ELSE
+    for (const rfid of data.rfid_data) {
+
+      // check other USER
+      const userCheck = await pool.query(`
+        SELECT user_id 
+        FROM user_rfid_mapping 
+        WHERE rfid_id=? AND status <> 'D'
+      `, [rfid]);
+
+      if (userCheck.length && userCheck[0].user_id !== data.user_id) {
+        return result(null, {
+          status: false,
+          message: `RFID already assigned to another USER`,
+          data: []
+        });
+      }
+
+      // check CPO
+      const cpoCheck = await pool.query(`
+        SELECT cpo_id 
+        FROM cpo_rfid_mapping 
+        WHERE rfid_id=? AND status <> 'D'
+      `, [rfid]);
+
+      if (cpoCheck.length) {
+        return result(null, {
+          status: false,
+          message: `RFID already assigned to a CPO`,
+          data: []
+        });
+      }
+    }
+
+    // ✅ SAFE → DELETE OLD
+    await pool.query(`
+      UPDATE user_rfid_mapping 
+      SET status='D', modify_date=?, modifyby=? 
+      WHERE user_id=? AND status <> 'D'
+    `, [datetime, modify_by, data.user_id]);
+
+    // ✅ INSERT NEW
+    const values = data.rfid_data.map(rfid => [
+      data.user_id,
+      rfid,
+      data.status || 'Y',
+      modify_by,
+      datetime
+    ]);
+
+    await pool.query(`
+      INSERT INTO user_rfid_mapping
+      (user_id, rfid_id, status, createdby, created_date)
+      VALUES ?
+    `, [values]);
+
+    result(null, { status: true, message: "UPDATED", data: [] });
+
+  } catch (error) {
+    console.error("updateUserRfidMapping:", error);
+    result(null, { status: false, message: error.message, data: [] });
+  }
+};
+
+
+RFid.getUserRFidMapping = async (login_id, result) => {
+  let final_res;
+  let resp;
+
+  try {
+    resp = await pool.query(`
+      SELECT 
+        urm.id as map_id,
+        u.id as user_id,
+        CONCAT(u.f_Name,' ',u.l_Name) as user_name,
+        cr.id as rf_id,
+        cr.rf_id_no,
+        cr.description,
+        cr.expiry_date,
+        urm.status,
+        urm.created_date,
+        urm.createdby,
+        urm.modify_date,
+        urm.modifyby
+      FROM user_rfid_mapping urm
+      INNER JOIN user_mst_new u ON u.id = urm.user_id AND u.status='Y'
+      INNER JOIN charger_rfid cr ON cr.id = urm.rfid_id AND cr.status='Y'
+      WHERE urm.status <> 'D'
+      ORDER BY urm.id DESC
+    `);
+
+    final_res = resp;
+
+  } catch (error) {
+    final_res = [];
+  } finally {
+    result(null, final_res);
+  }
+};
+RFid.getRFidsByUserId = async (user_id, result) => {
+  try {
+    const resp = await pool.query(`
+      SELECT rfid_id
+      FROM user_rfid_mapping
+      WHERE user_id=? AND status <> 'D'
+    `, [user_id]);
+
+    result(null, resp);
+
+  } catch (error) {
+    result({ kind: "not_found" }, null);
+  }
+};
+RFid.deleteUserRfidMapping = async (id, user_id, result) => {
+  try {
+    const datetime = new Date();
+
+    const resp = await pool.query(`
+      UPDATE user_rfid_mapping
+      SET status='D', modify_date=?, modifyby=?
+      WHERE id=?
+    `, [datetime, user_id, id]);
+
+    if (resp.affectedRows > 0) {
+      result(null, { status: true, message: "DELETED" });
+    } else {
+      result(null, { status: false, message: "NOT_FOUND" });
+    }
+
+  } catch (error) {
+    result(null, { status: false, message: error.message });
+  }
+};
+
+RFid.checkRfidUsage = async (rfid_id, result) => {
+  try {
+
+    // Check in USER mapping
+    const userResp = await pool.query(`
+      SELECT u.id, CONCAT(u.f_name,' ',u.l_name) as name
+      FROM user_rfid_mapping urm
+      INNER JOIN user_mst_new u ON u.id = urm.user_id
+      WHERE urm.rfid_id = ? AND urm.status <> 'D'
+      LIMIT 1
+    `, [rfid_id]);
+
+    if (userResp.length) {
+      return result(null, {
+        used: true,
+        mapped_to: 'USER',
+        name: userResp[0].name
+      });
+    }
+
+    // Check in CPO mapping
+    const cpoResp = await pool.query(`
+      SELECT cm.name
+      FROM cpo_rfid_mapping crm
+      INNER JOIN cpo_mst cm ON cm.id = crm.cpo_id
+      WHERE crm.rfid_id = ? AND crm.status <> 'D'
+      LIMIT 1
+    `, [rfid_id]);
+
+    if (cpoResp.length) {
+      return result(null, {
+        used: true,
+        mapped_to: 'CPO',
+        name: cpoResp[0].name
+      });
+    }
+
+    // free
+    return result(null, {
+      used: false
+    });
+
+  } catch (error) {
+    return result(error, null);
+  }
+};
+
+
 module.exports = {
   RFid: RFid
 };

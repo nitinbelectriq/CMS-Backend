@@ -6,7 +6,7 @@ const mysqlMain = {
   user: "root",
   password: "Belectriq##$$%%##",
   database: "belectriq_cms",
-  port: 3306
+  port: 3307
 };
 
 // -------------------- PostgreSQL Logs DB --------------------

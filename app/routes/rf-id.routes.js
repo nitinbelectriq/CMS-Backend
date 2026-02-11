@@ -29,5 +29,18 @@ module.exports = app => {
     // Delete a registered vehicle with id
     app.delete("/rfid/delete/:id/:user_id", rfids.delete);
     app.delete("/rfid/unMapRFidCpoID/:id/:user_id", rfids.unMapRFidCpoID);
+
+        // ================= USER RFID MAPPING =================
+
+    app.post("/rfid/createUserRfidMapping", checkToken, rfids.createUserRfidMapping);
+    app.post("/rfid/updateUserRfidMapping", checkToken, rfids.updateUserRfidMapping);
+
+    app.get("/rfid/getUserRFidMapping/:login_id", checkToken, rfids.getUserRFidMapping);
+    app.get("/rfid/getRFidsByUserId/:user_id", checkToken, rfids.getRFidsByUserId);
+
+    app.delete("/rfid/deleteUserRfidMapping/:id/:user_id", checkToken, rfids.deleteUserRfidMapping);
     
+    app.get("/rfid/checkRfidUsage/:rfid_id", checkToken, rfids.checkRfidUsage);
+
+
   };

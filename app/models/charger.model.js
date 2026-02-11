@@ -1763,7 +1763,7 @@ async function func_getChargersDynamicFilterCW(login_id, params) {
   if (isSA) {
     stmt = ` select csmap.id as map_id,chsm.cpo_id as cpo_id,csm.id as charger_id , csm.serial_no, case when csm.name is null then csm.serial_no else csm.name end as name,
       batch_id, csm.model_id ,cmm.name as model_name , cbm.name as charger_batch_name ,csmap.station_id , chsm.name as station_name ,
-      csm.current_version_id, vm.name as version_name , csm.no_of_guns,
+      csm.current_version_id, vm.name as version_name , IFNULL(ccm.max_connector_no,0) as no_of_guns,
       csm.address1  ,csm.address2  ,csm.PIN  ,csm.landmark  ,
       csm.city_id , city.name as city_name, csm.state_id, sm.name as state_name, csm.country_id, country.name as country_name,
       csm.Lat,csm.Lng,csm.OTA_Config,Periodic_Check_Ref_Time,Periodicity_in_hours,
@@ -1782,13 +1782,19 @@ async function func_getChargersDynamicFilterCW(login_id, params) {
       inner join charging_model_mst cmm on csm.model_id = cmm.id  and cmm.status='Y'
       left join charger_station_mapping csmap on csm.id = csmap.charger_id and csmap.status <>'D'
       left join charging_station_mst chsm on csmap.station_id = chsm.id
+      LEFT JOIN (
+   SELECT charger_id, MAX(connector_no) AS max_connector_no
+   FROM charger_connector_mapping
+   WHERE status <> 'D'
+   GROUP BY charger_id
+) ccm ON csm.id = ccm.charger_id
       left join cpo_mst cm on chsm.cpo_id = cm.id
       where csm.status = 'Y' ${whereClause}
       order by csm.id desc;`;
   } else {
     stmt = ` select csmap.id as map_id,chsm.cpo_id as cpo_id,csm.id as charger_id , csm.serial_no, case when csm.name is null then csm.serial_no else csm.name end as name,
       batch_id, csm.model_id ,cmm.name as model_name , cbm.name as charger_batch_name ,csmap.station_id , chsm.name as station_name ,
-      csm.current_version_id, vm.name as version_name , csm.no_of_guns,
+      csm.current_version_id, vm.name as version_name , IFNULL(ccm.max_connector_no,0) as no_of_guns,
       csm.address1  ,csm.address2  ,csm.PIN  ,csm.landmark  ,
       csm.city_id , city.name as city_name, csm.state_id, sm.name as state_name, csm.country_id, country.name as country_name,
       csm.Lat,csm.Lng,csm.OTA_Config,Periodic_Check_Ref_Time,Periodicity_in_hours,
@@ -1807,6 +1813,12 @@ async function func_getChargersDynamicFilterCW(login_id, params) {
       inner join charging_model_mst cmm on csm.model_id = cmm.id  and cmm.status='Y'
       left join charger_station_mapping csmap on csm.id = csmap.charger_id and csmap.status <>'D'
       left join charging_station_mst chsm on csmap.station_id = chsm.id
+      LEFT JOIN (
+   SELECT charger_id, MAX(connector_no) AS max_connector_no
+   FROM charger_connector_mapping
+   WHERE status <> 'D'
+   GROUP BY charger_id
+) ccm ON csm.id = ccm.charger_id
       inner join cpo_mst cm on chsm.cpo_id = cm.id and  cm.client_id = ${client_id}
       where csm.status = 'Y' ${whereClause} 
       order by csm.id desc;`;

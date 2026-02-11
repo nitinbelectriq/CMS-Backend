@@ -241,3 +241,133 @@ exports.unMapRFidCpoID = (req, res) => {
   });
 };
 
+
+// ================= USER RFID MAPPING =================
+
+// Create
+exports.createUserRfidMapping = (req, res) => {
+  if (!req.body || !req.body.user_id || !Array.isArray(req.body.rfid_data)) {
+    return res.status(400).send({
+      status: false,
+      message: "Invalid or missing data in request body",
+    });
+  }
+
+  const rfno = {
+    user_id: req.body.user_id,
+    rfid_data: req.body.rfid_data,
+    status: req.body.status || 'Y',
+    created_by: req.body.created_by,
+    modify_by: req.body.modify_by
+  };
+
+  RFNO.createUserRfidMapping(rfno, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        status: false,
+        message: err.message || "Error while creating User RFID mapping",
+      });
+    }
+    res.send(data);
+  });
+};
+
+
+// Update
+exports.updateUserRfidMapping = (req, res) => {
+  if (!req.body || !req.body.user_id || !Array.isArray(req.body.rfid_data)) {
+    return res.status(400).send({
+      status: false,
+      message: "Invalid or missing data in request body",
+    });
+  }
+
+  const rfno = {
+    user_id: req.body.user_id,
+    rfid_data: req.body.rfid_data,
+    status: req.body.status,
+    modify_by: req.body.modify_by
+  };
+
+  RFNO.updateUserRfidMapping(rfno, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        status: false,
+        message: err.message || "Error while updating User RFID mapping",
+      });
+    }
+    res.send(data);
+  });
+};
+
+
+// List
+exports.getUserRFidMapping = (req, res) => {
+  let login_id = req.params.login_id;
+
+  RFNO.getUserRFidMapping(login_id, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(200).send({ message: "NOT_FOUND" });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving User RFID Mapping"
+        });
+      }
+    } else res.send(data);
+  });
+};
+
+
+// Prefill (edit)
+exports.getRFidsByUserId = (req, res) => {
+  let user_id = req.params.user_id;
+
+  RFNO.getRFidsByUserId(user_id, (err, data) => {
+    if (err) {
+      if (err.kind === "not_found") {
+        res.status(200).send({ message: "NOT_FOUND" });
+      } else {
+        res.status(500).send({
+          message: "Error retrieving RFIDs"
+        });
+      }
+    } else res.send(data);
+  });
+};
+
+
+// Delete
+exports.deleteUserRfidMapping = (req, res) => {
+  RFNO.deleteUserRfidMapping(req.params.id, req.params.user_id, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        message: "Could not delete mapping"
+      });
+    }
+    res.status(200).send({
+      status: true,
+      message: "Mapping deleted successfully"
+    });
+  });
+};
+
+exports.checkRfidUsage = (req, res) => {
+  const rfid_id = req.params.rfid_id;
+
+  RFNO.checkRfidUsage(rfid_id, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        status: false,
+        message: err.message
+      });
+    }
+
+    res.send({
+      status: true,
+      data
+    });
+  });
+};
+
+
